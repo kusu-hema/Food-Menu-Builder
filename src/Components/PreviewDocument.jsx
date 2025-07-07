@@ -2,6 +2,8 @@ function PreviewDocument({ selectedItems, onRemove }) {
   return (
     <div style={{ border: '1px solid #ddd', padding: '20px', minHeight: '100%' }}>
       <h3 style={{ textAlign: 'center' }}>SHANMUKHA CATERERS PVT.LTD</h3>
+      <h6 style={{ textAlign: 'center' }}>An ISO 22000:2018 CERTIFIED COMPANY, Visit: <a href="">WWW.SHANMUKHACATERERS.CO.IN</a></h6>
+      <h5 style={{ textAlign: 'center' }}>VIDYA NAGAR, HYDERABAD -500 044, CUSTOMER CARE:1800 8903781</h5>
       <h3 style={{ textAlign: 'center' }}>WE CATER TO YOUR HEALTH</h3>
 
       {/* <h3 style={{ textAlign: 'center' }}>CATERING MENU</h3> */}
