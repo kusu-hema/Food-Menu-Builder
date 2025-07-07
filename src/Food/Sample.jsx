@@ -44,3 +44,82 @@ function App() {
 }
 
 export default App;
+
+
+
+
+
+
+
+
+
+// import React, { useEffect, useState } from 'react';
+
+// function App() {
+//   const [users, setUsers] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+
+//   useEffect(() => {
+//     fetch('http://localhost:4000/')
+//       .then((res) => {
+//         if (!res.ok) {
+//           throw new Error('Failed to fetch users');
+//         }
+//         return res.json();
+//       })
+//       .then((data) => {
+//         setUsers(data);
+//         setLoading(false);
+//       })
+//       .catch((err) => {
+//         console.error('Error fetching users:', err);
+//         setError(err.message);
+//         setLoading(false);
+//       });
+//   }, []);
+
+//   return (
+//     <div style={{ padding: '30px', fontFamily: 'Arial' }}>
+//       <h2>User List from PostgreSQL</h2>
+
+//       {loading ? (
+//         <p>Loading users...</p>
+//       ) : error ? (
+//         <p style={{ color: 'red' }}>❌ {error}</p>
+//       ) : users.length === 0 ? (
+//         <p>No users found.</p>
+//       ) : (
+//         <table
+//           border="1"
+//           cellPadding="10"
+//           cellSpacing="0"
+//           style={{ borderCollapse: 'collapse', marginTop: '20px', width: '100%' }}
+//         >
+//           <thead style={{ backgroundColor: '#f0f0f0' }}>
+//             <tr>
+//               <th>ID</th>
+//               <th>Name</th>
+//               <th>Email</th>
+//               {/* Uncomment below if you want to show password */}
+//               {/* <th>Password</th> */}
+//             </tr>
+//           </thead>
+//           <tbody>
+//             {users.map((user) => (
+//               <tr key={user.id || user.email}>
+//                 <td>{user.id}</td>
+//                 <td>{user.name}</td>
+//                 <td>{user.email}</td>
+//                 {/* <td>{user.password}</td> */}
+//               </tr>
+//             ))}
+//           </tbody>
+//         </table>
+//       )}
+//     </div>
+//   );
+// }
+
+// export default App;
+
