@@ -1,3 +1,5 @@
+import React from 'react'
+
 function MenuSelector({ selected, onSelect }) {
     return (
       <div>

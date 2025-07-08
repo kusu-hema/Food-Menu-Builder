@@ -1,3 +1,4 @@
+import React from 'react'
 function MenuItems({ items, onAdd, selectedItems }) {
     return (
       <div>
