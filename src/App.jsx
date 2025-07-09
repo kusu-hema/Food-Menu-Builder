@@ -1,9 +1,12 @@
 import React, { useState, useRef } from 'react';
+import { useReactToPrint } from 'react-to-print';
+
+// internal pages
+import PreviewDocument from './Components/PreviewDocument';
 import MenuSelector from './Components/MenuSelector';
 import MenuItems from './Components/MenuItems';
-import PreviewDocument from './Components/PreviewDocument';
 import menuData from './Data/Data';
-import { useReactToPrint } from 'react-to-print';
+ 
 
 function App() {
   const componentRef = useRef(null);
@@ -42,7 +45,8 @@ function App() {
 
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
-      <div style={{ width: '50%', padding: '20px' }}>
+      
+      <div style={{ width: '40%', padding: '20px' }}>
         <MenuSelector selected={category} onSelect={setCategory} />
         <MenuItems
           items={menuData[category]}
@@ -51,7 +55,7 @@ function App() {
         />
       </div>
 
-      <div style={{ width: '50%', padding: '20px', background: '#f9f9f9' }}>
+      <div style={{ width: '60%', padding: '20px', background: '#f9f9f9' }}>
         <button onClick={handlePrint}>Print Invoice</button>
 
         <div style={{ marginTop: '20px' }}>
@@ -62,6 +66,7 @@ function App() {
           />
         </div>
       </div>
+
     </div>
   );
 }
@@ -71,31 +76,4 @@ export default App;
 
 
  
-// import React, { useRef } from 'react';
-// import { useReactToPrint } from 'react-to-print';
-// import PrintableComponent from './Components/PrintableComponent';
-
-// function App() {
-//   const componentRef = useRef(null);
-
-//   const handlePrint = useReactToPrint({
-//     contentRef: componentRef,
-//     documentTitle: 'Invoice',
-//     pageStyle: `
-//       @page { margin: 20mm }
-//       body { font-family: Arial, sans-serif; }
-//     `,
-//   });
-
-//   return (
-//     <div>
-//       <button onClick={handlePrint}>Print Invoice</button>
-//       <div style={{ marginTop: '20px' }}>
-//         <PrintableComponent ref={componentRef} />
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default App;
-
+ 
