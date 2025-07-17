@@ -6,7 +6,7 @@ import PreviewDocument from './Components/PreviewDocument';
 import MenuSelector from './Components/MenuSelector';
 import MenuItems from './Components/MenuItems';
 import menuData from './Data/Data';
- 
+
 
 function App() {
   const componentRef = useRef(null);
