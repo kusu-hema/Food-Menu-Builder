@@ -2,17 +2,15 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, useLocation } from 'react-router-dom';
 import Sidebar from './Components/Sidebar';
 import AppRoutes from './routes/AppRoutes';
+import './App.css';
 
-const Layout = ({ isLoggedIn, setIsLoggedIn }) => {
+const AppLayout = ({ isLoggedIn, setIsLoggedIn }) => {
   const location = useLocation();
-
-  // Hide Sidebar on login page
   const isLoginPage = location.pathname === '/';
-  const showSidebar = isLoggedIn && !isLoginPage;
 
   return (
     <div style={{ display: 'flex' }}>
-      {showSidebar && <Sidebar />}
+      {!isLoginPage && <Sidebar />}
       <div style={{ flex: 1, padding: '20px', backgroundColor: '#f4f6f8', minHeight: '100vh' }}>
         <AppRoutes isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
       </div>
@@ -25,7 +23,7 @@ function App() {
 
   return (
     <Router>
-      <Layout isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+      <AppLayout isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
     </Router>
   );
 }

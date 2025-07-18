@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import {
   FaTachometerAlt,
   FaUserFriends,
@@ -9,26 +10,51 @@ import {
   FaFileInvoice,
   FaCalendarAlt,
   FaList,
-  FaSignOutAlt
+  FaSignOutAlt,
+  FaBars,
+  FaTimes,
 } from 'react-icons/fa';
 
 const menuItems = [
-  { label: 'Dashboard', icon: <FaTachometerAlt />, active: true },
-  { label: 'Leads', icon: <FaUserFriends /> },
-  { label: 'Customers', icon: <FaUsers /> },
-  { label: 'Orders', icon: <FaShoppingCart /> },
-  { label: 'Categories', icon: <FaLayerGroup /> },
-  { label: 'Products', icon: <FaBoxOpen /> },
-  { label: 'Invoice', icon: <FaFileInvoice /> },
-  { label: 'Corporate Events', icon: <FaCalendarAlt /> },
-  { label: 'Packages', icon: <FaList /> },
-  { label: 'Logout', icon: <FaSignOutAlt /> },
+  { label: 'Dashboard', icon: <FaTachometerAlt />, path: '/dashboard' },
+  { label: 'Leads', icon: <FaUserFriends />, path: '/leads' },
+  { label: 'Customers', icon: <FaUsers />, path: '/customers' },
+  { label: 'Orders', icon: <FaShoppingCart />, path: '/orders' },
+  { label: 'Categories', icon: <FaLayerGroup />, path: '/categories' },
+  { label: 'Products', icon: <FaBoxOpen />, path: '/products' },
+  { label: 'Invoice', icon: <FaFileInvoice />, path: '/invoice' },
+  { label: 'Corporate Events', icon: <FaCalendarAlt />, path: '/events' },
+  { label: 'Packages', icon: <FaList />, path: '/packages' },
+  { label: 'Logout', icon: <FaSignOutAlt />, path: '/' },
 ];
 
 const Sidebar = () => {
+  const location = useLocation();
+  const [isOpen, setIsOpen] = useState(true);
+
+  const toggleSidebar = () => setIsOpen(!isOpen);
+
   return (
     <>
       <style>{`
+        .sidebar-wrapper {
+          display: flex;
+        }
+
+        .sidebar-toggle {
+          position: fixed;
+          top: 1rem;
+          left: 1rem;
+          z-index: 1001;
+          background: #5b28f0;
+          border: none;
+          color: white;
+          padding: 0.5rem 0.75rem;
+          font-size: 1.25rem;
+          border-radius: 0.375rem;
+          cursor: pointer;
+        }
+
         .sidebar {
           height: 100vh;
           width: 16rem;
@@ -39,6 +65,12 @@ const Sidebar = () => {
           justify-content: space-between;
           padding: 1.5rem 1rem;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+          transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar.closed {
+          transform: translateX(-100%);
+          position: fixed;
         }
 
         .sidebar-title {
@@ -117,34 +149,49 @@ const Sidebar = () => {
         }
       `}</style>
 
-      <div className="sidebar">
-        {/* Sidebar Top */}
-        <div>
-          <h1 className="sidebar-title">Shanmukha</h1>
+      <button className="sidebar-toggle" onClick={toggleSidebar}>
+        {isOpen ? <FaTimes /> : <FaBars />}
+      </button>
 
-          <ul className="sidebar-menu">
-            {menuItems.map((item, index) => (
-              <li
-                key={index}
-                className={`sidebar-item ${item.active ? 'active' : ''}`}
-              >
-                <span className="sidebar-icon">{item.icon}</span>
-                {item.label}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Sidebar Footer */}
-        <div className="sidebar-avatar">
-          <img
-            src="https://via.placeholder.com/40"
-            alt="user"
-            className="avatar-img"
-          />
+      <div className="sidebar-wrapper">
+        <div className={`sidebar ${isOpen ? '' : 'closed'}`}>
           <div>
-            <p className="avatar-name">Shanmukha</p>
-            <p className="avatar-role">Owner</p>
+            <h1 className="sidebar-title">Shanmukha</h1>
+            <ul className="sidebar-menu">
+              {menuItems.map((item, index) => (
+                <li
+                  key={index}
+                  className={`sidebar-item ${location.pathname === item.path ? 'active' : ''}`}
+                >
+                  <Link
+                    to={item.path}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.75rem',
+                      color: 'inherit',
+                      textDecoration: 'none',
+                      width: '100%'
+                    }}
+                  >
+                    <span className="sidebar-icon">{item.icon}</span>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="sidebar-avatar">
+            <img
+              src="https://via.placeholder.com/40"
+              alt="user"
+              className="avatar-img"
+            />
+            <div>
+              <p className="avatar-name">Shanmukha</p>
+              <p className="avatar-role">Owner</p>
+            </div>
           </div>
         </div>
       </div>
