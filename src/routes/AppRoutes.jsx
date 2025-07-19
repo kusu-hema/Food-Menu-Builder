@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
-
+// pages...........
 import Dashboard from '../pages/Dashboard';
 import Leads from '../pages/Leads';
 import Customers from '../pages/Customers';
@@ -12,7 +12,7 @@ import Invoice from '../pages/Invoice';
 import CorporateEvents from '../pages/CorporateEvents';
 import  Packages from '../pages/Packages';
 
-// import all other pages similarly
+//  Login page 
 import Login from '../pages/Login';
 
 const AppRoutes = ({ isLoggedIn, setIsLoggedIn }) => {

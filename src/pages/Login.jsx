@@ -47,11 +47,13 @@ const Login = ({ onLogin }) => {
         Login
       </button>
 
-      <div style={{ marginTop: '20px', fontSize: '14px', color: '#6b7280' }}>
+      {/* <div style={{ marginTop: '20px', fontSize: '14px', color: '#6b7280' }}>
         <strong>Sample Credentials:</strong><br />
         Username: <code>admin</code><br />
         Password: <code>1234</code>
-      </div>
+      </div> */}
+
+
     </div>
   );
 };
