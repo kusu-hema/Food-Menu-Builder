@@ -10,35 +10,47 @@ import Categories from '../pages/Categories';
 import Products from '../pages/Products';
 import Invoice from '../pages/Invoice';
 import CorporateEvents from '../pages/CorporateEvents';
-import  Packages from '../pages/Packages';
+import Packages from '../pages/Packages';
+import Logout from '../pages/Logout';
+import Footer from '../Components/Footer'
 
-//  Login page 
+// Login page
 import Login from '../pages/Login';
 
 const AppRoutes = ({ isLoggedIn, setIsLoggedIn }) => {
-  if (!isLoggedIn) {
-    return (
-      <Routes>
-        <Route path="/" element={<Login onLogin={() => setIsLoggedIn(true)} />} />
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    );
-  }
-
   return (
     <Routes>
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/leads" element={<Leads />} />
-      <Route path="/customers" element={<Customers />} />
-      <Route path="/orders" element={<Orders />} />
-      <Route path="/Categories" element={<Categories />} />
-      <Route path="/products" element={<Products />} />
-      <Route path="/invoice" element={<Invoice />} />
-      <Route path="/events" element={<CorporateEvents />} />
-      <Route path="/packages" element={<Packages />} />
+      {/* Login Route */}
+      <Route
+        path="/"
+        element={
+          isLoggedIn ? (
+            <Navigate to="/dashboard" />
+          ) : (
+            <Login onLogin={() => setIsLoggedIn(true)} />
+          )
+        }
+      />
 
-      {/* Add other pages here like /orders, /products etc */}
-      <Route path="*" element={<Navigate to="/dashboard" />} />
+      {/* Protected Routes */}
+      {isLoggedIn && (
+        <>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/leads" element={<Leads />} />
+          <Route path="/customers" element={<Customers />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/categories" element={<Categories />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/invoice" element={<Invoice />} />
+          <Route path="/events" element={<CorporateEvents />} />
+          <Route path="/packages" element={<Packages />} />
+          <Route path="/footer" element={<Footer />} />
+          <Route path="/logout" element={<Logout setIsLoggedIn={setIsLoggedIn} />} />
+        </>
+      )}
+
+      {/* Catch-all redirect */}
+      <Route path="*" element={<Navigate to={isLoggedIn ? '/dashboard' : '/'} />} />
     </Routes>
   );
 };

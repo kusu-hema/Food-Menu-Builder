@@ -13,24 +13,35 @@ import {
   FaSignOutAlt,
   FaBars,
   FaTimes,
+  FaChevronDown,
+  FaChevronRight,
 } from 'react-icons/fa';
+import Shanmukhalogo from '../assets/shanmukhalogo.png'; // ✅ Adjust path to your logo file
 
 const menuItems = [
   { label: 'Dashboard', icon: <FaTachometerAlt />, path: '/dashboard' },
   { label: 'Leads', icon: <FaUserFriends />, path: '/leads' },
-  { label: 'Customers', icon: <FaUsers />, path: '/customers' },
+  {
+    label: 'Customers',
+    icon: <FaUsers />,
+    children: [
+      { label: 'Create Customer', path: '/customers/create' },
+      { label: 'Total Customers', path: '/customers/total' },
+    ],
+  },
   { label: 'Orders', icon: <FaShoppingCart />, path: '/orders' },
   { label: 'Categories', icon: <FaLayerGroup />, path: '/categories' },
   { label: 'Products', icon: <FaBoxOpen />, path: '/products' },
   { label: 'Invoice', icon: <FaFileInvoice />, path: '/invoice' },
   { label: 'Corporate Events', icon: <FaCalendarAlt />, path: '/events' },
   { label: 'Packages', icon: <FaList />, path: '/packages' },
-  { label: 'Logout', icon: <FaSignOutAlt />, path: '/' },
+  { label: 'Logout', icon: <FaSignOutAlt />, path: '/logout' },
 ];
 
 const Sidebar = () => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(true);
+  const [openDropdown, setOpenDropdown] = useState(null);
 
   const toggleSidebar = () => setIsOpen(!isOpen);
 
@@ -40,7 +51,6 @@ const Sidebar = () => {
         .sidebar-wrapper {
           display: flex;
         }
-
         .sidebar-toggle {
           position: fixed;
           top: 1rem;
@@ -54,7 +64,6 @@ const Sidebar = () => {
           border-radius: 0.375rem;
           cursor: pointer;
         }
-
         .sidebar {
           height: 100vh;
           width: 16rem;
@@ -66,34 +75,30 @@ const Sidebar = () => {
           padding: 1.5rem 1rem;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
           transition: transform 0.3s ease-in-out;
+          overflow-y: auto;
         }
-
         .sidebar.closed {
           transform: translateX(-100%);
           position: fixed;
         }
-
         .sidebar-title {
-          font-size: 1.75rem;
+          font-size: 1.5rem;
           font-weight: 700;
           color: #5b28f0;
-          margin-bottom: 2.5rem;
-          text-align: center;
+          margin: 0;
         }
-
         .sidebar-menu {
           list-style: none;
           padding: 0;
-          margin: 0;
+          margin-top: 1.5rem;
           display: flex;
           flex-direction: column;
           gap: 0.5rem;
         }
-
         .sidebar-item {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
+          justify-content: space-between;
           padding: 0.65rem 1rem;
           font-size: 0.95rem;
           font-weight: 500;
@@ -102,22 +107,33 @@ const Sidebar = () => {
           cursor: pointer;
           transition: all 0.25s ease-in-out;
         }
-
         .sidebar-item:hover {
           background: #f0f4ff;
           color: #5b28f0;
-          transform: translateX(2px);
         }
-
         .sidebar-item.active {
           background: linear-gradient(90deg, #5b28f0 0%, #6a4ff4 100%);
           color: white;
         }
-
         .sidebar-icon {
-          font-size: 1.2rem;
+          margin-right: 0.75rem;
         }
-
+        .dropdown-child {
+          list-style: none;
+          padding-left: 1.5rem;
+          margin-top: 0.25rem;
+          margin-bottom: 0.5rem;
+        }
+        .dropdown-child li {
+          padding: 0.45rem 0.5rem;
+          font-size: 0.88rem;
+          color: #374151;
+          border-radius: 0.5rem;
+        }
+        .dropdown-child li:hover {
+          background: #f0f4ff;
+          color: #5b28f0;
+        }
         .sidebar-avatar {
           display: flex;
           align-items: center;
@@ -127,7 +143,6 @@ const Sidebar = () => {
           border-radius: 0.75rem;
           margin-top: 2rem;
         }
-
         .avatar-img {
           height: 2.5rem;
           width: 2.5rem;
@@ -135,14 +150,11 @@ const Sidebar = () => {
           object-fit: cover;
           border: 2px solid #5b28f0;
         }
-
         .avatar-name {
           font-size: 0.875rem;
           font-weight: 600;
           color: #1f2937;
-          margin-bottom: 0.25rem;
         }
-
         .avatar-role {
           font-size: 0.75rem;
           color: #6b7280;
@@ -156,28 +168,67 @@ const Sidebar = () => {
       <div className="sidebar-wrapper">
         <div className={`sidebar ${isOpen ? '' : 'closed'}`}>
           <div>
-            <h1 className="sidebar-title">Shanmukha</h1>
+            {/* ✅ Logo and Text in One Line */}
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem' }}>
+              <img
+                src={Shanmukhalogo}
+                alt="Shanmukha Logo"
+                style={{ height: '40px', width: '40px', marginRight: '10px' }}
+              />
+              <h1 className="sidebar-title">Shanmukha</h1>
+            </div>
+
             <ul className="sidebar-menu">
               {menuItems.map((item, index) => (
-                <li
-                  key={index}
-                  className={`sidebar-item ${location.pathname === item.path ? 'active' : ''}`}
-                >
-                  <Link
-                    to={item.path}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.75rem',
-                      color: 'inherit',
-                      textDecoration: 'none',
-                      width: '100%'
-                    }}
+                <React.Fragment key={index}>
+                  <li
+                    className={`sidebar-item ${
+                      location.pathname === item.path ? 'active' : ''
+                    }`}
+                    onClick={() =>
+                      item.children
+                        ? setOpenDropdown(openDropdown === index ? null : index)
+                        : null
+                    }
                   >
-                    <span className="sidebar-icon">{item.icon}</span>
-                    {item.label}
-                  </Link>
-                </li>
+                    <Link
+                      to={item.path || '#'}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                        color: 'inherit',
+                        textDecoration: 'none',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <span className="sidebar-icon">{item.icon}</span>
+                        {item.label}
+                      </div>
+
+                      {item.children && (
+                        <span>
+                          {openDropdown === index ? (
+                            <FaChevronDown />
+                          ) : (
+                            <FaChevronRight />
+                          )}
+                        </span>
+                      )}
+                    </Link>
+                  </li>
+
+                  {item.children && openDropdown === index && (
+                    <ul className="dropdown-child">
+                      {item.children.map((child, childIdx) => (
+                        <li key={childIdx}>
+                          <Link to={child.path}>{child.label}</Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </React.Fragment>
               ))}
             </ul>
           </div>
