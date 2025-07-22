@@ -85,12 +85,14 @@ const PreviewDocument = React.forwardRef(({ selectedItems, onRemove }, ref) => (
 
     <div style={styles.infoRow}>
       <p><strong>DATE:</strong> 22.06.2025</p>
+      {/* <p><strong>PLACE:</strong> Vidya Nagar</p> */}
       <p><strong>PLACE:</strong> Vidya Nagar</p>
+
     </div>
 
     <div style={{ marginBottom: '10px', fontSize: '15px' }}>
       <p><strong>NAME:</strong> Anu</p>
-      <p><strong>CONTACT:</strong> +91 82973 25543</p>
+      <p><strong>CONTACT:</strong> +91 xxxxxxxxx</p>
       <p><strong>FOR:</strong> 100 MEMBERS</p>
     </div>
 

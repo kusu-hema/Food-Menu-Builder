@@ -16,7 +16,7 @@ import {
   FaChevronDown,
   FaChevronRight,
 } from 'react-icons/fa';
-import Shanmukhalogo from '../assets/shanmukhalogo.png'; // ✅ Adjust path to your logo file
+import Shanmukhalogo from '../assets/shanmukhalogo.png';
 
 const menuItems = [
   { label: 'Dashboard', icon: <FaTachometerAlt />, path: '/dashboard' },
@@ -29,33 +29,69 @@ const menuItems = [
       { label: 'Total Customers', path: '/customers/total' },
     ],
   },
-  { label: 'Orders', icon: <FaShoppingCart />, path: '/orders' },
-  { label: 'Categories', icon: <FaLayerGroup />, path: '/categories' },
-  { label: 'Products', icon: <FaBoxOpen />, path: '/products' },
-  { label: 'Invoice', icon: <FaFileInvoice />, path: '/invoice' },
-  { label: 'Corporate Events', icon: <FaCalendarAlt />, path: '/events' },
-  { label: 'Packages', icon: <FaList />, path: '/packages' },
+  {
+    label: 'Orders',
+    icon: <FaShoppingCart />,
+    children: [
+      { label: 'Create Order', path: '/orders/create' },
+      { label: 'Total Orders', path: '/orders/total' },
+    ],
+  },
+  {
+    label: 'Categories',
+    icon: <FaLayerGroup />,
+    children: [
+      { label: 'Add Category', path: '/categories/add' },
+      { label: 'All Categories', path: '/categories/all' },
+    ],
+  },
+  {
+    label: 'Products',
+    icon: <FaBoxOpen />,
+    children: [
+      { label: 'Add Product', path: '/products/add' },
+      { label: 'All Products', path: '/products/all' },
+    ],
+  },
+  {
+    label: 'Invoice',
+    icon: <FaFileInvoice />,
+    children: [
+      { label: 'Create Invoice', path: '/invoice/create' },
+      { label: 'All Invoices', path: '/invoice/all' },
+    ],
+  },
+  {
+    label: 'Corporate Events',
+    icon: <FaCalendarAlt />,
+    children: [
+      { label: 'Add Event', path: '/events/add' },
+      { label: 'All Events', path: '/events/all' },
+    ],
+  },
+  {
+    label: 'Packages',
+    icon: <FaList />,
+    children: [
+      { label: 'Create Package', path: '/packages/create' },
+      { label: 'All Packages', path: '/packages/all' },
+    ],
+  },
   { label: 'Logout', icon: <FaSignOutAlt />, path: '/logout' },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();
-  const [isOpen, setIsOpen] = useState(true);
   const [openDropdown, setOpenDropdown] = useState(null);
-
-  const toggleSidebar = () => setIsOpen(!isOpen);
 
   return (
     <>
       <style>{`
-        .sidebar-wrapper {
-          display: flex;
-        }
         .sidebar-toggle {
           position: fixed;
           top: 1rem;
           left: 1rem;
-          z-index: 1001;
+          z-index: 1200;
           background: #5b28f0;
           border: none;
           color: white;
@@ -74,12 +110,17 @@ const Sidebar = () => {
           justify-content: space-between;
           padding: 1.5rem 1rem;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-          transition: transform 0.3s ease-in-out;
           overflow-y: auto;
+          transition: all 0.3s ease-in-out;
+        }
+        .sidebar.fixed {
+          position: fixed;
+          left: 0;
+          top: 0;
+          z-index: 1100;
         }
         .sidebar.closed {
-          transform: translateX(-100%);
-          position: fixed;
+          display: none;
         }
         .sidebar-title {
           font-size: 1.5rem;
@@ -165,84 +206,75 @@ const Sidebar = () => {
         {isOpen ? <FaTimes /> : <FaBars />}
       </button>
 
-      <div className="sidebar-wrapper">
-        <div className={`sidebar ${isOpen ? '' : 'closed'}`}>
-          <div>
-            {/* ✅ Logo and Text in One Line */}
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem' }}>
-              <img
-                src={Shanmukhalogo}
-                alt="Shanmukha Logo"
-                style={{ height: '40px', width: '40px', marginRight: '10px' }}
-              />
-              <h1 className="sidebar-title">Shanmukha</h1>
-            </div>
-
-            <ul className="sidebar-menu">
-              {menuItems.map((item, index) => (
-                <React.Fragment key={index}>
-                  <li
-                    className={`sidebar-item ${
-                      location.pathname === item.path ? 'active' : ''
-                    }`}
-                    onClick={() =>
-                      item.children
-                        ? setOpenDropdown(openDropdown === index ? null : index)
-                        : null
-                    }
-                  >
-                    <Link
-                      to={item.path || '#'}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        width: '100%',
-                        color: 'inherit',
-                        textDecoration: 'none',
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <span className="sidebar-icon">{item.icon}</span>
-                        {item.label}
-                      </div>
-
-                      {item.children && (
-                        <span>
-                          {openDropdown === index ? (
-                            <FaChevronDown />
-                          ) : (
-                            <FaChevronRight />
-                          )}
-                        </span>
-                      )}
-                    </Link>
-                  </li>
-
-                  {item.children && openDropdown === index && (
-                    <ul className="dropdown-child">
-                      {item.children.map((child, childIdx) => (
-                        <li key={childIdx}>
-                          <Link to={child.path}>{child.label}</Link>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </React.Fragment>
-              ))}
-            </ul>
+      <div className={`sidebar ${isOpen ? 'fixed' : 'closed'}`}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem' }}>
+            <img
+              src={Shanmukhalogo}
+              alt="Shanmukha Logo"
+              style={{ height: '40px', width: '40px', marginRight: '10px' }}
+            />
+            <h1 className="sidebar-title">Shanmukha</h1>
           </div>
 
-          <div className="sidebar-avatar">
-            <img
-              src="https://via.placeholder.com/40"
-              alt="user"
-              className="avatar-img"
-            />
-            <div>
-              <p className="avatar-name">Shanmukha</p>
-              <p className="avatar-role">Owner</p>
-            </div>
+          <ul className="sidebar-menu">
+            {menuItems.map((item, index) => (
+              <React.Fragment key={index}>
+                <li
+                  className={`sidebar-item ${location.pathname === item.path ? 'active' : ''}`}
+                  onClick={() =>
+                    item.children
+                      ? setOpenDropdown(openDropdown === index ? null : index)
+                      : null
+                  }
+                >
+                  <Link
+                    to={item.path || '#'}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      width: '100%',
+                      color: 'inherit',
+                      textDecoration: 'none',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <span className="sidebar-icon">{item.icon}</span>
+                      {item.label}
+                    </div>
+
+                    {item.children && (
+                      <span>
+                        {openDropdown === index ? <FaChevronDown /> : <FaChevronRight />}
+                      </span>
+                    )}
+                  </Link>
+                </li>
+
+                {item.children && openDropdown === index && (
+                  <ul className="dropdown-child">
+                    {item.children.map((child, childIdx) => (
+                      <li key={childIdx}>
+                        <Link to={child.path}>{child.label}</Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </React.Fragment>
+            ))}
+          </ul>
+        </div>
+
+        <div className="sidebar-avatar">
+          <img
+            src="https://via.placeholder.com/40"
+            alt="user"
+            className="avatar-img"
+          />
+          <div>
+            <p className="avatar-name">Shanmukha</p>
+            <p className="avatar-role">Owner</p>
           </div>
         </div>
       </div>
