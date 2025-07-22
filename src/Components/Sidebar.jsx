@@ -16,7 +16,8 @@ import {
   FaChevronDown,
   FaChevronRight,
 } from 'react-icons/fa';
-import Shanmukhalogo from '../assets/shanmukhalogo.png';
+import Shanmukhalogo from '../assets/img/shanmukhalogo.png';
+
 
 const menuItems = [
   { label: 'Dashboard', icon: <FaTachometerAlt />, path: '/dashboard' },
@@ -25,7 +26,7 @@ const menuItems = [
     label: 'Customers',
     icon: <FaUsers />,
     children: [
-      { label: 'Create Customer', path: '/customers/create' },
+      { label: 'Create Customer', path: '/customers' },
       { label: 'Total Customers', path: '/customers/total' },
     ],
   },
@@ -208,11 +209,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
       <div className={`sidebar ${isOpen ? 'fixed' : 'closed'}`}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem' , paddingTop:'2rem' }}>
             <img
               src={Shanmukhalogo}
               alt="Shanmukha Logo"
-              style={{ height: '40px', width: '40px', marginRight: '10px' }}
+              style={{ height: '70px', width: '70px', marginRight: '10px' }}
             />
             <h1 className="sidebar-title">Shanmukha</h1>
           </div>
@@ -268,8 +269,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
         <div className="sidebar-avatar">
           <img
-            src="https://via.placeholder.com/40"
-            alt="user"
+            src={Shanmukhalogo}
+            alt={Shanmukhalogo}
             className="avatar-img"
           />
           <div>
