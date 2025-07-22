@@ -21,7 +21,15 @@ import Shanmukhalogo from '../assets/img/shanmukhalogo.png';
 
 const menuItems = [
   { label: 'Dashboard', icon: <FaTachometerAlt />, path: '/dashboard' },
-  { label: 'Leads', icon: <FaUserFriends />, path: '/leads' },
+  // { label: 'Leads', icon: <FaUserFriends />, path: '/leads' },
+  {
+    label: 'Leads',   
+    icon: <FaUserFriends />, 
+    children: [
+      { label: 'Total leads', path: '/leads' },
+      { label: 'Create Customer', path: '/customers' },
+    ],
+  },
   {
     label: 'Customers',
     icon: <FaUsers />,

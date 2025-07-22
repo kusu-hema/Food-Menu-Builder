@@ -14,7 +14,7 @@ import Packages from '../pages/Packages';
 import Logout from '../pages/Logout';
 import Footer from '../Components/Footer'
 
-// Login page
+// Login page.....
 import Login from '../pages/Login';
 
 const AppRoutes = ({ isLoggedIn, setIsLoggedIn }) => {

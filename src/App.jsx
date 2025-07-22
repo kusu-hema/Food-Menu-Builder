@@ -4,7 +4,7 @@ import { BrowserRouter as Router, useLocation } from 'react-router-dom';
 // Pages
 import Sidebar from './Components/Sidebar';
 import AppRoutes from './routes/AppRoutes';
-import Footer from './Components/Footer'
+import Footer from './Components/Footer';
 import './App.css';
 
 const AppLayout = ({ isLoggedIn, setIsLoggedIn }) => {
