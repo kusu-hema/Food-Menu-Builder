@@ -7,15 +7,16 @@ import Leads from '../pages/Leads';
 import Customers from '../pages/Customers';
 import Orders from '../pages/Orders';
 import Categories from '../pages/Categories';
-import Products from '../pages/Products';
+import Products from '../pages/Products';                                                                                                         
 import Invoice from '../pages/Invoice';
 import CorporateEvents from '../pages/CorporateEvents';
 import Packages from '../pages/Packages';
 import Logout from '../pages/Logout';
 import Footer from '../Components/Footer'
 
-// Login page.....
+// Login page.....                                                                                                                                                                                                                                                                                                                
 import Login from '../pages/Login';
+
 
 const AppRoutes = ({ isLoggedIn, setIsLoggedIn }) => {
   return (

@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import '../assets/css/style.css';
 
 const Leads = () => {
   const [isModalOpen, setModalOpen] = useState(false);
+  const [leads, setLeads] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -9,8 +11,19 @@ const Leads = () => {
     end: '',
     type: '',
     location: '',
-    status: 'New',
+    status: '',
   });
+
+  const fetchLeads = () => {
+    fetch('http://localhost:4000/api/customers')
+      .then((res) => res.json())
+      .then((data) => setLeads(data))
+      .catch((err) => console.error('Error fetching leads:', err));
+  };
+
+  useEffect(() => {
+    fetchLeads();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -18,155 +31,117 @@ const Leads = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('New User Data:', formData);
-    // You can call your backend API here
-    setModalOpen(false); // close modal
-  };
 
-  const styles = {
-    table: {
-      width: '100%',
-      borderCollapse: 'collapse',
-      minWidth: '700px',
-    },
-    thtd: {
-      padding: '12px 15px',
-      textAlign: 'left',
-      borderBottom: '1px solid #eee',
-      fontSize: '14px',
-    },
-    status: {
-      padding: '5px 10px',
-      background: '#f2f2f2',
-      borderRadius: '8px',
-      fontSize: '13px',
-    },
+    fetch('http://localhost:4000/api/customers', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to create lead');
+        return res.json();
+      })
+      .then((data) => {
+        console.log('User created:', data);
+        setModalOpen(false);
+        setFormData({
+          name: '',
+          phone: '',
+          start: '',
+          end: '',
+          type: '',
+          location: '',
+          status: '',
+        });
+        fetchLeads();
+      })
+      .catch((err) => {
+        console.error('Error creating user:', err);
+      });
   };
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-      <h2 style={{ marginBottom: '20px' }}>Hello Shanmukha 👋🏻,</h2>
+    <div className="leads-container">
+      <h2 className="leads-heading">Hello Shanmukha 👋🏻,</h2>
 
-      {/* Cards */}
-      <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginBottom: '30px' }}>
+      <div className="leads-cards">
         {[
           { title: 'New Orders', count: 12, color: '#f78f1e' },
           { title: 'Await Accepting orders', count: 10, color: '#f6c40d' },
           { title: 'On Way Orders', count: 20, color: '#5b8def' },
-          { title: 'Delivered orders', count: 12, color: '#43d39e' }
+          { title: 'Delivered orders', count: 12, color: '#43d39e' },
         ].map((card, index) => (
-          <div key={index} style={{
-            background: '#fff',
-            borderRadius: '15px',
-            padding: '20px',
-            boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
-            width: '200px',
-            borderTop: `6px solid ${card.color}`,
-            flexGrow: 1,
-            minWidth: '150px'
-          }}>
+          <div key={index} className="card" style={{ borderTop: `6px solid ${card.color}` }}>
             <h4>{card.title}</h4>
             <h2>{card.count}</h2>
-            <p style={{ color: '#888' }}>This week</p>
+            <p className="card-subtext">This week</p>
           </div>
         ))}
       </div>
 
-      {/* Search and Actions */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '20px',
-        flexWrap: 'wrap',
-        gap: '10px'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <input
-            type="text"
-            placeholder="Search"
-            style={{
-              padding: '10px 15px',
-              borderRadius: '10px',
-              border: '1px solid #ddd',
-              outline: 'none'
-            }}
-          />
-          <span style={{ fontWeight: 'bold', fontSize: '18px' }}>180 Orders</span>
+      <div className="leads-controls">
+        <div className="leads-search-group">
+          <input type="text" placeholder="Search" className="leads-search-input" />
+          <span className="leads-total-orders">{leads.length} Orders</span>
         </div>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <button style={btnStyle}>⬇️ Export</button>
-          <button style={btnStyle}>⚙️ Sort: Default</button>
-          <button onClick={() => setModalOpen(true)} style={{
-            padding: '10px 20px',
-            background: 'linear-gradient(90deg, #845ef7, #a084f7)',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '10px',
-            cursor: 'pointer'
-          }}>+ Add New User</button>
+          <button className="button-style">⬇️ Export</button>
+          <button className="button-style">⚙️ Sort: Default</button>
+          <button onClick={() => setModalOpen(true)} className="button-add">
+            + Add New User
+          </button>
         </div>
       </div>
 
-      {/* Table */}
-      <div style={{
-        background: '#fff',
-        borderRadius: '15px',
-        padding: '20px',
-        boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
-        overflowX: 'auto'
-      }}>
-        <table style={styles.table}>
+      <div className="table-container">
+        <table className="table">
           <thead>
             <tr>
-              <th style={styles.thtd}>SNo</th>
-              <th style={styles.thtd}>Name</th>
-              <th style={styles.thtd}>Phone</th>
-              <th style={styles.thtd}>Start Date</th>
-              <th style={styles.thtd}>End Date</th>
-              <th style={styles.thtd}>Type</th>
-              <th style={styles.thtd}>Location</th>
-              <th style={styles.thtd}>Status</th>
-              <th style={styles.thtd}>Actions</th>
+              <th>SNo</th>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Type</th>
+              <th>Location</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {/* Sample rows */}
-            {[...Array(5)].map((_, i) => (
-              <tr key={i}>
-                <td style={styles.thtd}>{i + 1}.</td>
-                <td style={styles.thtd}>Ramya</td>
-                <td style={styles.thtd}>9848XXXXXXXX</td>
-                <td style={styles.thtd}>July 16</td>
-                <td style={styles.thtd}>July 17</td>
-                <td style={styles.thtd}>Marriage</td>
-                <td style={styles.thtd}>Hyderabad</td>
-                <td style={styles.thtd}><span style={styles.status}>New</span></td>
-                <td style={styles.thtd}>Edit | Share</td>
+            {leads.length === 0 ? (
+              <tr>
+                <td colSpan="9">No data available</td>
               </tr>
-            ))}
+            ) : (
+              leads.map((lead, i) => (
+                <tr key={lead.id ?? i}>
+                  <td>{i + 1}.</td>
+                  <td>{lead.name}</td>
+                  <td>{lead.phone}</td>
+                  <td>{lead.start}</td>
+                  <td>{lead.end}</td>
+                  <td>{lead.type}</td>
+                  <td>{lead.location}</td>
+                  <td>
+                    <span className="status-badge">{lead.status}</span>
+                  </td>
+                  <td>Edit | Share</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
-      {/* Modal */}
       {isModalOpen && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.4)', display: 'flex', justifyContent: 'center', alignItems: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            background: '#fff',
-            padding: '30px',
-            borderRadius: '15px',
-            width: '90%',
-            maxWidth: '500px',
-            boxShadow: '0 8px 20px rgba(0,0,0,0.2)'
-          }}>
-            <h3 style={{ marginBottom: '20px' }}>Add New User</h3>
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-              {['name', 'phone', 'start', 'end', 'type', 'location'].map((field) => (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Add New User</h3>
+            <form onSubmit={handleSubmit} className="modal-form">
+              {['name', 'phone', 'start', 'end', 'type', 'location', 'status'].map((field) => (
                 <input
                   key={field}
                   name={field}
@@ -174,32 +149,13 @@ const Leads = () => {
                   onChange={handleChange}
                   placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
                   required
-                  style={{
-                    padding: '10px',
-                    borderRadius: '8px',
-                    border: '1px solid #ccc',
-                    outline: 'none'
-                  }}
                 />
               ))}
-              <select name="status" value={formData.status} onChange={handleChange} required style={{ padding: '10px', borderRadius: '8px' }}>
-                <option>New</option>
-                <option>Accepted</option>
-                <option>Delivered</option>
-              </select>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <button type="button" onClick={() => setModalOpen(false)} style={{ ...btnStyle, background: '#eee' }}>
+              <div className="modal-buttons">
+                <button type="button" onClick={() => setModalOpen(false)} className="button-style cancel-button">
                   Cancel
                 </button>
-                <button type="submit" style={{
-                  background: '#845ef7',
-                  color: '#fff',
-                  border: 'none',
-                  padding: '10px 20px',
-                  borderRadius: '10px',
-                  cursor: 'pointer'
-                }}>
+                <button type="submit" className="button-add">
                   Save User
                 </button>
               </div>
@@ -209,14 +165,6 @@ const Leads = () => {
       )}
     </div>
   );
-};
-
-const btnStyle = {
-  background: '#f7f7f7',
-  border: '1px solid #ddd',
-  borderRadius: '10px',
-  padding: '10px 15px',
-  cursor: 'pointer'
 };
 
 export default Leads;
