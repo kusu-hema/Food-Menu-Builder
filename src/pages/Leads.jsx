@@ -122,7 +122,7 @@ const Leads = () => {
                   <td>{lead.name}</td>
                   <td>{lead.phone}</td>
                   <td>{lead.start}</td>
-                  <td>{lead.end}</td>
+                  <td>{lead.end_date}</td>
                   <td>{lead.type}</td>
                   <td>{lead.location}</td>
                   <td>
@@ -141,7 +141,7 @@ const Leads = () => {
           <div className="modal-content">
             <h3>Add New User</h3>
             <form onSubmit={handleSubmit} className="modal-form">
-              {['name', 'phone', 'start', 'end', 'type', 'location', 'status'].map((field) => (
+              {['name', 'phone', 'start', 'end_date', 'type', 'location', 'status'].map((field) => (
                 <input
                   key={field}
                   name={field}

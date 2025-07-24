@@ -10,7 +10,7 @@ import './App.css';
 const AppLayout = ({ isLoggedIn, setIsLoggedIn }) => {
   const location = useLocation();
   const isLoginPage = location.pathname === '/';
-
+  
   // Sidebar toggle state
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
@@ -68,9 +68,4 @@ function App() {
   );
 }
 
-export default App;
-
-
-
-
- 
+export default App; 
