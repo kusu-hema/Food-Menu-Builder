@@ -1,219 +1,170 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import '../assets/css/style.css';
 
-const    Categories = () => {
-  const styles = {
-    container: {
-      padding: '30px',
-      fontFamily: 'Inter, sans-serif',
-      background: '#f6f7fb',
-      minHeight: '100vh',
-      color: '#222'
-    },
-    header: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      flexWrap: 'wrap'
-    },
-    searchBox: {
-      padding: '10px',
-      border: '1px solid #ddd',
-      borderRadius: '12px',
-      width: '200px',
-      marginTop: '10px'
-    },
-    overviewGrid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-      gap: '20px',
-      marginTop: '30px'
-    },
-    card: {
-      background: 'white',
-      padding: '20px',
-      borderRadius: '16px',
-      boxShadow: '0 5px 15px rgba(0,0,0,0.05)'
-    },
-    sectionTitle: {
-      marginTop: '40px',
-      marginBottom: '10px'
-    },
-    table: {
-      width: '100%',
-      borderCollapse: 'collapse',
-      marginTop: '10px'
-    },
-    thtd: {
-      padding: '10px',
-      fontSize: '14px',
-      textAlign: 'left',
-      borderBottom: '1px solid #eee'
-    },
-    status: {
-      background: '#00c897',
-      color: 'white',
-      padding: '3px 8px',
-      borderRadius: '6px',
-      fontSize: '12px'
-    }
+const Leads = () => {
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [leads, setLeads] = useState([]);
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    start: '',
+    end: '',
+    type: '',
+    location: '',
+    status: '',
+  });
+
+  const fetchLeads = () => {
+    fetch('http://localhost:4000/api/customers1')
+      .then((res) => res.json())
+      .then((data) => setLeads(data))
+      .catch((err) => console.error('Error fetching leads:', err));
+  };
+
+  useEffect(() => {
+    fetchLeads();
+  }, []);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    fetch('http://localhost:4000/api/customers', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to create lead');
+        return res.json();
+      })
+      .then((data) => {
+        console.log('User created:', data);
+        setModalOpen(false);
+        setFormData({
+          name: '',
+          phone: '',
+          start: '',
+          end: '',
+          type: '',
+          location: '',
+          status: '',
+        });
+        fetchLeads();
+      })
+      .catch((err) => {
+        console.error('Error creating user:', err);
+      });
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <h2>Hello Shanmukha 👋🏼</h2>
-        <input type="text" placeholder="Search" style={styles.searchBox} />
+    <div className="leads-container">
+      <h2 className="leads-heading pt-5">Hello Shanmukha 👋🏻,</h2>
+
+      {/* <div className="leads-cards">
+        {[
+          { title: 'New Orders', count: 12, color: '#f78f1e' },
+          { title: 'Await Accepting orders', count: 10, color: '#f6c40d' },
+          { title: 'On Way Orders', count: 20, color: '#5b8def' },
+          { title: 'Delivered orders', count: 12, color: '#43d39e' },
+        ].map((card, index) => (
+          <div key={index} className="card" style={{ borderTop: `6px solid ${card.color}` }}>
+            <h4>{card.title}</h4>
+            <h2>{card.count}</h2>
+            <p className="card-subtext">This week</p>
+          </div>
+        ))}
+      </div> */}
+
+      <div className="leads-controls">
+        <div className="leads-search-group">
+          <input type="text" placeholder="Search" className="leads-search-input" />
+          <span className="leads-total-orders">{leads.length} Orders</span>
+        </div>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <button className="button-style">⬇️ Export</button>
+          <button className="button-style">⚙️ Sort: Default</button>
+          <button onClick={() => setModalOpen(true)} className="button-add">
+            + Add New Category
+          </button>
+        </div>
       </div>
 
-      <div style={styles.overviewGrid}>
-        <div style={styles.card}>
-          <h4>Total Orders</h4>
-          <p>124</p>
-        </div>
-        <div style={styles.card}>
-          <h4>Upcoming Events</h4>
-          <p>8</p>
-        </div>
-        <div style={styles.card}>
-          <h4>Total Customers</h4>
-          <p>256</p>
-        </div>
-        <div style={styles.card}>
-          <h4>Today’s Bookings</h4>
-          <p>5</p>
-        </div>
-      </div>
-
-      <h3 style={styles.sectionTitle}>Upcoming Events</h3>
-      <div style={styles.card}>
-        <table style={styles.table}>
+      <div className="table-container">
+        <table className="table">
           <thead>
             <tr>
-              <th style={styles.thtd}>SNo</th>
-              <th style={styles.thtd}>Name</th>
-              <th style={styles.thtd}>Phone</th>
-              <th style={styles.thtd}>Start Date</th>
-              <th style={styles.thtd}>End Date</th>
-              <th style={styles.thtd}>Type</th>
-              <th style={styles.thtd}>Location</th>
-              <th style={styles.thtd}>Status</th>
-              <th style={styles.thtd}>Actions</th>
+              <th>SNo</th>
+              <th>Category Name</th>
+              {/* <th>Order id</th> */}
+              <th>Status</th>
+              <th>Action</th>
+              {/* <th>Type</th> */}
+              {/* <th>Location</th> */}
+              {/* <th>Status</th> */}
+              {/* <th>Actions</th> */}
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td style={styles.thtd}>1.</td>
-              <td style={styles.thtd}>Ramya</td>
-              <td style={styles.thtd}>9848XXXXXXXX</td>
-              <td style={styles.thtd}>July 16</td>
-              <td style={styles.thtd}>July 17</td>
-              <td style={styles.thtd}>Marriage</td>
-              <td style={styles.thtd}>Hyderabad</td>
-              <td style={styles.thtd}><span style={styles.status}>New</span></td>
-              <td style={styles.thtd}>Edit | Share</td>
-            </tr>
-
-            <tr>
-              <td style={styles.thtd}>2.</td>
-              <td style={styles.thtd}>lavanya</td>
-              <td style={styles.thtd}>9848XXXXXXXX</td>
-              <td style={styles.thtd}>July 16</td>
-              <td style={styles.thtd}>July 17</td>
-              <td style={styles.thtd}>Marriage</td>
-              <td style={styles.thtd}>Hyderabad</td>
-              <td style={styles.thtd}><span style={styles.status}>New</span></td>
-              <td style={styles.thtd}>Edit | Share</td>
-            </tr>
-
-            <tr>
-              <td style={styles.thtd}>3.</td>
-              <td style={styles.thtd}>sita</td>
-              <td style={styles.thtd}>9848XXXXXXXX</td>
-              <td style={styles.thtd}>July 16</td>
-              <td style={styles.thtd}>July 17</td>
-              <td style={styles.thtd}>Marriage</td>
-              <td style={styles.thtd}>Hyderabad</td>
-              <td style={styles.thtd}><span style={styles.status}>New</span></td>
-              <td style={styles.thtd}>Edit | Share</td>
-            </tr>
-
-            <tr>
-              <td style={styles.thtd}>4.</td>
-              <td style={styles.thtd}>Ramya</td>
-              <td style={styles.thtd}>9848XXXXXXXX</td>
-              <td style={styles.thtd}>July 16</td>
-              <td style={styles.thtd}>July 17</td>
-              <td style={styles.thtd}>Marriage</td>
-              <td style={styles.thtd}>Hyderabad</td>
-              <td style={styles.thtd}><span style={styles.status}>New</span></td>
-              <td style={styles.thtd}>Edit | Share</td>
-            </tr>
-
-            <tr>
-              <td style={styles.thtd}>5.</td>
-              <td style={styles.thtd}>Ramya</td>
-              <td style={styles.thtd}>9848XXXXXXXX</td>
-              <td style={styles.thtd}>July 16</td>
-              <td style={styles.thtd}>July 17</td>
-              <td style={styles.thtd}>Marriage</td>
-              <td style={styles.thtd}>Hyderabad</td>
-              <td style={styles.thtd}><span style={styles.status}>New</span></td>
-              <td style={styles.thtd}>Edit | Share</td>
-            </tr>
-
-            <tr>
-              <td style={styles.thtd}>6.</td>
-              <td style={styles.thtd}>Ramya</td>
-              <td style={styles.thtd}>9848XXXXXXXX</td>
-              <td style={styles.thtd}>July 16</td>
-              <td style={styles.thtd}>July 17</td>
-              <td style={styles.thtd}>Marriage</td>
-              <td style={styles.thtd}>Hyderabad</td>
-              <td style={styles.thtd}><span style={styles.status}>New</span></td>
-              <td style={styles.thtd}>Edit | Share</td>
-            </tr>
-
-            <tr>
-              <td style={styles.thtd}>7.</td>
-              <td style={styles.thtd}>Ramya</td>
-              <td style={styles.thtd}>9848XXXXXXXX</td>
-              <td style={styles.thtd}>July 16</td>
-              <td style={styles.thtd}>July 17</td>
-              <td style={styles.thtd}>Marriage</td>
-              <td style={styles.thtd}>Hyderabad</td>
-              <td style={styles.thtd}><span style={styles.status}>New</span></td>
-              <td style={styles.thtd}>Edit | Share</td>
-            </tr>
-
-            <tr>
-              <td style={styles.thtd}>8.</td>
-              <td style={styles.thtd}>Ramya</td>
-              <td style={styles.thtd}>9848XXXXXXXX</td>
-              <td style={styles.thtd}>July 16</td>
-              <td style={styles.thtd}>July 17</td>
-              <td style={styles.thtd}>Marriage</td>
-              <td style={styles.thtd}>Hyderabad</td>
-              <td style={styles.thtd}><span style={styles.status}>New</span></td>
-              <td style={styles.thtd}>Edit | Share</td>
-            </tr>
-
+            {leads.length === 0 ? (
+              <tr>
+                <td colSpan="9">No data available</td>
+              </tr>
+            ) : (
+              leads.map((lead, i) => (
+                <tr key={lead.id ?? i}>
+                  <td>{i + 1}.</td>
+                  {/* <td>{lead.name}</td> */}
+                  {/* <td>{lead.phone}</td> */}
+                  {/* <td>{lead.start}</td> */}
+                  {/* <td>{lead.end_date}</td> */}
+                  {/* <td>{lead.type}</td> */}
+                  {/* <td>{lead.location}</td> */}
+                  <td>
+                    {/* <span className="status-badge">{lead.status}</span> */}
+                  </td>
+                  {/* <td>Edit | Share</td> */}
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
-      <h3 style={styles.sectionTitle}>Customers</h3>
-      <div style={styles.card}>
-        <p>Customer list or stats will be displayed here.</p>
-      </div>
-
-      <h3 style={styles.sectionTitle}>Last Section</h3>
-      <div style={styles.card}>
-        <p>Additional information or footer widgets go here.</p>
-      </div>
+      {isModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Add New User</h3>
+            <form onSubmit={handleSubmit} className="modal-form">
+              {['name', 'image', 'Action'].map((field) => (
+                <input
+                  key={field}
+                  name={field}
+                  value={formData[field]}
+                  onChange={handleChange}
+                  placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                  required
+                />
+              ))}
+              <div className="modal-buttons">
+                <button type="button" onClick={() => setModalOpen(false)} className="button-style cancel-button">
+                  Cancel
+                </button>
+                <button type="submit" className="button-add">
+                  Save User
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default  Categories;
-
- 
+export default Leads;

@@ -64,7 +64,7 @@ const Leads = () => {
 
   return (
     <div className="leads-container">
-      <h2 className="leads-heading">Hello Shanmukha 👋🏻,</h2>
+      <h2 className="leads-heading pt-5">Hello Shanmukha 👋🏻,</h2>
 
       <div className="leads-cards">
         {[

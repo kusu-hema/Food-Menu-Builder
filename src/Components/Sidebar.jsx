@@ -16,15 +16,16 @@ import {
   FaChevronDown,
   FaChevronRight,
 } from 'react-icons/fa';
+// Image 
 import Shanmukhalogo from '../assets/img/shanmukhalogo.png';
 
 
+// Menu Items Paaths 
 const menuItems = [
   { label: 'Dashboard', icon: <FaTachometerAlt />, path: '/dashboard' },
-  // { label: 'Leads', icon: <FaUserFriends />, path: '/leads' },
   {
-    label: 'Leads',   
-    icon: <FaUserFriends />, 
+    label: 'Leads',
+    icon: <FaUserFriends />,
     children: [
       { label: 'Total leads', path: '/leads' },
       { label: 'Create Customer', path: '/customers' },
@@ -50,7 +51,7 @@ const menuItems = [
     label: 'Categories',
     icon: <FaLayerGroup />,
     children: [
-      { label: 'Add Category', path: '/categories/add' },
+      { label: 'Add Category', path: '/categories' },
       { label: 'All Categories', path: '/categories/all' },
     ],
   },
@@ -95,195 +96,101 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
   return (
     <>
-      <style>{`
-        .sidebar-toggle {
-          position: fixed;
-          top: 1rem;
-          left: 1rem;
-          z-index: 1200;
-          background: #5b28f0;
-          border: none;
-          color: white;
-          padding: 0.5rem 0.75rem;
-          font-size: 1.25rem;
-          border-radius: 0.375rem;
-          cursor: pointer;
-        }
-        .sidebar {
-          height: 100vh;
-          width: 16rem;
-          background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
-          border-right: 1px solid #e5e7eb;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          padding: 1.5rem 1rem;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-          overflow-y: auto;
-          transition: all 0.3s ease-in-out;
-        }
-        .sidebar.fixed {
-          position: fixed;
-          left: 0;
-          top: 0;
-          z-index: 1100;
-        }
-        .sidebar.closed {
-          display: none;
-        }
-        .sidebar-title {
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: #5b28f0;
-          margin: 0;
-        }
-        .sidebar-menu {
-          list-style: none;
-          padding: 0;
-          margin-top: 1.5rem;
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-        }
-        .sidebar-item {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0.65rem 1rem;
-          font-size: 0.95rem;
-          font-weight: 500;
-          color: #374151;
-          border-radius: 0.625rem;
-          cursor: pointer;
-          transition: all 0.25s ease-in-out;
-        }
-        .sidebar-item:hover {
-          background: #f0f4ff;
-          color: #5b28f0;
-        }
-        .sidebar-item.active {
-          background: linear-gradient(90deg, #5b28f0 0%, #6a4ff4 100%);
-          color: white;
-        }
-        .sidebar-icon {
-          margin-right: 0.75rem;
-        }
-        .dropdown-child {
-          list-style: none;
-          padding-left: 1.5rem;
-          margin-top: 0.25rem;
-          margin-bottom: 0.5rem;
-        }
-        .dropdown-child li {
-          padding: 0.45rem 0.5rem;
-          font-size: 0.88rem;
-          color: #374151;
-          border-radius: 0.5rem;
-        }
-        .dropdown-child li:hover {
-          background: #f0f4ff;
-          color: #5b28f0;
-        }
-        .sidebar-avatar {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          background: #eef2ff;
-          padding: 0.75rem;
-          border-radius: 0.75rem;
-          margin-top: 2rem;
-        }
-        .avatar-img {
-          height: 2.5rem;
-          width: 2.5rem;
-          border-radius: 50%;
-          object-fit: cover;
-          border: 2px solid #5b28f0;
-        }
-        .avatar-name {
-          font-size: 0.875rem;
-          font-weight: 600;
-          color: #1f2937;
-        }
-        .avatar-role {
-          font-size: 0.75rem;
-          color: #6b7280;
-        }
-      `}</style>
-
-      <button className="sidebar-toggle" onClick={toggleSidebar}>
+      <button
+        className="fixed top-4 left-4 z-[1200] bg-[#5b28f0] text-white px-3 py-2 text-xl rounded-md cursor-pointer"
+        onClick={toggleSidebar}
+      >
         {isOpen ? <FaTimes /> : <FaBars />}
       </button>
 
-      <div className={`sidebar ${isOpen ? 'fixed' : 'closed'}`}>
+      <div
+        className={`${
+          isOpen ? 'fixed' : 'hidden'
+        } h-screen w-64 bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 flex flex-col justify-between px-4 py-6 shadow-md overflow-y-auto z-[1100]`}
+      >
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2rem' , paddingTop:'2rem' }}>
+          <div className="flex items-center mb-8 pt-8">
             <img
               src={Shanmukhalogo}
               alt="Shanmukha Logo"
-              style={{ height: '70px', width: '70px', marginRight: '10px' }}
+              className="h-[70px] w-[70px] mr-3"
             />
-            <h1 className="sidebar-title">Shanmukha</h1>
+            <h1 className="text-[#5b28f0] font-bold text-xl">Shanmukha</h1>
           </div>
 
-          <ul className="sidebar-menu">
+          <ul className="space-y-2">
             {menuItems.map((item, index) => (
               <React.Fragment key={index}>
                 <li
-                  className={`sidebar-item ${location.pathname === item.path ? 'active' : ''}`}
+                  className={`flex items-center justify-between px-4 py-2.5 text-sm font-medium rounded-lg cursor-pointer transition duration-200 ${
+                    location.pathname === item.path
+                      ? 'bg-gradient-to-r from-[#5b28f0] to-[#6a4ff4] text-white'
+                      : 'text-gray-700 hover:bg-[#f0f4ff] hover:text-[#5b28f0]'
+                  }`}
                   onClick={() =>
                     item.children
                       ? setOpenDropdown(openDropdown === index ? null : index)
                       : null
                   }
                 >
+                  {/* Drop Down Menu  */}
                   <Link
                     to={item.path || '#'}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      width: '100%',
-                      color: 'inherit',
-                      textDecoration: 'none',
-                    }}
+                    className="flex items-center justify-between w-full text-inherit no-underline"
                   >
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <span className="sidebar-icon">{item.icon}</span>
+                    <div className="flex items-center gap-3">
+                      <span>{item.icon}</span>
                       {item.label}
                     </div>
-
                     {item.children && (
                       <span>
-                        {openDropdown === index ? <FaChevronDown /> : <FaChevronRight />}
+                        {openDropdown === index ? (
+                          <FaChevronDown />
+                        ) : (
+                          <FaChevronRight />
+                        )}
                       </span>
                     )}
                   </Link>
                 </li>
-
+                
+                {/* Sub menu  */}
+                
                 {item.children && openDropdown === index && (
-                  <ul className="dropdown-child">
+                  <ul className="pl-6 mt-1 mb-2 space-y-1">
                     {item.children.map((child, childIdx) => (
                       <li key={childIdx}>
-                        <Link to={child.path}>{child.label}</Link>
+                        <Link
+                          to={child.path}
+                          className={`block px-2 py-1.5 text-sm rounded transition duration-200 ${
+                            location.pathname === child.path
+                              ? 'bg-gradient-to-r from-[#5b28f0] to-[#6a4ff4] text-white'
+                              : 'text-gray-700 hover:bg-[#f0f4ff] hover:text-[#5b28f0]'
+                          }`}
+                        >
+                          {child.label}
+                        </Link>
                       </li>
                     ))}
                   </ul>
                 )}
+
+
+
               </React.Fragment>
             ))}
           </ul>
         </div>
 
-        <div className="sidebar-avatar">
+        <div className="flex items-center gap-3 bg-[#eef2ff] p-3 rounded-xl mt-8">
           <img
             src={Shanmukhalogo}
-            alt={Shanmukhalogo}
-            className="avatar-img"
+            alt="Shanmukha Avatar"
+            className="h-10 w-10 rounded-full object-cover border-2 border-[#5b28f0]"
           />
           <div>
-            <p className="avatar-name">Shanmukha</p>
-            <p className="avatar-role">Owner</p>
+            <p className="text-sm font-semibold text-gray-900">Shanmukha</p>
+            <p className="text-xs text-gray-500">Owner</p>
           </div>
         </div>
       </div>

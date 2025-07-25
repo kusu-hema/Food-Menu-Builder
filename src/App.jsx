@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, useLocation } from 'react-router-dom';
+import './index.css';
 
 // Pages
 import Sidebar from './Components/Sidebar';
