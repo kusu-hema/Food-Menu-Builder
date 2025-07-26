@@ -1,21 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import '../assets/css/style.css';
 
-const Leads = () => {
+const Categories = () => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [leads, setLeads] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
-    phone: '',
-    start: '',
-    end: '',
-    type: '',
-    location: '',
-    status: '',
+    action: '',
+    image: null,
   });
 
   const fetchLeads = () => {
-    fetch('http://localhost:4000/api/customers1')
+    fetch('http://localhost:4000/api/customers')
       .then((res) => res.json())
       .then((data) => setLeads(data))
       .catch((err) => console.error('Error fetching leads:', err));
@@ -26,18 +22,23 @@ const Leads = () => {
   }, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, files } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: files ? files[0] : value,
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const data = new FormData();
+    data.append('name', formData.name);
+    data.append('action', formData.action);
+    data.append('image', formData.image);
 
     fetch('http://localhost:4000/api/customers', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
+      body: data,
     })
       .then((res) => {
         if (!res.ok) throw new Error('Failed to create lead');
@@ -46,40 +47,15 @@ const Leads = () => {
       .then((data) => {
         console.log('User created:', data);
         setModalOpen(false);
-        setFormData({
-          name: '',
-          phone: '',
-          start: '',
-          end: '',
-          type: '',
-          location: '',
-          status: '',
-        });
+        setFormData({ name: '', action: '', image: null });
         fetchLeads();
       })
-      .catch((err) => {
-        console.error('Error creating user:', err);
-      });
+      .catch((err) => console.error('Error creating user:', err));
   };
 
   return (
     <div className="leads-container">
       <h2 className="leads-heading pt-5">Hello Shanmukha 👋🏻,</h2>
-
-      {/* <div className="leads-cards">
-        {[
-          { title: 'New Orders', count: 12, color: '#f78f1e' },
-          { title: 'Await Accepting orders', count: 10, color: '#f6c40d' },
-          { title: 'On Way Orders', count: 20, color: '#5b8def' },
-          { title: 'Delivered orders', count: 12, color: '#43d39e' },
-        ].map((card, index) => (
-          <div key={index} className="card" style={{ borderTop: `6px solid ${card.color}` }}>
-            <h4>{card.title}</h4>
-            <h2>{card.count}</h2>
-            <p className="card-subtext">This week</p>
-          </div>
-        ))}
-      </div> */}
 
       <div className="leads-controls">
         <div className="leads-search-group">
@@ -101,34 +77,22 @@ const Leads = () => {
             <tr>
               <th>SNo</th>
               <th>Category Name</th>
-              {/* <th>Order id</th> */}
               <th>Status</th>
               <th>Action</th>
-              {/* <th>Type</th> */}
-              {/* <th>Location</th> */}
-              {/* <th>Status</th> */}
-              {/* <th>Actions</th> */}
             </tr>
           </thead>
           <tbody>
             {leads.length === 0 ? (
               <tr>
-                <td colSpan="9">No data available</td>
+                <td colSpan="4">No data available</td>
               </tr>
             ) : (
               leads.map((lead, i) => (
                 <tr key={lead.id ?? i}>
                   <td>{i + 1}.</td>
-                  {/* <td>{lead.name}</td> */}
-                  {/* <td>{lead.phone}</td> */}
-                  {/* <td>{lead.start}</td> */}
-                  {/* <td>{lead.end_date}</td> */}
-                  {/* <td>{lead.type}</td> */}
-                  {/* <td>{lead.location}</td> */}
-                  <td>
-                    {/* <span className="status-badge">{lead.status}</span> */}
-                  </td>
-                  {/* <td>Edit | Share</td> */}
+                  <td>{lead.name}</td>
+                  <td>{lead.status}</td>
+                  <td>{lead.action}</td>
                 </tr>
               ))
             )}
@@ -139,24 +103,35 @@ const Leads = () => {
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h3>Add New User</h3>
+            <h3>Add New Category</h3>
             <form onSubmit={handleSubmit} className="modal-form">
-              {['name', 'image', 'Action'].map((field) => (
-                <input
-                  key={field}
-                  name={field}
-                  value={formData[field]}
-                  onChange={handleChange}
-                  placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                  required
-                />
-              ))}
+              <input
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Category Name"
+                required
+              />
+              <input
+                name="action"
+                value={formData.action}
+                onChange={handleChange}
+                placeholder="Action"
+                required
+              />
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
+                onChange={handleChange}
+                required
+              />
               <div className="modal-buttons">
                 <button type="button" onClick={() => setModalOpen(false)} className="button-style cancel-button">
                   Cancel
                 </button>
                 <button type="submit" className="button-add">
-                  Save User
+                  Save Category
                 </button>
               </div>
             </form>
@@ -167,4 +142,4 @@ const Leads = () => {
   );
 };
 
-export default Leads;
+export default Categories;

@@ -69,7 +69,7 @@ const Leads = () => {
       <div className="leads-cards">
         {[
           { title: 'New Orders', count: 12, color: '#f78f1e' },
-          { title: 'Await Accepting orders', count: 10, color: '#f6c40d' },
+          { title: 'Accepting orders', count: 10, color: '#f6c40d' },
           { title: 'On Way Orders', count: 20, color: '#5b8def' },
           { title: 'Delivered orders', count: 12, color: '#43d39e' },
         ].map((card, index) => (
@@ -81,19 +81,34 @@ const Leads = () => {
         ))}
       </div>
 
-      <div className="leads-controls">
-        <div className="leads-search-group">
-          <input type="text" placeholder="Search" className="leads-search-input" />
-          <span className="leads-total-orders">{leads.length} Orders</span>
+      <div className="leads-controls px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10">
+        <div className="leads-search-group flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+          <input
+            type="text"
+            placeholder="Search"
+            className="leads-search-input w-full sm:w-64 px-2 py-1 text-sm border rounded-md"
+          />
+          <span className="leads-total-orders text-sm sm:text-base">
+            {leads.length} Orders
+          </span>
         </div>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <button className="button-style">⬇️ Export</button>
-          <button className="button-style">⚙️ Sort: Default</button>
-          <button onClick={() => setModalOpen(true)} className="button-add">
+
+        <div className="flex flex-wrap justify-start sm:justify-end gap-2 mt-4">
+          <button className="button-style px-3 py-1 text-sm bg-blue-500 text-black rounded-md">
+            ⬇️ Export
+          </button>
+          <button className="button-style px-3 py-1 text-sm bg-gray-300 text-black rounded-md">
+            ⚙️ Sort: Default
+          </button>
+          <button
+            onClick={() => setModalOpen(true)}
+            className="button-add px-3 py-1 text-sm bg-green-500 text-white rounded-md"
+          >
             + Add New User
           </button>
         </div>
       </div>
+
 
       <div className="table-container">
         <table className="table">
