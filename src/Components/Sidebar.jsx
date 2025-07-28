@@ -36,6 +36,7 @@ const menuItems = [
     icon: <FaUsers />,
     children: [
       { label: 'Create Customer', path: '/customers' },
+      { label: 'Customer Profile', path: '/customerprofile' },
       { label: 'Total Customers', path: '/customers/total' },
     ],
   },
@@ -67,7 +68,7 @@ const menuItems = [
     label: 'Invoice',
     icon: <FaFileInvoice />,
     children: [
-      { label: 'Create Invoice', path: '/invoice/create' },
+      { label: 'Create Invoice', path: '/invoice' },
       { label: 'All Invoices', path: '/invoice/all' },
     ],
   },

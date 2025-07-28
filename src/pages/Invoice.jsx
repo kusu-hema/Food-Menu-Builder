@@ -1,14 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 
-// internal pages
 import PreviewDocument from '../Components/PreviewDocument';
-
-// import PreviewDocument from './Components/PreviewDocument';
 import MenuSelector from '../Components/MenuSelector';
 import MenuItems from '../Components/MenuItems';
 import menuData from '../Data/Data';
-
 
 function Invoice() {
   const componentRef = useRef(null);
@@ -46,36 +42,45 @@ function Invoice() {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh' }}>
-      
-      <div style={{ width: '40%', padding: '20px' }}>
-        <MenuSelector selected={category} onSelect={setCategory} />
-        <MenuItems
-          items={menuData[category]}
-          onAdd={handleAdd}
-          selectedItems={selectedItems[category]}
-        />
-      </div>
-
-      <div style={{ width: '60%', padding: '20px', background: '#f9f9f9' }}>
-        <button onClick={handlePrint}>Print Invoice</button>
-
-        <div style={{ marginTop: '20px' }}>
-          <PreviewDocument
-            ref={componentRef}
-            selectedItems={selectedItems}
-            onRemove={handleRemove}
-          />
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-10">
+      <div className="flex flex-col lg:flex-row gap-6">
+        
+        {/* Left Panel */}
+        <div className="lg:w-2/5 bg-white rounded-lg shadow-md p-4 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">Select Menu</h2>
+          <MenuSelector selected={category} onSelect={setCategory} />
+          <div className="mt-4">
+            <MenuItems
+              items={menuData[category]}
+              onAdd={handleAdd}
+              selectedItems={selectedItems[category]}
+            />
+          </div>
         </div>
-      </div>
 
+        {/* Right Panel */}
+        <div className="lg:w-3/5 bg-white rounded-lg shadow-md p-4 sm:p-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-800"> Invoice Preview</h2>
+            <button
+              onClick={handlePrint}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            >
+              Print Invoice
+            </button>
+          </div>
+          <div className="mt-4">
+            <PreviewDocument
+              ref={componentRef}
+              selectedItems={selectedItems}
+              onRemove={handleRemove}
+            />
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 }
 
 export default Invoice;
-
-
-
- 
- 

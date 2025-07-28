@@ -5,6 +5,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from '../pages/Dashboard';
 import Leads from '../pages/Leads';
 import Customers from '../pages/Customers';
+import CustomerProfile from '../pages/CustomerProfile';
+
 import Orders from '../pages/Orders';
 import Categories from '../pages/Categories';
 import Products from '../pages/Products';                                                                                                         
@@ -39,6 +41,7 @@ const AppRoutes = ({ isLoggedIn, setIsLoggedIn }) => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/leads" element={<Leads />} />
           <Route path="/customers" element={<Customers />} />
+          <Route path="/customerprofile" element={<CustomerProfile />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/products" element={<Products />} />

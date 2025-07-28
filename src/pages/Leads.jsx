@@ -7,8 +7,8 @@ const Leads = () => {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
-    start: '',
-    end: '',
+    // start: '',
+    // end: '',
     type: '',
     location: '',
     status: '',
@@ -117,8 +117,8 @@ const Leads = () => {
               <th>SNo</th>
               <th>Name</th>
               <th>Phone</th>
-              <th>Start Date</th>
-              <th>End Date</th>
+              {/* <th>Start Date</th> */}
+              {/* <th>End Date</th> */}
               <th>Type</th>
               <th>Location</th>
               <th>Status</th>
@@ -136,8 +136,8 @@ const Leads = () => {
                   <td>{i + 1}.</td>
                   <td>{lead.name}</td>
                   <td>{lead.phone}</td>
-                  <td>{lead.start}</td>
-                  <td>{lead.end_date}</td>
+                  {/* <td>{lead.start}</td> */}
+                  {/* <td>{lead.end_date}</td> */}
                   <td>{lead.type}</td>
                   <td>{lead.location}</td>
                   <td>
