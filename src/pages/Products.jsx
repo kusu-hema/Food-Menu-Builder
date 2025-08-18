@@ -1,221 +1,115 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-const    Products = () => {
-  const styles = {
-    container: {
-      padding: '30px',
-      fontFamily: 'Inter, sans-serif',
-      background: '#f6f7fb',
-      minHeight: '100vh',
-      color: '#222'
-    },
-    header: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      flexWrap: 'wrap'
-    },
-    searchBox: {
-      padding: '10px',
-      border: '1px solid #ddd',
-      borderRadius: '12px',
-      width: '200px',
-      marginTop: '10px'
-    },
-    overviewGrid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-      gap: '20px',
-      marginTop: '30px'
-    },
-    card: {
-      background: 'white',
-      padding: '20px',
-      borderRadius: '16px',
-      boxShadow: '0 5px 15px rgba(0,0,0,0.05)'
-    },
-    sectionTitle: {
-      marginTop: '40px',
-      marginBottom: '10px'
-    },
-    table: {
-      width: '100%',
-      borderCollapse: 'collapse',
-      marginTop: '10px'
-    },
-    thtd: {
-      padding: '10px',
-      fontSize: '14px',
-      textAlign: 'left',
-      borderBottom: '1px solid #eee'
-    },
-    status: {
-      background: '#00c897',
-      color: 'white',
-      padding: '3px 8px',
-      borderRadius: '6px',
-      fontSize: '12px'
-    }
-  };
+// Main App component
+const Products = () => {
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  // useEffect hook to fetch data when the component mounts
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        // Fetch data from your backend API
+        const response = await fetch('http://localhost:4000/api/categories');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setCategories(data);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+        setError('Failed to fetch data. Please ensure your backend is running.');
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Render the table based on the state
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <h2>Hello Shanmukha 👋🏼</h2>
-        <input type="text" placeholder="Search" style={styles.searchBox} />
-      </div>
+    <div className="bg-gray-100 min-h-screen p-8 font-sans antialiased">
+      <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-lg p-6">
+        <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+          Categories Table
+        </h1>
 
-      <div style={styles.overviewGrid}>
-        <div style={styles.card}>
-          <h4>Total Orders</h4>
-          <p>124</p>
-        </div>
-        <div style={styles.card}>
-          <h4>Upcoming Events</h4>
-          <p>8</p>
-        </div>
-        <div style={styles.card}>
-          <h4>Total Customers</h4>
-          <p>256</p>
-        </div>
-        <div style={styles.card}>
-          <h4>Today’s Bookings</h4>
-          <p>5</p>
-        </div>
-      </div>
+        {/* Conditional rendering based on loading, error, and data state */}
+        {loading && (
+          <div className="flex justify-center items-center h-48">
+            <div className="text-xl text-gray-600">Loading...</div>
+          </div>
+        )}
 
-      <h3 style={styles.sectionTitle}>Upcoming Events</h3>
-      <div style={styles.card}>
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th style={styles.thtd}>SNo</th>
-              <th style={styles.thtd}>Name</th>
-              <th style={styles.thtd}>Phone</th>
-              <th style={styles.thtd}>Start Date</th>
-              <th style={styles.thtd}>End Date</th>
-              <th style={styles.thtd}>Type</th>
-              <th style={styles.thtd}>Location</th>
-              <th style={styles.thtd}>Status</th>
-              <th style={styles.thtd}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style={styles.thtd}>1.</td>
-              <td style={styles.thtd}>Ramya</td>
-              <td style={styles.thtd}>9848XXXXXXXX</td>
-              <td style={styles.thtd}>July 16</td>
-              <td style={styles.thtd}>July 17</td>
-              <td style={styles.thtd}>Marriage</td>
-              <td style={styles.thtd}>Hyderabad</td>
-              <td style={styles.thtd}><span style={styles.status}>New</span></td>
-              <td style={styles.thtd}>Edit | Share</td>
-            </tr>
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <strong className="font-bold">Error!</strong>
+            <span className="block sm:inline ml-2">{error}</span>
+          </div>
+        )}
 
-            <tr>
-              <td style={styles.thtd}>2.</td>
-              <td style={styles.thtd}>lavanya</td>
-              <td style={styles.thtd}>9848XXXXXXXX</td>
-              <td style={styles.thtd}>July 16</td>
-              <td style={styles.thtd}>July 17</td>
-              <td style={styles.thtd}>Marriage</td>
-              <td style={styles.thtd}>Hyderabad</td>
-              <td style={styles.thtd}><span style={styles.status}>New</span></td>
-              <td style={styles.thtd}>Edit | Share</td>
-            </tr>
+        {!loading && !error && categories.length > 0 && (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    SNo
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Image
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Category Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {categories.map((category) => (
+                  <tr key={category.sno}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {category.sno}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {/* <img
+                        src={`http://localhost:4000/${category.image}`} // Construct the URL to the image
+                        alt={category.category_name}
+                        className="h-12 w-12 rounded-full object-cover"
+                        onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/48x48?text=N/A"; }}
+                      /> */}
+                       <img
+                        src={`http://localhost:4000/${category.image}`}
+                        alt={category.category_name}
+                        className="h-12 w-12 rounded-full object-cover"
+                        onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/48x48?text=N/A"; }}
+                      />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
+                      {category.category_name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
+                      {category.status}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-            <tr>
-              <td style={styles.thtd}>3.</td>
-              <td style={styles.thtd}>sita</td>
-              <td style={styles.thtd}>9848XXXXXXXX</td>
-              <td style={styles.thtd}>July 16</td>
-              <td style={styles.thtd}>July 17</td>
-              <td style={styles.thtd}>Marriage</td>
-              <td style={styles.thtd}>Hyderabad</td>
-              <td style={styles.thtd}><span style={styles.status}>New</span></td>
-              <td style={styles.thtd}>Edit | Share</td>
-            </tr>
-
-            <tr>
-              <td style={styles.thtd}>4.</td>
-              <td style={styles.thtd}>Ramya</td>
-              <td style={styles.thtd}>9848XXXXXXXX</td>
-              <td style={styles.thtd}>July 16</td>
-              <td style={styles.thtd}>July 17</td>
-              <td style={styles.thtd}>Marriage</td>
-              <td style={styles.thtd}>Hyderabad</td>
-              <td style={styles.thtd}><span style={styles.status}>New</span></td>
-              <td style={styles.thtd}>Edit | Share</td>
-            </tr>
-
-            <tr>
-              <td style={styles.thtd}>5.</td>
-              <td style={styles.thtd}>Ramya</td>
-              <td style={styles.thtd}>9848XXXXXXXX</td>
-              <td style={styles.thtd}>July 16</td>
-              <td style={styles.thtd}>July 17</td>
-              <td style={styles.thtd}>Marriage</td>
-              <td style={styles.thtd}>Hyderabad</td>
-              <td style={styles.thtd}><span style={styles.status}>New</span></td>
-              <td style={styles.thtd}>Edit | Share</td>
-            </tr>
-
-            <tr>
-              <td style={styles.thtd}>6.</td>
-              <td style={styles.thtd}>Ramya</td>
-              <td style={styles.thtd}>9848XXXXXXXX</td>
-              <td style={styles.thtd}>July 16</td>
-              <td style={styles.thtd}>July 17</td>
-              <td style={styles.thtd}>Marriage</td>
-              <td style={styles.thtd}>Hyderabad</td>
-              <td style={styles.thtd}><span style={styles.status}>New</span></td>
-              <td style={styles.thtd}>Edit | Share</td>
-            </tr>
-
-            <tr>
-              <td style={styles.thtd}>7.</td>
-              <td style={styles.thtd}>Ramya</td>
-              <td style={styles.thtd}>9848XXXXXXXX</td>
-              <td style={styles.thtd}>July 16</td>
-              <td style={styles.thtd}>July 17</td>
-              <td style={styles.thtd}>Marriage</td>
-              <td style={styles.thtd}>Hyderabad</td>
-              <td style={styles.thtd}><span style={styles.status}>New</span></td>
-              <td style={styles.thtd}>Edit | Share</td>
-            </tr>
-
-            <tr>
-              <td style={styles.thtd}>8.</td>
-              <td style={styles.thtd}>Ramya</td>
-              <td style={styles.thtd}>9848XXXXXXXX</td>
-              <td style={styles.thtd}>July 16</td>
-              <td style={styles.thtd}>July 17</td>
-              <td style={styles.thtd}>Marriage</td>
-              <td style={styles.thtd}>Hyderabad</td>
-              <td style={styles.thtd}><span style={styles.status}>New</span></td>
-              <td style={styles.thtd}>Edit | Share</td>
-            </tr>
-
-          </tbody>
-        </table>
-      </div>
-
-      <h3 style={styles.sectionTitle}>Customers</h3>
-      <div style={styles.card}>
-        <p>Customer list or stats will be displayed here.</p>
-      </div>
-
-      <h3 style={styles.sectionTitle}>Last Section</h3>
-      <div style={styles.card}>
-        <p>Additional information or footer widgets go here.</p>
+        {!loading && !error && categories.length === 0 && (
+          <div className="flex justify-center items-center h-48">
+            <div className="text-xl text-gray-600">No categories found.</div>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default  Products;
-
- 
-
-   
+export default Products;

@@ -60,7 +60,7 @@ const menuItems = [
     label: 'Products',
     icon: <FaBoxOpen />,
     children: [
-      { label: 'Add Product', path: '/products/add' },
+      { label: 'Add Product', path: '/products' },
       { label: 'All Products', path: '/products/all' },
     ],
   },
