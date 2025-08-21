@@ -190,7 +190,7 @@ const Modal = ({ isOpen, onClose, children }) => {
 const CategoriesTable = ({ categories, loading, error, onEdit, onDelete }) => {
   return (
     <div className="    rounded-lg p-6 w-full max-w-2xl">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Categories Table</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Product Table</h1>
       {/* Conditional rendering based on loading, error, and data state */}
       {loading && (
         <div className="flex justify-center items-center h-48">
