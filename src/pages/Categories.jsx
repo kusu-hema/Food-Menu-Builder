@@ -157,12 +157,13 @@ const Modal = ({ isOpen, onClose, children }) => {
  *
  * @param {object} props - The component props.
  * @param {Array<object>} props.categories - The list of categories to display.
+ * @param {object} props.productCounts - An object containing category names and their corresponding product counts.
  * @param {boolean} props.loading - Loading state.
  * @param {string} props.error - Error message.
  * @param {function} props.onEdit - Callback for editing a category.
  * @param {function} props.onDelete - Callback for deleting a category.
  */
-const CategoriesTable = ({ categories, loading, error, onEdit, onDelete }) => {
+const CategoriesTable = ({ categories, productCounts, loading, error, onEdit, onDelete }) => {
   return (
     <div className="rounded-lg p-6 w-full max-w-2xl">
       <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Categories Table</h1>
@@ -223,7 +224,7 @@ const CategoriesTable = ({ categories, loading, error, onEdit, onDelete }) => {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
-                      {category.category_name}
+                      {category.category_name} ({productCounts[category.category_name.toLowerCase()] || 0})
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <button
@@ -266,7 +267,7 @@ const CategoriesTable = ({ categories, loading, error, onEdit, onDelete }) => {
                     />
                   )}
                   <div className="flex-1">
-                    <div className="font-bold text-gray-900 text-lg capitalize">{category.category_name}</div>
+                    <div className="font-bold text-gray-900 text-lg capitalize">{category.category_name} ({productCounts[category.category_name.toLowerCase()] || 0})</div>
                     <div className="text-gray-500 text-sm">SNo: {category.sno}</div>
                   </div>
                 </div>
@@ -301,26 +302,59 @@ const CategoriesTable = ({ categories, loading, error, onEdit, onDelete }) => {
 // This is the main parent component that orchestrates the layout
 const App = () => {
   const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]); // State to store raw products data
+  const [productCounts, setProductCounts] = useState({}); // State for product counts
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
 
-  // Function to fetch the categories from the backend
-  const fetchCategories = async () => {
+  // Function to fetch the categories and product counts from the backend
+  const fetchData = async () => {
     setLoading(true);
     try {
-      // Corrected API endpoint to fetch categories
-      const response = await fetch('http://localhost:4000/api/categories');
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
+      // Fetch both categories and products in parallel
+      const [categoriesResponse, productsResponse] = await Promise.all([
+        fetch('http://localhost:4000/api/categories'),
+        fetch('http://localhost:4000/api/products')
+      ]);
+
+      if (!categoriesResponse.ok) {
+        throw new Error('Failed to fetch categories.');
       }
-      const data = await response.json();
-      setCategories(data);
-      setLoading(false);
+      if (!productsResponse.ok) {
+        throw new Error('Failed to fetch products.');
+      }
+
+      const categoriesData = await categoriesResponse.json();
+      const productsData = await productsResponse.json();
+
+      // Store the raw product data for the debug panel
+      setProducts(productsData);
+
+      // Log the raw data to the console for debugging
+      console.log('Categories data from API:', categoriesData);
+      console.log('Products data from API:', productsData);
+
+      // Calculate the product counts per category, converting names to lowercase for a consistent match
+      const counts = productsData.reduce((acc, product) => {
+        // Add a check to ensure product.category is a string before calling toLowerCase()
+        if (product && typeof product.category === 'string') {
+          const categoryName = product.category.toLowerCase().trim();
+          acc[categoryName] = (acc[categoryName] || 0) + 1;
+        }
+        return acc;
+      }, {});
+      
+      console.log('Calculated product counts:', counts);
+
+      setCategories(categoriesData);
+      setProductCounts(counts); // Set the calculated product counts
+      setError(null);
     } catch (err) {
-      console.error("Error fetching categories:", err);
+      console.error("Error fetching data:", err);
       setError('Failed to fetch data. Please ensure your backend is running.');
+    } finally {
       setLoading(false);
     }
   };
@@ -328,7 +362,6 @@ const App = () => {
   // Function to handle category deletion
   const handleDelete = async (sno) => {
     try {
-      // Corrected API endpoint for deleting a category
       const response = await fetch(`http://localhost:4000/api/categories/${sno}`, {
         method: 'DELETE',
       });
@@ -336,7 +369,7 @@ const App = () => {
         throw new Error('Failed to delete category.');
       }
       // If deletion is successful, refresh the list
-      fetchCategories();
+      fetchData();
     } catch (err) {
       console.error("Error deleting category:", err);
       setError('Failed to delete category. Please try again.');
@@ -348,7 +381,7 @@ const App = () => {
     setEditingCategory(category);
     setIsModalOpen(true);
   };
-  
+
   // Function to close the modal and reset the editing state
   const closeModalAndReset = () => {
     setIsModalOpen(false);
@@ -357,7 +390,7 @@ const App = () => {
 
   // Fetch data when the component mounts or after a save/delete
   useEffect(() => {
-    fetchCategories();
+    fetchData();
   }, []);
 
   return (
@@ -376,19 +409,35 @@ const App = () => {
           </button>
           <CategoriesTable
             categories={categories}
+            productCounts={productCounts} // Pass the product counts as a prop
             loading={loading}
             error={error}
             onEdit={handleEdit}
             onDelete={handleDelete}
           />
         </div>
+
+        {/* Debug Panel - Displays raw API data for troubleshooting */}
+        <div className="w-full max-w-sm p-6 bg-gray-900 text-green-400 font-mono rounded-lg shadow-xl">
+          <h2 className="text-xl font-bold mb-4 text-center">Debug Panel</h2>
+          <div className="space-y-4 text-sm">
+            <div>
+              <h3 className="text-base font-semibold mb-2">Categories JSON:</h3>
+              <pre className="whitespace-pre-wrap break-all">{JSON.stringify(categories, null, 2)}</pre>
+            </div>
+            <div>
+              <h3 className="text-base font-semibold mb-2">Products JSON:</h3>
+              <pre className="whitespace-pre-wrap break-all">{JSON.stringify(products, null, 2)}</pre>
+            </div>
+          </div>
+        </div>
       </div>
-      
+
       {/* The Modal component is now conditionally rendered */}
       <Modal isOpen={isModalOpen} onClose={closeModalAndReset}>
         <CategoryForm
           editingCategory={editingCategory}
-          onCategorySaved={fetchCategories}
+          onCategorySaved={fetchData} // Use the new fetchData function here
           onClose={closeModalAndReset}
         />
       </Modal>
