@@ -76,7 +76,7 @@ const menuItems = [
     label: 'Corporate Events',
     icon: <FaCalendarAlt />,
     children: [
-      { label: 'Add Event', path: '/events/add' },
+      { label: 'Add Event', path: '/events' },
       { label: 'All Events', path: '/events/all' },
     ],
   },

@@ -300,7 +300,7 @@ const CategoriesTable = ({ categories, productCounts, loading, error, onEdit, on
 };
 
 // This is the main parent component that orchestrates the layout
-const App = () => {
+const  Categories = () => {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]); // State to store raw products data
   const [productCounts, setProductCounts] = useState({}); // State for product counts
@@ -445,4 +445,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Categories;
