@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import * as XLSX from 'xlsx';
 
 /**
  * Renders the form to create or edit a product.
@@ -11,8 +12,8 @@ import React, { useState, useEffect } from 'react';
  * @param {function} props.onProductSaved - A callback function to call after a successful save (create/update).
  * @param {function} props.onClose - A callback to close the modal.
  */
-const CategoryForm = ({ editingProduct, onProductSaved, onClose }) => {
-  const [product, setProduct] = useState('');
+const ProductForm = ({ editingProduct, onProductSaved, onClose }) => {
+  const [product, setProduct] = useState(''); // Updated state variable name to match backend
   const [category, setCategory] = useState('');
   const [action, setAction] = useState('');
   const [image, setImage] = useState(null);
@@ -21,7 +22,8 @@ const CategoryForm = ({ editingProduct, onProductSaved, onClose }) => {
   // Use a useEffect hook to populate the form fields when a product is selected for editing
   useEffect(() => {
     if (editingProduct) {
-      setProduct(editingProduct.product);
+      // Use the correct product key here
+      setProduct(editingProduct.product); 
       setCategory(editingProduct.category);
       setAction(editingProduct.action);
     } else {
@@ -43,7 +45,8 @@ const CategoryForm = ({ editingProduct, onProductSaved, onClose }) => {
     if (image) {
       formData.append('image', image);
     }
-    formData.append('product', product);
+    // Updated to use the correct key name 'product'
+    formData.append('product', product); 
     formData.append('category', category);
     formData.append('action', action);
 
@@ -178,18 +181,18 @@ const Modal = ({ isOpen, onClose, children }) => {
 };
 
 /**
- * Renders the table of categories with edit and delete buttons.
+ * Renders the table of products with edit and delete buttons.
  *
  * @param {object} props - The component props.
- * @param {Array<object>} props.categories - The list of categories to display.
+ * @param {Array<object>} props.products - The list of products to display.
  * @param {boolean} props.loading - Loading state.
  * @param {string} props.error - Error message.
  * @param {function} props.onEdit - Callback for editing a product.
  * @param {function} props.onDelete - Callback for deleting a product.
  */
-const CategoriesTable = ({ categories, loading, error, onEdit, onDelete }) => {
+const ProductsTable = ({ products, loading, error, onEdit, onDelete }) => {
   return (
-    <div className="    rounded-lg p-6 w-full max-w-2xl">
+    <div className="rounded-lg p-6 w-full max-w-2xl">
       <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Product Table</h1>
       {/* Conditional rendering based on loading, error, and data state */}
       {loading && (
@@ -203,7 +206,7 @@ const CategoriesTable = ({ categories, loading, error, onEdit, onDelete }) => {
           <span className="block sm:inline ml-2">{error}</span>
         </div>
       )}
-      {!loading && !error && categories.length > 0 && (
+      {!loading && !error && products.length > 0 && (
         // The table is now hidden on small screens and a card layout is shown instead.
         // It becomes a standard table again on medium-sized screens and up.
         <>
@@ -233,21 +236,21 @@ const CategoriesTable = ({ categories, loading, error, onEdit, onDelete }) => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {categories.map((category) => (
-                  <tr key={category.sno}>
+                {products.map((product) => (
+                  <tr key={product.sno}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {category.sno}
+                      {product.sno}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {category.image && (
+                      {product.image && (
                         <img
-                          src={`http://localhost:4000/${category.image}`}
-                          alt={category.product}
+                          src={`http://localhost:4000/${product.image}`}
+                          alt={product.product}
                           className="h-12 w-12 rounded-full object-cover"
                           onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/48x48?text=N/A"; }}
                         />
                       )}
-                      {!category.image && (
+                      {!product.image && (
                         <img
                           src="https://placehold.co/48x48?text=N/A"
                           alt="Not available"
@@ -256,23 +259,24 @@ const CategoriesTable = ({ categories, loading, error, onEdit, onDelete }) => {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
-                      {category.product}
+                      {/* Using product.product to match the backend key */}
+                      {product.product} 
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
-                      {category.category}
+                      {product.category}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
-                      {category.action}
+                      {product.action}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <button
-                        onClick={() => onEdit(category)}
+                        onClick={() => onEdit(product)}
                         className="px-4 py-2 mr-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                       >
                         Edit
                       </button>
                       <button
-                        onClick={() => onDelete(category.sno)}
+                        onClick={() => onDelete(product.sno)}
                         className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
                       >
                         Delete
@@ -286,42 +290,43 @@ const CategoriesTable = ({ categories, loading, error, onEdit, onDelete }) => {
 
           {/* Card view for small screens */}
           <div className="md:hidden space-y-4">
-            {categories.map((category) => (
-              <div key={category.sno} className="bg-white p-4 rounded-lg shadow-md border border-gray-200">
+            {products.map((product) => (
+              <div key={product.sno} className="bg-white p-4 rounded-lg shadow-md border border-gray-200">
                 <div className="flex items-center space-x-4 mb-4">
-                  {category.image && (
+                  {product.image && (
                     <img
-                      src={`http://localhost:4000/${category.image}`}
-                      alt={category.product}
+                      src={`http://localhost:4000/${product.image}`}
+                      alt={product.product}
                       className="h-16 w-16 rounded-full object-cover"
                       onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/64x64?text=N/A"; }}
                     />
                   )}
-                  {!category.image && (
+                  {!product.image && (
                     <img
                       src="https://placehold.co/64x64?text=N/A"
                       alt="Not available"
                       className="h-16 w-16 rounded-full object-cover"
                     />
+                    
                   )}
                   <div className="flex-1">
-                    <div className="font-bold text-gray-900 text-lg capitalize">{category.product}</div>
-                    <div className="text-gray-500 text-sm">SNo: {category.sno}</div>
+                    <div className="font-bold text-gray-900 text-lg capitalize">{product.product}</div>
+                    <div className="text-gray-500 text-sm">SNo: {product.sno}</div>
                   </div>
                 </div>
                 <div className="space-y-2 text-sm text-gray-600">
-                  <div><span className="font-semibold text-gray-800">Category Name:</span> <span className="capitalize">{category.category}</span></div>
-                  <div><span className="font-semibold text-gray-800">Action:</span> <span className="capitalize">{category.action}</span></div>
+                  <div><span className="font-semibold text-gray-800">Category Name:</span> <span className="capitalize">{product.category}</span></div>
+                  <div><span className="font-semibold text-gray-800">Action:</span> <span className="capitalize">{product.action}</span></div>
                 </div>
                 <div className="mt-4 flex space-x-2">
                   <button
-                    onClick={() => onEdit(category)}
+                    onClick={() => onEdit(product)}
                     className="flex-1 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                   >
                     Edit
                   </button>
                   <button
-                    onClick={() => onDelete(category.sno)}
+                    onClick={() => onDelete(product.sno)}
                     className="flex-1 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
                   >
                     Delete
@@ -332,9 +337,9 @@ const CategoriesTable = ({ categories, loading, error, onEdit, onDelete }) => {
           </div>
         </>
       )}
-      {!loading && !error && categories.length === 0 && (
+      {!loading && !error && products.length === 0 && (
         <div className="flex justify-center items-center h-48">
-          <div className="text-xl text-gray-600">No categories found.</div>
+          <div className="text-xl text-gray-600">No products found.</div>
         </div>
       )}
     </div>
@@ -343,14 +348,15 @@ const CategoriesTable = ({ categories, loading, error, onEdit, onDelete }) => {
 
 // This is the main parent component that orchestrates the layout
 const App = () => {
-  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [message, setMessage] = useState(null);
 
-  // Function to fetch the categories from the backend
-  const fetchCategories = async () => {
+  // Function to fetch the products from the backend
+  const fetchProducts = async () => {
     setLoading(true);
     try {
       const response = await fetch('http://localhost:4000/api/products');
@@ -358,10 +364,10 @@ const App = () => {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      setCategories(data);
+      setProducts(data);
       setLoading(false);
     } catch (err) {
-      console.error("Error fetching categories:", err);
+      console.error("Error fetching products:", err);
       setError('Failed to fetch data. Please ensure your backend is running.');
       setLoading(false);
     }
@@ -377,7 +383,7 @@ const App = () => {
         throw new Error('Failed to delete product.');
       }
       // If deletion is successful, refresh the list
-      fetchCategories();
+      fetchProducts();
     } catch (err) {
       console.error("Error deleting product:", err);
       setError('Failed to delete product. Please try again.');
@@ -396,27 +402,122 @@ const App = () => {
     setEditingProduct(null);
   };
 
+  // Function to handle Excel file import
+  const handleImport = (event) => {
+    setMessage(null);
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 }); // Use header: 1 to get array of arrays
+
+          if (!Array.isArray(json) || json.length < 2) {
+            setMessage({ text: 'No data found in the Excel file.', type: 'error' });
+            return;
+          }
+
+          // Normalize keys to match the database schema
+          const headers = json[0].map(header => header.toLowerCase().replace(/\s/g, ''));
+          const productData = json.slice(1).map(row => {
+            const productObject = {};
+            headers.forEach((header, index) => {
+              // Map Excel header names to the correct keys
+              if (header === 'sno') productObject.sno = row[index];
+              if (header === 'product' || header === 'productname') productObject.product = row[index];
+              if (header === 'category' || header === 'categoryname') productObject.category = row[index];
+              if (header === 'action') productObject.action = row[index];
+            });
+            return productObject;
+          });
+
+          const response = await fetch('http://localhost:4000/api/products/bulk-import', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(productData),
+          });
+
+          if (response.ok) {
+            setMessage({ text: 'Products imported successfully!', type: 'success' });
+            fetchProducts();
+          } else {
+            const errorData = await response.json();
+            setMessage({ text: `Error: ${errorData.message}`, type: 'error' });
+          }
+        } catch (error) {
+          console.error("Error importing products:", error);
+          setMessage({ text: 'Failed to import file. Please check the file format.', type: 'error' });
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  };
+
+  // Function to handle Excel file export
+  const handleExport = () => {
+    if (products.length === 0) {
+      setMessage({ text: 'No products to export.', type: 'error' });
+      return;
+    }
+    const worksheet = XLSX.utils.json_to_sheet(products);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Products");
+    XLSX.writeFile(workbook, "products.xlsx");
+  };
+
   // Fetch data when the component mounts or after a save/delete
   useEffect(() => {
-    fetchCategories();
+    fetchProducts();
   }, []);
 
   return (
     <div className="bg-gray-100 min-h-screen p-8 font-sans antialiased">
       <div className="flex flex-col md:flex-row md:justify-center md:items-start space-y-8 md:space-y-0 md:space-x-8">
-        {/* Container for the table and the button */}
+        {/* Container for the table and the buttons */}
         <div className="w-full max-w-2xl">
-          <button
-            onClick={() => {
-              setEditingProduct(null); // Ensure form is for creation
-              setIsModalOpen(true);
-            }}
-            className="mb-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
-          >
-            Add New Product
-          </button>
-          <CategoriesTable
-            categories={categories}
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0 sm:space-x-4">
+            <button
+              onClick={() => {
+                setEditingProduct(null); // Ensure form is for creation
+                setIsModalOpen(true);
+              }}
+              className="w-full sm:w-auto flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+            >
+              Add New Product
+            </button>
+            <button
+              onClick={handleExport}
+              className="w-full sm:w-auto flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
+            >
+              Export to Excel
+            </button>
+            <label
+              htmlFor="excel-import"
+              className="w-full sm:w-auto flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors cursor-pointer"
+            >
+              Import from Excel
+              <input
+                id="excel-import"
+                type="file"
+                accept=".xlsx, .xls"
+                onChange={handleImport}
+                className="hidden"
+              />
+            </label>
+          </div>
+          {message && (
+            <div className={`mt-4 px-4 py-3 rounded-lg text-center font-medium ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+              {message.text}
+            </div>
+          )}
+          <ProductsTable
+            products={products}
             loading={loading}
             error={error}
             onEdit={handleEdit}
@@ -427,9 +528,9 @@ const App = () => {
       
       {/* The Modal component is now conditionally rendered */}
       <Modal isOpen={isModalOpen} onClose={closeModalAndReset}>
-        <CategoryForm
+        <ProductForm
           editingProduct={editingProduct}
-          onProductSaved={fetchCategories}
+          onProductSaved={fetchProducts}
           onClose={closeModalAndReset}
         />
       </Modal>
