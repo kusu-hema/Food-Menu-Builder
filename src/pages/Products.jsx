@@ -307,7 +307,7 @@ const ProductsTable = ({ products, loading, error, onEdit, onDelete }) => {
                       alt="Not available"
                       className="h-16 w-16 rounded-full object-cover"
                     />
-                    
+
                   )}
                   <div className="flex-1">
                     <div className="font-bold text-gray-900 text-lg capitalize">{product.product}</div>
@@ -347,7 +347,7 @@ const ProductsTable = ({ products, loading, error, onEdit, onDelete }) => {
 };
 
 // This is the main parent component that orchestrates the layout
-const App = () => {
+const  Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -538,4 +538,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Products;

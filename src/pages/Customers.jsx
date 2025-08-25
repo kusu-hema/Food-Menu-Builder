@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 // import './App.css';
 import { BsSearch } from 'react-icons/bs';
 
-function App() {
+function  Customers() {
     const productList = ["blue pant"
         , "black pant"
         , "blue shirt"
@@ -55,4 +55,4 @@ function App() {
     );
 }
 
-export default App;
+export default Customers;
