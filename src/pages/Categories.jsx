@@ -418,7 +418,7 @@ const  Categories = () => {
         </div>
 
         {/* Debug Panel - Displays raw API data for troubleshooting */}
-        <div className="w-full max-w-sm p-6 bg-gray-900 text-green-400 font-mono rounded-lg shadow-xl">
+        {/* <div className="w-full max-w-sm p-6 bg-gray-900 text-green-400 font-mono rounded-lg shadow-xl">
           <h2 className="text-xl font-bold mb-4 text-center">Debug Panel</h2>
           <div className="space-y-4 text-sm">
             <div>
@@ -430,7 +430,7 @@ const  Categories = () => {
               <pre className="whitespace-pre-wrap break-all">{JSON.stringify(products, null, 2)}</pre>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* The Modal component is now conditionally rendered */}

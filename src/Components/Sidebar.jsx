@@ -28,14 +28,14 @@ const menuItems = [
     icon: <FaUserFriends />,
     children: [
       { label: 'Total leads', path: '/leads' },
-      { label: 'Create Customer', path: '/customers' },
+      { label: 'Create Customer', path: '/dashboard' },
     ],
   },
   {
     label: 'Customers',
     icon: <FaUsers />,
     children: [
-      { label: 'Create Customer', path: '/customers' },
+      { label: 'Create Customer', path: '/dashboard' },
       { label: 'Customer Profile', path: '/customerprofile' },
       { label: 'Total Customers', path: '/customers/total' },
     ],
