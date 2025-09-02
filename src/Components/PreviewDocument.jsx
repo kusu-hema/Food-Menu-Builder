@@ -35,6 +35,8 @@ const PreviewDocument = React.forwardRef(({ selectedItems, onRemove }, ref) => (
       <p><strong>FOR:</strong> 100 MEMBERS</p>
     </div>
 
+     
+    {/* Main Menu */}
     {['Tiffin', 'Lunch', 'Dinner'].map((category) => (
       <div key={category} className="mb-4">
         <div className="text-lg font-semibold text-gray-800 border-b pb-1 mb-2">
@@ -60,6 +62,8 @@ const PreviewDocument = React.forwardRef(({ selectedItems, onRemove }, ref) => (
         )}
       </div>
     ))}
+
+    {/* Main Menu */}
   </div>
 ));
 
