@@ -1,72 +1,35 @@
-// import React, { useState, useEffect } from 'react';
+import React from 'react';
 
-// function MenuSelector({ selected, onSelect }) {
-//   const [categories, setCategories] = useState([]);
-//   const [isLoading, setIsLoading] = useState(true);
-//   const [error, setError] = useState(null);
-
-//   useEffect(() => {
-//     // Replace with your actual localhost URL
-//     const apiUrl = 'http://localhost:4000/api/categories'; 
-
-//     fetch(apiUrl)
-//       .then(response => {
-//         if (!response.ok) {
-//           throw new Error('Network response was not ok');
-//         }
-//         return response.json();
-//       })
-//       .then(data => {
-//         // Assuming the API returns an array of objects with a 'category_name' field
-//         const fetchedCategories = data.map(item => item.category_name);
-//         setCategories(fetchedCategories);
-//         setIsLoading(false);
-//       })
-//       .catch(err => {
-//         setError(err.message);
-//         setIsLoading(false);
-//       });
-//   }, []);
-
-//   if (isLoading) {
-//     return <div>Loading categories...</div>;
-//   }
-
-//   if (error) {
-//     return <div>Error: {error}</div>;
-//   }
-
-//   return (
-//     <div>
-//       <h2>Select Menu Category</h2>
-//       {categories.map((cat) => (
-//         <button
-//           key={cat}
-//           onClick={() => onSelect(cat)}
-//           style={{
-//             margin: '5px',
-//             padding: '10px',
-//             background: selected === cat ? 'darkblue' : 'lightgray',
-//             color: selected === cat ? 'white' : 'black'
-//           }}
-//         >
-//           {cat}
-//         </button>
-//       ))}
-//     </div>
-//   );
-// }
-
-// export default MenuSelector;
-
-
-import React from 'react'
-
-export default function MenuSelector() {
+function MenuSelector({ context, onChange }) {
   return (
-    // <div>MenuSelector</div>
-    <>
-    </>
-  )
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+      <input
+        type="date"
+        value={context.date}
+        onChange={(e) => onChange('date', e.target.value)}
+        className="border rounded px-2 py-1"
+      />
+      <select
+        value={context.meal}
+        onChange={(e) => onChange('meal', e.target.value)}
+        className="border rounded px-2 py-1"
+      >
+        <option value="">Select Meal</option>
+        <option value="Breakfast">Breakfast</option>
+        <option value="Lunch">Lunch</option>
+        <option value="Tiffin">Tiffin</option>
+        <option value="Dinner">Dinner</option>
+      </select>
+      <input
+        type="number"
+        value={context.members}
+        onChange={(e) => onChange('members', e.target.value)}
+        className="border rounded px-2 py-1"
+        placeholder="Members"
+        min="1"
+      />
+    </div>
+  );
 }
 
+export default MenuSelector;
