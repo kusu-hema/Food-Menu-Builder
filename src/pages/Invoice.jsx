@@ -48,7 +48,7 @@ function Invoice() {
         {/* Left Panel */}
         <div className="lg:w-2/5 bg-white rounded-lg shadow-md p-4 sm:p-6">
           <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-800">Select Menu</h2>
-          <MenuSelector selected={category} onSelect={setCategory} />
+          {/* <MenuSelector selected={category} onSelect={setCategory} /> */}
           <div className="mt-4">
             <MenuItems
               items={menuData[category]}

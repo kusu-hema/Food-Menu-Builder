@@ -1,20 +1,26 @@
 import React, { useState, useEffect } from 'react';
 
 function MenuItems({ onAdd, selectedItems }) {
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const apiUrl = 'http://localhost:4000/api/products';
-
-    fetch(apiUrl)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
+    fetch('http://localhost:4000/api/categories')
+      .then(res => res.json())
+      .then(data => {
+        const categoryList = data.map(item => item.category_name);
+        setCategories(categoryList);
+        setSelectedCategory(categoryList[0] || '');
       })
+      .catch(err => console.error('Error fetching categories:', err));
+  }, []);
+
+  useEffect(() => {
+    fetch('http://localhost:4000/api/products')
+      .then(res => res.json())
       .then(data => {
         setItems(data);
         setIsLoading(false);
@@ -25,60 +31,56 @@ function MenuItems({ onAdd, selectedItems }) {
       });
   }, []);
 
-  if (isLoading) {
-    return <div>Loading menu items...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
   const imageBaseUrl = 'http://localhost:4000/';
+  const filteredItems = items.filter(item =>
+    item.category?.trim().toLowerCase() === selectedCategory.trim().toLowerCase()
+  );
 
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-4">Available Items</h3>
-      <div className="grid grid-cols-3 gap-4">
-        {items.map((item) => (
-          <div
-            key={item.product}
-            onClick={() => {
-              if (typeof onAdd === 'function') {
-                onAdd(item.product); // Pass unique ID
-              } else {
-                console.error("Error: 'onAdd' prop is not a function.");
-              }
-            }}
-            style={{
-              border: '1px solid #ccc',
-              padding: '10px',
-              cursor: 'pointer',
-              background: selectedItems.includes(item.product) ? '#e0ffe0' : '#fff',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              textAlign: 'center',
-              borderRadius: '8px'
-            }}
+      <div className="mb-4 flex flex-wrap gap-2">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setSelectedCategory(cat)}
+            className={`px-4 py-2 rounded-md text-sm font-medium ${
+              selectedCategory === cat ? 'bg-blue-800 text-white' : 'bg-gray-200 text-black'
+            } hover:bg-blue-600 hover:text-white transition`}
           >
-            {item.image && (
-              <img
-                src={`${imageBaseUrl}${item.image}`}
-                alt={item.product}
-                style={{
-                  width: '50px',
-                  height: '50px',
-                  marginBottom: '10px',
-                  borderRadius: '50%',
-                  objectFit: 'cover'
-                }}
-              />
-            )}
-            {/* <span>➕ {item.product}</span> */}
-            <span style={{ fontSize: '12px' }}> {item.product}</span>
-          </div>
+            {cat}
+          </button>
         ))}
       </div>
+
+      <h3 className="text-lg font-semibold mb-4">Available Items</h3>
+      {isLoading ? (
+        <div>Loading menu items...</div>
+      ) : error ? (
+        <div className="text-red-500">Error: {error}</div>
+      ) : filteredItems.length === 0 ? (
+        <p className="italic text-gray-500">No items found for "{selectedCategory}".</p>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          {filteredItems.map((item) => (
+            <div
+              key={item.product}
+              onClick={() => onAdd(item.product)}
+              className={`border rounded-lg p-3 cursor-pointer flex flex-col items-center text-center transition ${
+                selectedItems.includes(item.product) ? 'bg-green-100' : 'bg-white'
+              } hover:shadow-md`}
+            >
+              {item.image && (
+                <img
+                  src={`${imageBaseUrl}${item.image}`}
+                  alt={item.product}
+                  className="w-12 h-12 mb-2 rounded-full object-cover"
+                />
+              )}
+              <span className="text-xs font-medium truncate w-full">{item.product}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
