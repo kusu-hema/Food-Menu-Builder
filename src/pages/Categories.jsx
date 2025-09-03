@@ -36,19 +36,27 @@ const CategoryForm = ({ editingCategory, onCategorySaved, onClose }) => {
 
     // Create a FormData object to handle file and text data
     const formData = new FormData();
-    // Only append a new image if one has been selected
+    formData.append('category_name', categoryName);
+
+    // If an image has been selected in the form, append it to the formData.
+    // If we're editing an existing category and no new image is selected,
+    // the image field will not be added to the formData, and the backend
+    // should be smart enough to keep the old image.
     if (image) {
       formData.append('image', image);
     }
-    // Append the category name, which is a required field
-    formData.append('category_name', categoryName);
 
-    // Determine the API endpoint and HTTP method based on whether we are editing or creating
     const isEditing = !!editingCategory;
     const url = isEditing
       ? `http://localhost:4000/api/categories/${editingCategory.sno}`
       : 'http://localhost:4000/api/categories';
     const method = isEditing ? 'PUT' : 'POST';
+
+    // Log the FormData content for debugging purposes
+    console.log(`Submitting form to: ${url} with method: ${method}`);
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
 
     try {
       const response = await fetch(url, {
@@ -62,9 +70,7 @@ const CategoryForm = ({ editingCategory, onCategorySaved, onClose }) => {
           : 'Category created successfully!';
         setMessage({ text: successMessage, type: 'success' });
 
-        // Call the callback to trigger a refresh in the table component
         onCategorySaved();
-        // Close the modal after a short delay
         setTimeout(onClose, 1000);
       } else {
         const errorData = await response.json();
@@ -72,7 +78,7 @@ const CategoryForm = ({ editingCategory, onCategorySaved, onClose }) => {
       }
     } catch (error) {
       console.error(`Error saving category:`, error);
-      setMessage({ text: 'Failed to connect to the server.', type: 'error' });
+      setMessage({ text: 'Failed to connect to the server. Please check if your backend is running.', type: 'error' });
     }
   };
 
@@ -300,7 +306,7 @@ const CategoriesTable = ({ categories, productCounts, loading, error, onEdit, on
 };
 
 // This is the main parent component that orchestrates the layout
-const  Categories = () => {
+const Categories = () => {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]); // State to store raw products data
   const [productCounts, setProductCounts] = useState({}); // State for product counts

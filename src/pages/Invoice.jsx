@@ -20,6 +20,13 @@ function Invoice() {
     { date: '', meal: '', members: '', items: {} }
   ]);
 
+  const [formData, setFormData] = useState({
+    date: '',
+    place: '',
+    name: '',
+    contact: '',
+  });
+
   const updateContext = (index, field, value) => {
     const updated = [...menuContexts];
     updated[index][field] = value;
@@ -58,11 +65,16 @@ function Invoice() {
     setMenuContexts([...menuContexts, { date: '', meal: '', members: '', items: {} }]);
   };
 
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* Left Panel */}
-        <div className="lg:w-2/5 bg-white rounded-lg shadow-md p-4">
+        {/* Left Panel - Fixed & Scrollable */}
+        <div className="lg:w-2/5 bg-white rounded-lg shadow-md p-4 overflow-y-auto h-[calc(100vh-3rem)] sticky top-6 self-start">
           <h2 className="text-lg font-semibold mb-4 text-gray-800">Select Menu</h2>
           {menuContexts.map((context, index) => (
             <div key={index} className="mb-6 border rounded p-4 bg-white shadow">
@@ -101,6 +113,8 @@ function Invoice() {
               menuContexts={menuContexts}
               onRemoveItem={handleRemoveItem}
               onRemoveContext={handleRemoveContext}
+              formData={formData}
+              onFormChange={handleFormChange}
             />
           </div>
         </div>
