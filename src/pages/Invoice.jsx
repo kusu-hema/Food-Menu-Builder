@@ -13,6 +13,7 @@ function Invoice() {
     pageStyle: `
       @page { margin: 20mm }
       body { font-family: Arial, sans-serif; }
+      div { page-break-inside: avoid; }
     `,
   });
 
@@ -71,10 +72,10 @@ function Invoice() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Left Panel - Fixed & Scrollable */}
-        <div className="lg:w-2/5 bg-white rounded-lg shadow-md p-4 overflow-y-auto h-[calc(100vh-3rem)] sticky top-6 self-start">
+    <div className="min-h-screen bg-gray-100 p-6 overflow-x-auto">
+      <div className="flex flex-row gap-6 min-w-[1000px]">
+        {/* Left Panel - Scrollable */}
+        <div className="w-[400px] bg-white rounded-lg shadow-md p-4 overflow-y-auto max-h-[calc(100vh-3rem)]">
           <h2 className="text-lg font-semibold mb-4 text-gray-800">Select Menu</h2>
           {menuContexts.map((context, index) => (
             <div key={index} className="mb-6 border rounded p-4 bg-white shadow">
@@ -96,8 +97,8 @@ function Invoice() {
           </button>
         </div>
 
-        {/* Right Panel */}
-        <div className="lg:w-3/5 bg-white rounded-lg shadow-md p-4">
+        {/* Right Panel - Scrollable */}
+        <div className="flex-1 bg-white rounded-lg shadow-md p-4 overflow-y-auto max-h-[calc(100vh-3rem)]">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-semibold text-gray-800">Invoice Preview</h2>
             <button
