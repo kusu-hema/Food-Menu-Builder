@@ -35,7 +35,7 @@ function MenuSelector({ context, onChange }) {
       >
         <option value=" ">Buf/Seat</option>
         <option value="Buffet">Buffet</option>
-        <option value="seating">Seating</option>
+        <option value="SITTING">Sitting</option>
       </select>
     </div>
   );
