@@ -48,19 +48,24 @@ const PreviewDocument = React.forwardRef(
             className="mb-8 relative border rounded-lg p-4 shadow bg-white"
           >
             {/* Remove Context Button */}
-            <button
-              onClick={() => onRemoveContext(index)}
-              className="absolute top-2 right-2 text-red-600 text-sm border border-gray-300 rounded px-2 py-0.5 hover:bg-red-50 transition print:hidden"
-              title="Remove entire menu context"
-            >
-              ❌
-            </button>
+           <button
+            onClick={() => {
+              const confirmDelete = window.confirm('Are you sure you want to delete this menu context?');
+              if (confirmDelete) {
+                onRemoveContext(index);
+              }
+            }}
+            className="absolute top-2 right-2 text-red-600 text-sm border border-gray-300 rounded px-2 py-0.5 hover:bg-red-50 transition print:hidden"
+            title="Remove entire menu context"
+          >
+            ❌
+          </button>
 
             
 
             {/* Context Header */}
             <h4 className="text-md font-bold text-gray-700 mb-4">
-              {formatDate(entry.date)} {entry.meal?.toUpperCase()} FOR {entry.members} MEMBERS
+              {formatDate(entry.date)} {entry.meal?.toUpperCase()} FOR {entry.members} MEMBERS {entry.buffet}
             </h4>
 
             {/* Category Table */}

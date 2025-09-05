@@ -31,7 +31,7 @@ function Invoice() {
 
     const [menuContexts, setMenuContexts] = useState(() => {
     const saved = localStorage.getItem('menuContexts');
-      return saved ? JSON.parse(saved) : [{ date: '', meal: '', members: '', items: {} }];
+      return saved ? JSON.parse(saved) : [{ date: '', meal: '', members: '', buffet:'' , items: {} }];
     });
 
     // const [formData, setFormData] = useState(() => {
@@ -56,6 +56,11 @@ function Invoice() {
   const handleAddItem = (index, category, itemName) => {
     const updated = [...menuContexts];
     const context = updated[index];
+
+    // Check if item already exists
+    const existingItems = context.items[category] || [];
+    if (existingItems.includes(itemName)) return; // Skip if already added
+
     const updatedItems = {
       ...context.items,
       [category]: [...(context.items[category] || []), itemName]
@@ -63,6 +68,9 @@ function Invoice() {
     updated[index].items = updatedItems;
     setMenuContexts(updated);
   };
+
+ 
+
 
   const handleRemoveItem = (contextIndex, category, itemName) => {
     const updated = [...menuContexts];
@@ -82,33 +90,61 @@ function Invoice() {
   };
 
   const addMenuContext = () => {
-    setMenuContexts([...menuContexts, { date: '', meal: '', members: '', items: {} }]);
+    setMenuContexts([...menuContexts, { date: '', meal: '', members: '', buffet:'' , items: {} }]);
   };
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    
   };
+
+  const [expandedIndex, setExpandedIndex] = useState(null);
+
+  const toggleAccordion = (index) => {
+  setExpandedIndex(prev => (prev === index ? null : index));
+};
 
   return (
     <div className="min-h-screen bg-gray-100 p-6 overflow-x-auto">
       <div className="flex flex-row gap-6 min-w-[1000px]">
-        
+
         {/* Left Panel - Scrollable */}
         <div className="w-[400px] bg-white rounded-lg shadow-md p-4 overflow-y-auto max-h-[calc(100vh-3rem)]">
           <h2 className="text-lg font-semibold mb-4 text-gray-800">Select Menu</h2>
-          {menuContexts.map((context, index) => (
-            <div key={index} className="mb-6 border rounded p-4 bg-white shadow">
-              <MenuSelector
-                context={context}
-                onChange={(field, value) => updateContext(index, field, value)}
-              />
-              <MenuItems
-                selectedItems={context.items}
-                onAddItem={(category, itemName) => handleAddItem(index, category, itemName)}
-              />
-            </div>
-          ))}
+          {menuContexts.map((context, index) => {
+           const isOpen = expandedIndex === index;
+           return (
+            <div key={index} className="mb-4 border rounded bg-white shadow">
+              {/* Accordion Header */}
+              <div
+                className="flex justify-between items-center p-3 cursor-pointer bg-gray-100 hover:bg-gray-200"
+                onClick={() => toggleAccordion(index)}
+              >
+                <div className="font-semibold text-gray-800">
+                  {context.date || 'Select Date'} – {context.meal || 'Meal'} – {context.members || 'Members'}
+                </div>
+                <div className="text-sm text-blue-600">
+                  {isOpen ? '▲ Collapse' : '▼ Expand'}
+                </div>
+              </div>
+
+              {/* Accordion Body */}
+              {isOpen && (
+                <div className="p-4 border-t">
+                  <MenuSelector
+                    context={context}
+                    onChange={(field, value) => updateContext(index, field, value)}
+                  />
+                  <MenuItems
+                    selectedItems={context.items}
+                    onAddItem={(category, itemName) => handleAddItem(index, category, itemName)}
+                  />
+                </div>
+                    )}
+                  </div>
+                );
+          })}
           <button
             onClick={addMenuContext}
             className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"

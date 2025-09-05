@@ -28,6 +28,15 @@ function MenuSelector({ context, onChange }) {
         placeholder="Members"
         min="1"
       />
+      <select
+      Value={context.buffet}
+      onChange={(e) => onChange('buffet', e.target.value)}
+      className='border rounded px-2 py-1'
+      >
+        <option value=" ">Buf/Seat</option>
+        <option value="Buffet">Buffet</option>
+        <option value="seating">Seating</option>
+      </select>
     </div>
   );
 }
