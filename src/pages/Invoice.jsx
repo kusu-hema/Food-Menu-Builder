@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import MenuSelector from '../Components/MenuSelector';
 import MenuItems from '../Components/MenuItems';
@@ -6,7 +6,7 @@ import PreviewDocument from '../Components/PreviewDocument';
 
 function Invoice() {
   const componentRef = useRef(null);
-
+  
   const handlePrint = useReactToPrint({
     contentRef: componentRef,
     documentTitle: 'Invoice',
@@ -17,16 +17,35 @@ function Invoice() {
     `,
   });
 
-  const [menuContexts, setMenuContexts] = useState([
-    { date: '', meal: '', members: '', items: {} }
-  ]);
+  // const [menuContexts, setMenuContexts] = useState([
+  //   { date: '', meal: '', members: '', items: {} }
+  // ]);
 
-  const [formData, setFormData] = useState({
-    date: '',
-    place: '',
-    name: '',
-    contact: '',
-  });
+  // const [formData, setFormData] = useState({
+  //   date: '',
+
+  //   place: '',
+  //   name: '',
+  //   contact: '',
+  // });
+
+    const [menuContexts, setMenuContexts] = useState(() => {
+    const saved = localStorage.getItem('menuContexts');
+      return saved ? JSON.parse(saved) : [{ date: '', meal: '', members: '', items: {} }];
+    });
+
+    // const [formData, setFormData] = useState(() => {
+    //   const saved = localStorage.getItem('formData');
+    //   return saved ? JSON.parse(saved) : { date: '', place: '', name: '', contact: '' };
+    // });
+
+    useEffect(() => {
+      localStorage.setItem('menuContexts', JSON.stringify(menuContexts));
+    }, [menuContexts]);
+
+    // useEffect(() => {
+    //   localStorage.setItem('formData', JSON.stringify(formData));
+    // }, [formData]);
 
   const updateContext = (index, field, value) => {
     const updated = [...menuContexts];
@@ -74,6 +93,7 @@ function Invoice() {
   return (
     <div className="min-h-screen bg-gray-100 p-6 overflow-x-auto">
       <div className="flex flex-row gap-6 min-w-[1000px]">
+        
         {/* Left Panel - Scrollable */}
         <div className="w-[400px] bg-white rounded-lg shadow-md p-4 overflow-y-auto max-h-[calc(100vh-3rem)]">
           <h2 className="text-lg font-semibold mb-4 text-gray-800">Select Menu</h2>
@@ -108,16 +128,20 @@ function Invoice() {
               Print Invoice
             </button>
           </div>
+
+          {/* Previewdocument file */}
+
           <div className="mt-4">
             <PreviewDocument
               ref={componentRef}
               menuContexts={menuContexts}
               onRemoveItem={handleRemoveItem}
               onRemoveContext={handleRemoveContext}
-              formData={formData}
+              // formData={formData}
               onFormChange={handleFormChange}
             />
           </div>
+
         </div>
       </div>
     </div>

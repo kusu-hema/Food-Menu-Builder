@@ -56,6 +56,8 @@ const PreviewDocument = React.forwardRef(
               ❌
             </button>
 
+            
+
             {/* Context Header */}
             <h4 className="text-md font-bold text-gray-700 mb-4">
               {formatDate(entry.date)} {entry.meal?.toUpperCase()} FOR {entry.members} MEMBERS
