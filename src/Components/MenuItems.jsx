@@ -27,7 +27,7 @@ function MenuItems({ selectedItems, onAddItem }) {
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap gap-2">
+      <div className="mb-4 flex flex-wrap gap-2 ">
         {categories.map((cat) => (
           <button
             key={cat}
