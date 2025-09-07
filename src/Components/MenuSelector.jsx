@@ -31,7 +31,7 @@ function MenuSelector({ context, onChange }) {
       <select
       Value={context.buffet}
       onChange={(e) => onChange('buffet', e.target.value)}
-      className='border rounded px-2 py-1'
+      className='border rounded px-2 py-1 '
       >
         <option value=" ">Buf/Seat</option>
         <option value="Buffet">Buffet</option>

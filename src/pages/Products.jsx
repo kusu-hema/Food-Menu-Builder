@@ -210,9 +210,9 @@ const ProductsTable = ({ products, loading, error, onEdit, onDelete }) => {
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Category Name
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  {/* <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Action
-                  </th>
+                  </th> */}
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Actions
                   </th>
@@ -246,9 +246,9 @@ const ProductsTable = ({ products, loading, error, onEdit, onDelete }) => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 capitalize">
                       {product.category}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 capitalize">
+                    {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 capitalize">
                       {product.action}
-                    </td>
+                    </td> */}
                     <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
                       <button
                         onClick={() => onEdit(product)}
@@ -295,7 +295,7 @@ const ProductsTable = ({ products, loading, error, onEdit, onDelete }) => {
                 </div>
                 <div className="space-y-2 text-sm text-gray-600">
                   <div><span className="font-semibold text-gray-800">Category:</span> <span className="capitalize">{product.category}</span></div>
-                  <div><span className="font-semibold text-gray-800">Action:</span> <span className="capitalize">{product.action}</span></div>
+                  {/* <div><span className="font-semibold text-gray-800">Action:</span> <span className="capitalize">{product.action}</span></div> */}
                 </div>
                 <div className="mt-4 flex space-x-2">
                   <button

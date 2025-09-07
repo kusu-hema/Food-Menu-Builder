@@ -35,7 +35,7 @@ const PreviewDocument = React.forwardRef(
           </a>
         </h4>
         <h4 className="text-center text-sm text-gray-700 mb-4">
-          VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: 1800 890 3081
+          VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: 1800 890 3081.
         </h4>
         <h3 className="subheading text-center font-black uppercase text-base mb-6 text-[#00B254]">
           WE CATER TO YOUR HEALTH
@@ -64,8 +64,13 @@ const PreviewDocument = React.forwardRef(
             </button>
 
             {/* Context Header */}
-            <h4 className="menuheaing text-lg font-black uppercase text-neutral-900 mb-4">
+            {/* <h4 className="menuheaing text-lg font-black uppercase text-neutral-900 mb-4">
               {formatDate(entry.date)} {entry.meal?.toUpperCase()} FOR {entry.members} MEMBERS {entry.buffet}
+            </h4> */}
+
+            <h4 className="menuheading text-lg font-black uppercase text-neutral-900 mb-4">
+              {formatDate(entry.date)} {entry.meal?.toUpperCase()} FOR {entry.members} MEMBERS{' '}
+              <span className="text-[#FF0000]">{entry.buffet?.toUpperCase()}</span>
             </h4>
   
 

@@ -120,7 +120,7 @@ function Invoice() {
                 onClick={() => toggleAccordion(index)}
               >
                 <div className="font-semibold text-gray-800">
-                  {context.date || 'Select Date'} – {context.meal || 'Meal'} – {context.members || 'Members'}
+                  {context.date || 'Select Date'} - {context.meal || 'Meal'} - {context.members || 'Members'}
                 </div>
                 <div className="text-sm text-blue-600">
                   {isOpen ? '▲ Collapse' : '▼ Expand'}
