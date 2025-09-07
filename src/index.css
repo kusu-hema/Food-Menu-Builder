@@ -8,7 +8,30 @@
   font-weight: 600;
   font-style: normal;
   /* text-transform: uppercase !important; */
+
 }
+
+.Mainheading{
+  font-weight: 900;
+  font-size: xx-large;
+}
+
+
+.subheading{
+  font-weight: 900;
+  letter-spacing: 1.3px;
+  font-size: larger;
+}
+
+.menuheaing{
+  font-weight: 900;
+  /* letter-spacing: 1.3px; */
+  font-size: larger;
+}
+
+
+
+
 
 /* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;

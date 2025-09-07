@@ -18,26 +18,26 @@ const PreviewDocument = React.forwardRef(
         className="max-w-4xl mx-auto bg-white p-6 text-black font-serif border border-black print:border-none"
       >
         {/* Header */}
-        <h2 className="text-center text-xl font-bold uppercase mb-2">
+        <h2 className="Mainheading  text-center text-xl text-900 font-bold font-extrabold uppercase mb-2 text-[#FFC100]">
           SHAMMUKHA CATERERS PVT. LTD
-        </h2>
-        <h4 className="text-center text-sm text-gray-700 mb-1 break-words">
-          <span className="block sm:inline">
-            An ISO 22000:2018 CERTIFIED COMPANY
+       </h2>
+        <h4 className="text-center text-sm text-gray-700 mb-1 break-words ">
+          <span className="block sm:inline text-[#00B254]">
+            An ISO 22000:2018 CERTIFIED COMPANY, Visit : 
           </span>{' '}
           <a
-            href="https://www.shammukhacaterers.com"
+            href="https://www.shammukhacaterers.co.in"
             target="_blank"
             rel="noreferrer"
-            className="text-blue-600 hover:underline block sm:inline"
+            className="text-blue-600 hover:underline block sm:inline underline-offset-2"
           >
-            www.shammukhacaterers.com
+            www.shammukhacaterers.co.in
           </a>
         </h4>
         <h4 className="text-center text-sm text-gray-700 mb-4">
-          VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: 1800 8903081
+          VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: 1800 890 3081
         </h4>
-        <h3 className="text-center font-bold uppercase text-base mb-6">
+        <h3 className="subheading text-center font-black uppercase text-base mb-6 text-[#00B254]">
           WE CATER TO YOUR HEALTH
         </h3>
 
@@ -64,12 +64,10 @@ const PreviewDocument = React.forwardRef(
             </button>
 
             {/* Context Header */}
-            {/* <h4 className="text-md font-bold text-black mb-4"> */}
-            <h4 className="text-lg font-black uppercase text-neutral-900 mb-4">
+            <h4 className="menuheaing text-lg font-black uppercase text-neutral-900 mb-4">
               {formatDate(entry.date)} {entry.meal?.toUpperCase()} FOR {entry.members} MEMBERS {entry.buffet}
             </h4>
   
-             
 
             {/* Category Table */}
             <table className="w-full text-sm border border-black">
@@ -77,7 +75,7 @@ const PreviewDocument = React.forwardRef(
                 {Object.entries(entry.items).map(([category, items]) => (
                   <tr key={category} className="border-b border-black align-top">
                     {/* Category Name */}
-                    <td className="p-2 font-bold text-black w-1/3 text-lg font-black  uppercase border-r border-black">
+                    <td className="menuheaing p-2 font-bold text-black w-1/3 text-lg font-black  uppercase border-r border-black " >
                       {category}
                     </td>
 

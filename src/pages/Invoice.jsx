@@ -70,8 +70,6 @@ function Invoice() {
   };
 
  
-
-
   const handleRemoveItem = (contextIndex, category, itemName) => {
     const updated = [...menuContexts];
     const filtered = updated[contextIndex].items[category].filter(i => i !== itemName);
@@ -177,6 +175,7 @@ function Invoice() {
               onFormChange={handleFormChange}
             />
           </div>
+
 
         </div>
       </div>
