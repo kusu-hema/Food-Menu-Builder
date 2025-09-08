@@ -67,11 +67,28 @@ const PreviewDocument = React.forwardRef(
             {/* <h4 className="menuheaing text-lg font-black uppercase text-neutral-900 mb-4">
               {formatDate(entry.date)} {entry.meal?.toUpperCase()} FOR {entry.members} MEMBERS {entry.buffet}
             </h4> */}
-
+            
+            {/* 
             <h4 className="menuheading text-lg font-black uppercase text-neutral-900 mb-4">
               {formatDate(entry.date)} {entry.meal?.toUpperCase()} FOR {entry.members} MEMBERS{' '}
               <span className="text-[#FF0000]">{entry.buffet?.toUpperCase()}</span>
-            </h4>
+            </h4> */}
+
+
+            <h4
+            style={{
+              fontWeight: 900,
+              fontSize: 'larger',
+              textTransform: 'uppercase',
+              color: '#1a1a1a', // equivalent to text-neutral-900
+              marginBottom: '1rem',
+              letterSpacing: '1.3px',
+              // textAlign: 'center'
+            }}
+          >
+            {formatDate(entry.date)} {entry.meal?.toUpperCase()} FOR {entry.members} MEMBERS{' '}
+            <span style={{ color: '#FF0000' }}>{entry.buffet?.toUpperCase()}</span>
+          </h4>
   
 
             {/* Category Table */}
