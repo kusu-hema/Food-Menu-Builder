@@ -15,7 +15,7 @@ const ProductForm = ({ editingProduct, onProductSaved, onClose }) => {
   const [action, setAction] = useState('');
   const [image, setImage] = useState(null);
   const [message, setMessage] = useState(null);
-
+ 
   useEffect(() => {
     if (editingProduct) {
       setProduct(editingProduct.product);

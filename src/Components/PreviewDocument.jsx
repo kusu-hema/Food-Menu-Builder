@@ -26,7 +26,8 @@ const PreviewDocument = React.forwardRef(
             An ISO 22000:2018 CERTIFIED COMPANY, Visit : 
           </span>{' '}
           <a
-            href="https://www.shammukhacaterers.co.in"
+            // href="https://www.shammukhacaterers.co.in"
+            href="https://www.shanmukhacaterers.co.in/"
             target="_blank"
             rel="noreferrer"
             className="text-blue-600 hover:underline block sm:inline underline-offset-2"
@@ -43,9 +44,13 @@ const PreviewDocument = React.forwardRef(
 
         {/* Context Blocks */}
         {menuContexts.map((entry, index) => (
+          // <div
+          //   key={index}
+          //   className="mb-8 relative border border-black p-4 bg-white"
+          // >
           <div
             key={index}
-            className="mb-8 relative border border-black p-4 bg-white"
+            className="mb-8 relative border border-black p-4 bg-white print:no-border"
           >
             {/* Remove Context Button */}
             <button
@@ -60,7 +65,7 @@ const PreviewDocument = React.forwardRef(
               className="absolute top-2 right-2 text-red-600 text-sm border border-gray-300 rounded px-2 py-0.5 hover:bg-red-50 transition print:hidden"
               title="Remove entire menu context"
             >
-              ❌
+              ❌ 
             </button>
 
             {/* Context Header */}
@@ -75,7 +80,7 @@ const PreviewDocument = React.forwardRef(
             </h4> */}
 
 
-            <h4
+          <h4
             style={{
               fontWeight: 900,
               fontSize: 'larger',
@@ -95,14 +100,17 @@ const PreviewDocument = React.forwardRef(
             <table className="w-full text-sm border border-black">
               <tbody>
                 {Object.entries(entry.items).map(([category, items]) => (
-                  <tr key={category} className="border-b border-black align-top">
+                  <tr key={category} className="border-b border-black align-top" >
                     {/* Category Name */}
-                    <td className="menuheaing p-2 font-bold text-black w-1/3 text-lg font-black  uppercase border-r border-black " >
+                    {/* <td className="menuheaing p-2 font-bold text-black w-1/3 text-lg font-black  uppercase border-r border-black " >
+                      {category}
+                    </td> */}
+                    <td className="menuheaing p-2 font-bold text-black w-1/4 text-base uppercase border-r border-black">
                       {category}
                     </td>
 
                     {/* Items Inline */}
-                    <td className="p-2 text-black w-2/3 uppercase flex flex-wrap gap-2">
+                    {/* <td className="p-2 text-black w-2/3 uppercase flex flex-wrap gap-2">
                       {items.map((item, i) => (
                         <span
                           key={i}
@@ -118,6 +126,25 @@ const PreviewDocument = React.forwardRef(
                           </button>
                         </span>
                       ))}
+                    </td> */}
+                    <td className="p-1 font-bold text-base text-black w-2/3 uppercase">
+                      <div className="flex flex-wrap gap-x-4 gap-y-1">
+                        {items.map((item, i) => (
+                          <span
+                            key={i}
+                            className="inline-flex items-center gap-1"
+                          >
+                            * {item}
+                            <button
+                              onClick={() => onRemoveItem(index, category, item)}
+                              className="text-red-600 text-xs border border-gray-300 rounded px-1 py-0.5 hover:bg-red-50 transition print:hidden"
+                              title="Remove item"
+                            >
+                              ❌
+                            </button>
+                          </span>
+                        ))}
+                      </div>
                     </td>
                   </tr>
                 ))}

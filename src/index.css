@@ -11,6 +11,12 @@
 
 }
 
+@media print {
+  .print\:no-border {
+    border: none !important;
+  }
+}
+
 .Mainheading{
   font-weight: 900;
   font-size: xx-large;

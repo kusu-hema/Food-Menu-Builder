@@ -11,9 +11,10 @@ function Invoice() {
     contentRef: componentRef,
     documentTitle: 'Invoice',
     pageStyle: `
-      @page { margin: 20mm }
+      @page { margin: 10mm }
       body { font-family: Arial, sans-serif; }
       div { page-break-inside: avoid; }
+      
     `,
   });
 
