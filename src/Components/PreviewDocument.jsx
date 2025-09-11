@@ -1,8 +1,19 @@
 import React from 'react';
 
-const PreviewDocument = React.forwardRef(
-  ({ menuContexts, onRemoveItem, onRemoveContext }, ref) => {
-    // Format date as "07-August-2025"
+// const PreviewDocument = React.forwardRef(
+//   ({ menuContexts, onRemoveItem, onRemoveContext }, ref) => {
+//     // Format date as "07-August-2025"
+//     const formatDate = (dateStr) => {
+//       if (!dateStr) return '';
+//       const date = new Date(dateStr);
+//       const day = String(date.getDate()).padStart(2, '0');
+//       const month = date.toLocaleString('en-US', { month: 'long' });
+//       const year = date.getFullYear();
+//       return `${day}-${month}-${year}`;
+//     };
+
+    const PreviewDocument = React.forwardRef(
+  ({ menuContexts, onRemoveItem, onRemoveContext, formData }, ref) => {
     const formatDate = (dateStr) => {
       if (!dateStr) return '';
       const date = new Date(dateStr);
@@ -11,6 +22,7 @@ const PreviewDocument = React.forwardRef(
       const year = date.getFullYear();
       return `${day}-${month}-${year}`;
     };
+
 
     return (
       <div
@@ -41,6 +53,23 @@ const PreviewDocument = React.forwardRef(
         <h3 className="subheading text-center font-black uppercase text-base mb-6 text-[#00B254]">
           WE CATER TO YOUR HEALTH
         </h3>
+
+
+        {/* Form Data */}
+        <div className="mb-6 text-sm font-medium text-black flex flex-wrap justify-between print:flex-row print:gap-0  uppercase ">
+            {/* Left Column: Date + Place */}
+            <div className="w-full md:w-[48%] print:w-[48%]">
+              <div className="mb-1 "><span style={{ fontWeight:'900', fontSize:'larger'}} >Date: </span> {formData.date}</div>
+              <div className="mb-1 "><span style={{ fontWeight:'900', fontSize:'larger'}} >Place:</span>  {formData.place}</div>
+            </div>
+
+            {/* Right Column: Name + Contact */}
+            <div className="w-full md:w-[48%] print:w-[48%]">
+              <div className="mb-1 "><span style={{ fontWeight:'900', fontSize:'larger'}} >Name:</span> {formData.name}</div>
+              <div className="mb-1"><span style={{ fontWeight:'900', fontSize:'larger'}} >Contact:</span> {formData.contact}</div>
+            </div>
+          </div>
+
 
         {/* Context Blocks */}
         {menuContexts.map((entry, index) => (

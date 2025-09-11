@@ -46,9 +46,11 @@ function MenuItems({ selectedItems, onAddItem }) {
         {filteredItems.map((item) => (
           <div
             key={item.product}
-            onClick={() => onAddItem(item.category, item.product)}
+            // onClick={() => onAddItem(item.category, item.product)}
+            onClick={() => onAddItem(selectedCategory, item.product)}
             className={`border rounded-lg p-3 cursor-pointer flex flex-col items-center text-center transition ${
-              selectedItems[item.category]?.includes(item.product) ? 'bg-green-100' : 'bg-white'
+              selectedItems[selectedCategory]?.includes(item.product) ?
+               'bg-green-100' : 'bg-white'
             } hover:shadow-md`}
           >
             {item.image && (

@@ -53,7 +53,7 @@ const menuItems = [
     icon: <FaLayerGroup />,
     children: [
       { label: 'Add Category', path: '/categories' },
-      { label: 'All Categories', path: '/categories/all' },
+      { label: 'All Categories', path: '/events' },
     ],
   },
   {
