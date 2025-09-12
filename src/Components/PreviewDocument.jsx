@@ -58,32 +58,24 @@ const PreviewDocument = React.forwardRef(
 
 
         {/* Form Data */}
-        <div className="mb-2 text-sm font-medium text-black flex flex-wrap justify-between print:flex-row print:gap-0  uppercase ">
-            {/* Left Column: Date + Place */}
-            {/* <div className="w-full md:w-[48%] print:w-[48%]">
-              <div className="mb-1">
-              <span style={{ fontWeight: '900', fontSize: 'larger' }}>Date:</span> {formatDate(formData.date)}
-            </div>
-              <div className="mb-1 "><span style={{ fontWeight:'900', fontSize:'larger'}} >Place:</span>  {formData.place}</div>
-            </div> */}
-
+        <div className="mb-2 text-sm font-medium text-black flex flex-wrap justify-between print:flex-row print:gap-0  uppercase">
+            {/* Left Column: Name + Contact */}
+    
              <div className="w-full md:w-[48%] print:w-[48%]">
               <div className="mb-1 "><span style={{ fontWeight:'900', fontSize:'larger'}} >Name:</span> {formData.name}</div>
               <div className="mb-1"><span style={{ fontWeight:'900', fontSize:'larger'}} >Contact:</span> {formData.contact}</div>
             </div>
 
-            {/* Right Column: Name + Contact */}
-            {/* <div className="w-full md:w-[48%] print:w-[48%]">
-              <div className="mb-1 "><span style={{ fontWeight:'900', fontSize:'larger'}} >Name:</span> {formData.name}</div>
-              <div className="mb-1"><span style={{ fontWeight:'900', fontSize:'larger'}} >Contact:</span> {formData.contact}</div>
-            </div> */}
-             <div className="w-full md:w-[48%] print:w-[48%]">
+            {/* Right Column: Date + Place */}
+
+            <div className="w-full md:w-[48%] print:w-[48%]">
               <div className="mb-1">
               <span style={{ fontWeight: '900', fontSize: 'larger' }}>Date:</span> {formatDate(formData.date)}
             </div>
               <div className="mb-1 "><span style={{ fontWeight:'900', fontSize:'larger'}} >Place:</span>  {formData.place}</div>
             </div>
-          </div>
+
+        </div>
 
 
         {/* Context Blocks */}
@@ -109,17 +101,11 @@ const PreviewDocument = React.forwardRef(
             </button>
 
             {/* Context Header */}
+
             {/* <h4 className="menuheaing text-lg font-black uppercase text-neutral-900 mb-4">
               {formatDate(entry.date)} {entry.meal?.toUpperCase()} FOR {entry.members} MEMBERS {entry.buffet}
             </h4> */}
             
-            {/* 
-            <h4 className="menuheading text-lg font-black uppercase text-neutral-900 mb-4">
-              {formatDate(entry.date)} {entry.meal?.toUpperCase()} FOR {entry.members} MEMBERS{' '}
-              <span className="text-[#FF0000]">{entry.buffet?.toUpperCase()}</span>
-            </h4> */}
-
-
           <h4
             style={{
               fontWeight: 900,

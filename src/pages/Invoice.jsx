@@ -13,6 +13,7 @@ function Invoice() {
     pageStyle: `
       @page { margin: 5mm }
       body { font-family: Arial, sans-serif; }
+      // @page { margin: 20mm 5mm 5mm 5mm }
       // div { page-break-inside: avoid; }
     `,
   });
@@ -80,12 +81,13 @@ function Invoice() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const [expandedIndex, setExpandedIndex] = useState(null);
+
   const toggleAccordion = (index) => {
     setExpandedIndex(prev => (prev === index ? null : index));
   };
 
   const [formExpanded, setFormExpanded] = useState(true);
+  const [expandedIndex, setExpandedIndex] = useState(null);
 
   return (
     <div className="min-h-screen bg-gray-100 p-6 overflow-x-auto">
@@ -96,10 +98,10 @@ function Invoice() {
           <h2 className="text-lg font-semibold mb-4 text-gray-800">Select Menu</h2>
 
           <div
-            className="flex justify-between items-center mb-2 cursor-pointer bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded"
+            className="flex justify-between items-center mb-2 cursor-pointer bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded border"
             onClick={() => setFormExpanded(prev => !prev)}
           >
-            <h2 className="text-lg font-semibold text-gray-800">Customer Details</h2>
+            <h2 className="text-lg font-semibold text-gray-800 ">Customer Details</h2>
             <span className="text-sm text-blue-600">
               {formExpanded ? '▲ Collapse' : '▼ Expand'}
             </span>
