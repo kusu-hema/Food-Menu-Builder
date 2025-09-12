@@ -58,32 +58,39 @@ const PreviewDocument = React.forwardRef(
 
 
         {/* Form Data */}
-        <div className="mb-6 text-sm font-medium text-black flex flex-wrap justify-between print:flex-row print:gap-0  uppercase ">
+        <div className="mb-2 text-sm font-medium text-black flex flex-wrap justify-between print:flex-row print:gap-0  uppercase ">
             {/* Left Column: Date + Place */}
-            <div className="w-full md:w-[48%] print:w-[48%]">
+            {/* <div className="w-full md:w-[48%] print:w-[48%]">
               <div className="mb-1">
               <span style={{ fontWeight: '900', fontSize: 'larger' }}>Date:</span> {formatDate(formData.date)}
             </div>
               <div className="mb-1 "><span style={{ fontWeight:'900', fontSize:'larger'}} >Place:</span>  {formData.place}</div>
+            </div> */}
+
+             <div className="w-full md:w-[48%] print:w-[48%]">
+              <div className="mb-1 "><span style={{ fontWeight:'900', fontSize:'larger'}} >Name:</span> {formData.name}</div>
+              <div className="mb-1"><span style={{ fontWeight:'900', fontSize:'larger'}} >Contact:</span> {formData.contact}</div>
             </div>
 
             {/* Right Column: Name + Contact */}
-            <div className="w-full md:w-[48%] print:w-[48%]">
+            {/* <div className="w-full md:w-[48%] print:w-[48%]">
               <div className="mb-1 "><span style={{ fontWeight:'900', fontSize:'larger'}} >Name:</span> {formData.name}</div>
               <div className="mb-1"><span style={{ fontWeight:'900', fontSize:'larger'}} >Contact:</span> {formData.contact}</div>
+            </div> */}
+             <div className="w-full md:w-[48%] print:w-[48%]">
+              <div className="mb-1">
+              <span style={{ fontWeight: '900', fontSize: 'larger' }}>Date:</span> {formatDate(formData.date)}
+            </div>
+              <div className="mb-1 "><span style={{ fontWeight:'900', fontSize:'larger'}} >Place:</span>  {formData.place}</div>
             </div>
           </div>
 
 
         {/* Context Blocks */}
         {menuContexts.map((entry, index) => (
-          // <div
-          //   key={index}
-          //   className="mb-8 relative border border-black p-4 bg-white"
-          // >
           <div
             key={index}
-            className="mb-8 relative border border-black p-4 bg-white print:no-border"
+            className="mb-8 relative border border-black p-2 bg-white print:no-border"
           >
             {/* Remove Context Button */}
             <button

@@ -13,7 +13,7 @@ function Invoice() {
     pageStyle: `
       @page { margin: 5mm }
       body { font-family: Arial, sans-serif; }
-      div { page-break-inside: avoid; }
+      // div { page-break-inside: avoid; }
     `,
   });
 
