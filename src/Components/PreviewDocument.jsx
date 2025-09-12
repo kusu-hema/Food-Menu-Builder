@@ -12,18 +12,20 @@ import React from 'react';
 //       return `${day}-${month}-${year}`;
 //     };
 
-    const PreviewDocument = React.forwardRef(
+const PreviewDocument = React.forwardRef(
   ({ menuContexts, onRemoveItem, onRemoveContext, formData }, ref) => {
+    // Format date as "30-AUG-2025"
     const formatDate = (dateStr) => {
       if (!dateStr) return '';
       const date = new Date(dateStr);
       const day = String(date.getDate()).padStart(2, '0');
-      const month = date.toLocaleString('en-US', { month: 'long' });
+      const month = date.toLocaleString('en-US', { month: 'long' }).toUpperCase();
       const year = date.getFullYear();
       return `${day}-${month}-${year}`;
     };
 
 
+    
     return (
       <div
         ref={ref}
@@ -59,7 +61,9 @@ import React from 'react';
         <div className="mb-6 text-sm font-medium text-black flex flex-wrap justify-between print:flex-row print:gap-0  uppercase ">
             {/* Left Column: Date + Place */}
             <div className="w-full md:w-[48%] print:w-[48%]">
-              <div className="mb-1 "><span style={{ fontWeight:'900', fontSize:'larger'}} >Date: </span> {formData.date}</div>
+              <div className="mb-1">
+              <span style={{ fontWeight: '900', fontSize: 'larger' }}>Date:</span> {formatDate(formData.date)}
+            </div>
               <div className="mb-1 "><span style={{ fontWeight:'900', fontSize:'larger'}} >Place:</span>  {formData.place}</div>
             </div>
 

@@ -422,7 +422,8 @@ const Categories = () => {
             onDelete={handleDelete}
           />
         </div>
-
+        
+        <div>
         {/* Debug Panel - Displays raw API data for troubleshooting */}
         {/* <div className="w-full max-w-sm p-6 bg-gray-900 text-green-400 font-mono rounded-lg shadow-xl">
           <h2 className="text-xl font-bold mb-4 text-center">Debug Panel</h2>
@@ -437,6 +438,8 @@ const Categories = () => {
             </div>
           </div>
         </div> */}
+        </div>
+
       </div>
 
       {/* The Modal component is now conditionally rendered */}
@@ -447,6 +450,7 @@ const Categories = () => {
           onClose={closeModalAndReset}
         />
       </Modal>
+      
     </div>
   );
 };
