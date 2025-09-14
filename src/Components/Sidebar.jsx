@@ -40,6 +40,15 @@ const menuItems = [
       { label: 'Total Customers', path: '/customers/total' },
     ],
   },
+    {
+    label: 'Menu',
+    icon: <FaUsers />,
+    children: [
+      { label: 'Create Menu', path: '/invoice' },
+      { label: 'Total Menus', path: '/customerprofile' },
+      // { label: 'Total Customers', path: '/customers/total' },
+    ],
+  },
   {
     label: 'Orders',
     icon: <FaShoppingCart />,
@@ -82,6 +91,14 @@ const menuItems = [
   },
   {
     label: 'Packages',
+    icon: <FaList />,
+    children: [
+      { label: 'Create Package', path: '/packages/create' },
+      { label: 'All Packages', path: '/packages/all' },
+    ],
+  },
+  {
+    label: 'HR',
     icon: <FaList />,
     children: [
       { label: 'Create Package', path: '/packages/create' },

@@ -1,17 +1,5 @@
 import React from 'react';
 
-// const PreviewDocument = React.forwardRef(
-//   ({ menuContexts, onRemoveItem, onRemoveContext }, ref) => {
-//     // Format date as "07-August-2025"
-//     const formatDate = (dateStr) => {
-//       if (!dateStr) return '';
-//       const date = new Date(dateStr);
-//       const day = String(date.getDate()).padStart(2, '0');
-//       const month = date.toLocaleString('en-US', { month: 'long' });
-//       const year = date.getFullYear();
-//       return `${day}-${month}-${year}`;
-//     };
-
 const PreviewDocument = React.forwardRef(
   ({ menuContexts, onRemoveItem, onRemoveContext, formData }, ref) => {
     // Format date as "30-AUG-2025"
@@ -24,8 +12,6 @@ const PreviewDocument = React.forwardRef(
       return `${day}-${month}-${year}`;
     };
 
-
-    
     return (
       <div
         ref={ref}
@@ -40,7 +26,6 @@ const PreviewDocument = React.forwardRef(
             An ISO 22000:2018 CERTIFIED COMPANY, Visit : 
           </span>{' '}
           <a
-            // href="https://www.shammukhacaterers.co.in"
             href="https://www.shanmukhacaterers.co.in/"
             target="_blank"
             rel="noreferrer"
@@ -100,26 +85,20 @@ const PreviewDocument = React.forwardRef(
               ❌ 
             </button>
 
-            {/* Context Header */}
-
-            {/* <h4 className="menuheaing text-lg font-black uppercase text-neutral-900 mb-4">
-              {formatDate(entry.date)} {entry.meal?.toUpperCase()} FOR {entry.members} MEMBERS {entry.buffet}
-            </h4> */}
-            
-          <h4
+            {/* Context Header */} 
+           <h4
             style={{
               fontWeight: 900,
               fontSize: 'larger',
               textTransform: 'uppercase',
-              color: '#1a1a1a', // equivalent to text-neutral-900
+              color: '#1a1a1a',  
               marginBottom: '1rem',
               letterSpacing: '1.3px',
-              // textAlign: 'center'
             }}
           >
             {formatDate(entry.date)} {entry.meal?.toUpperCase()} FOR {entry.members} MEMBERS{' '}
             <span style={{ color: '#FF0000' }}>{entry.buffet?.toUpperCase()}</span>
-          </h4>
+           </h4>
   
 
             {/* Category Table */}
