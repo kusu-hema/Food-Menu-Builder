@@ -18,6 +18,7 @@ const PreviewDocument = React.forwardRef(
       LUNCH: 600,
       EVENING_SNACKS: 200,
       DINNER: 400,
+      TIFFIN:100,
     };
 
     const invoiceRows = menuContexts.map((ctx, i) => {
@@ -240,13 +241,15 @@ const PreviewDocument = React.forwardRef(
                 <td className="border border-black p-2">{row.members}</td>
                 <td className="border border-black p-2">₹{row.price}</td>
                 <td className="border border-black p-2">₹{row.total}</td>
+                
               </tr>
             ))}
+            
           </tbody>
         </table>
 
         {/* Totals */}
-        <div className="text-right mt-4 text-base font-bold text-black">
+        <div className="text-center mt-4 text-base font-bold text-black">
           <div>SUB TOTAL: ₹{subtotal}</div>
           <div>GST 5%: ₹{gst}</div>
           <div>TOTAL AMOUNT: ₹{totalAmount}</div>
@@ -270,8 +273,6 @@ const PreviewDocument = React.forwardRef(
         </h4>
      
     
-
-
     </div>
     );
   }
