@@ -12,6 +12,37 @@ const PreviewDocument = React.forwardRef(
       return `${day}-${month}-${year}`;
     };
 
+
+    const pricingMap = {
+      BREAKFAST: 200,
+      LUNCH: 600,
+      EVENING_SNACKS: 200,
+      DINNER: 400,
+    };
+
+    const invoiceRows = menuContexts.map((ctx, i) => {
+      const meal = ctx.meal?.toUpperCase();
+      const members = parseInt(ctx.members) || 0;
+      const price = pricingMap[meal] || 0;
+      const total = members * price;
+
+
+      return {
+        sno: i + 1,
+        event: `${formatDate(ctx.date)} ${meal}`,
+        members,
+        price,
+        total,
+      };
+    });
+
+
+    const subtotal = invoiceRows.reduce((sum, row) => sum + row.total, 0);
+    const gst = Math.round(subtotal * 0.10);
+    const totalAmount = subtotal + gst;
+    const advance = 50000;
+    const balance = totalAmount - advance;
+
     return (
       <div
         ref={ref}
@@ -190,64 +221,40 @@ const PreviewDocument = React.forwardRef(
         </div>
                                                     
 
-        <table className='w-full text-sm border border-black'>
-         <tbody>
-          <tr className="border-b border-black align-top ">
-            <th>SNO</th>
-            <th>EVENT</th>
-            <th>MEMBERS</th>
-            <th>PRICE</th>
-            <th>TOTAL</th>
-          </tr>
-           <tr className='text-center'>
-            <td>1</td>
-            <td>EVENT</td>
-            <td>MEMBERS</td>
-            <td>PRICE</td>
-            <td>TOTAL</td>
-           </tr>
-           <tr className='text-center'>
-            <td>2</td>
-            <td>EVENT</td>
-            <td>MEMBERS</td>
-            <td>PRICE</td>
-            <td>TOTAL</td>
-           </tr>
-           <tr className='text-center'>
-            <td>3</td>
-            <td>EVENT</td>
-            <td>MEMBERS</td>
-            <td>PRICE</td>
-            <td>TOTAL</td>
-           </tr><tr className='text-center'>
-            <td>4</td>
-            <td>EVENT</td>
-            <td>MEMBERS</td>
-            <td>PRICE</td>
-            <td>TOTAL</td>
-           </tr><tr className='text-center'>
-            <td>5</td>
-            <td>EVENT</td>
-            <td>MEMBERS</td>
-            <td>PRICE</td>
-            <td>TOTAL</td>
-           </tr><tr className='text-center'>
-            <td>6</td>
-            <td>EVENT</td>
-            <td>MEMBERS</td>
-            <td>PRICE</td>
-            <td>TOTAL</td>
-           </tr><tr className='text-center'>
-            <td>7</td>
-            <td>EVENT</td>
-            <td>MEMBERS</td>
-            <td>PRICE</td>
-            <td>TOTAL</td>
-           </tr>
+        {/* Invoice Table */}
+        <table className="w-full text-sm border border-black mt-6">
+          <thead>
+            <tr className="bg-[#FFC100] text-black font-bold text-center">
+              <th className="border border-black p-2">SNO</th>
+              <th className="border border-black p-2">EVENT</th>
+              <th className="border border-black p-2">MEMBERS</th>
+              <th className="border border-black p-2">PRICE</th>
+              <th className="border border-black p-2">TOTAL</th>
+            </tr>
+          </thead>
+          <tbody>
+            {invoiceRows.map((row, i) => (
+              <tr key={i} className="text-center text-black font-semibold">
+                <td className="border border-black p-2">{row.sno}</td>
+                <td className="border border-black p-2">{row.event}</td>
+                <td className="border border-black p-2">{row.members}</td>
+                <td className="border border-black p-2">₹{row.price}</td>
+                <td className="border border-black p-2">₹{row.total}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
 
+        {/* Totals */}
+        <div className="text-right mt-4 text-base font-bold text-black">
+          <div>SUB TOTAL: ₹{subtotal}</div>
+          <div>GST 5%: ₹{gst}</div>
+          <div>TOTAL AMOUNT: ₹{totalAmount}</div>
+          <div>ADVANCE AMOUNT: ₹{advance}</div>
+          <div>BALANCE AMOUNT: ₹{balance}</div>
+        </div>
 
+ 
         {/* last section */}
         <h4 className="text-center text-sm text-gray-700 mb-4">
            NOTE: ADDITIONAL WILL BE CHARGED FOR EXTRA PLATES 
