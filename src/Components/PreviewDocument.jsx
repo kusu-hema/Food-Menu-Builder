@@ -233,7 +233,7 @@ const PreviewDocument = React.forwardRef(
               <th className="border border-black p-2">TOTAL</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="bg-[#f2dcdb] text-black font-bold text-center" >
             {invoiceRows.map((row, i) => (
               <tr key={i} className="text-center text-black font-semibold">
                 <td className="border border-black p-2">{row.sno}</td>
@@ -241,34 +241,75 @@ const PreviewDocument = React.forwardRef(
                 <td className="border border-black p-2">{row.members}</td>
                 <td className="border border-black p-2">₹{row.price}</td>
                 <td className="border border-black p-2">₹{row.total}</td>
+                {/* <div>SUB TOTAL: ₹{subtotal}</div> */}
+
                 
               </tr>
             ))}
+
+             {/* Static Subtotal Row */}
+              <tr className="text-center  text-black font-bold">
+                <td colSpan="4" className="border border-black p-2">Lead Counters</td>
+                <td className="border border-black p-2">₹{subtotal}</td>
+              </tr>
+              <tr className="text-center  text-black font-bold">
+                <td colSpan="4" className="border border-black p-2">Water Bottles</td>
+                <td className="border border-black p-2">₹{subtotal}</td>
+              </tr>
+              <tr className="text-center  text-black font-bold">
+                <td colSpan="4" className="border border-black p-2">Labour Charges</td>
+                <td className="border border-black p-2">₹{subtotal}</td>
+              </tr>
+              <tr className="text-center  text-black font-bold">
+                <td colSpan="4" className="border border-black p-2">Transport Charges</td>
+                <td className="border border-black p-2">₹{subtotal}</td>
+              </tr>
+
+              <tr className="text-black font-bold">
+                <td colSpan="4" className="border border-black p-2">Subtotal</td>
+                <td className="border border-black p-2">₹{subtotal}</td>
+              </tr>
+              <tr className="text-black font-bold">
+                <td colSpan="4" className="border border-black p-2">GST 5%</td>
+                <td className="border border-black p-2">₹{gst}</td>
+              </tr>
+              <tr className="text-black font-bold">
+                <td colSpan="4" className="border border-black p-2">TOTAL AMOUNT</td>
+                <td className="border border-black p-2">₹{totalAmount}</td>
+              </tr>
+              <tr className="text-black font-bold">
+                <td colSpan="4" className="border border-black p-2">ADVANCE AMOUNT</td>
+                <td className="border border-black p-2">₹{advance}</td>
+              </tr>
+              <tr className="text-black font-bold">
+                <td colSpan="4" className="border border-black p-2">BALANCE AMOUNT</td>
+                <td className="border border-black p-2">₹{balance}</td>
+              </tr>
             
           </tbody>
         </table>
 
         {/* Totals */}
-        <div className="text-center mt-4 text-base font-bold text-black">
+        {/* <div className="text-center mt-4 text-base font-bold text-black">
           <div>SUB TOTAL: ₹{subtotal}</div>
           <div>GST 5%: ₹{gst}</div>
           <div>TOTAL AMOUNT: ₹{totalAmount}</div>
           <div>ADVANCE AMOUNT: ₹{advance}</div>
           <div>BALANCE AMOUNT: ₹{balance}</div>
-        </div>
+        </div> */}
 
  
         {/* last section */}
-        <h4 className="text-center text-sm text-gray-700 mb-4">
+        <h4 className="text-center text-black font-bold text-sm mb-4 mt-4">
            NOTE: ADDITIONAL WILL BE CHARGED FOR EXTRA PLATES 
         </h4>
-        <h4 className="text-center text-sm text-gray-700 mb-4">
+        <h4 className="text-center text-black font-bold text-sm mb-4">
            *** With best Wishes from Shanmukha Caterers Pvt.Ltd and Service....
         </h4>
-        <h4 className="text-center text-sm text-gray-700 mb-4">
+        <h4 className="text-center text-black font-bold text-sm mb-4">
           From Shanmukha Caterers Pvt.Ltd
         </h4>
-        <h4 className="text-center text-sm text-gray-700 mb-4">
+        <h4 className="text-center text-black font-bold text-sm mb-4">
           Manager
         </h4>
      
