@@ -14,11 +14,11 @@ const PreviewDocument = forwardRef(
 
     // Mapping of meal types to their base prices
     const pricingMap = {
-      BREAKFAST: 200,
-      LUNCH: 600,
-      EVENING_SNACKS: 200,
-      DINNER: 400,
-      TIFFIN: 100,
+      BREAKFAST: 0,
+      LUNCH: 0,
+      EVENING_SNACKS: 0,
+      DINNER: 0,
+      TIFFIN: 0,
     };
 
     // Initialize invoice rows based on menu contexts
@@ -54,7 +54,7 @@ const PreviewDocument = forwardRef(
     const calculateTotals = () => {
       const calculatedSubtotalFromRows = invoiceRows.reduce((sum, row) => sum + row.total, 0);
       const newSubtotal = calculatedSubtotalFromRows + leadCounters + waterBottles + labourCharges + transportCharges;
-      const newGst = Math.round(newSubtotal * 0.10); // 10% GST
+      const newGst = Math.round(newSubtotal * 0.5); // 10% GST
       const newTotalAmount = newSubtotal + newGst;
       const newBalance = newTotalAmount - advance;
 

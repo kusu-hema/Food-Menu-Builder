@@ -13,6 +13,8 @@ function Invoice() {
     pageStyle: `
       @page { margin: 5mm }
       body { font-family: Arial, sans-serif; }
+      // webkit-print-color-adjust: exact;
+      // print-color-adjust: exact;
       // @page { margin: 20mm 5mm 5mm 5mm }
       // div { page-break-inside: avoid; }
     `,
