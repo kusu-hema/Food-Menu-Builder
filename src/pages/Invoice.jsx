@@ -7,18 +7,41 @@ import PreviewDocument from '../Components/PreviewDocument';
 function Invoice() {
   const componentRef = useRef(null);
 
+  // const handlePrint = useReactToPrint({
+  //   contentRef: componentRef,
+  //   documentTitle: 'Invoice',
+  //   pageStyle: `
+  //     @page { margin: 5mm }
+  //     body { font-family: Arial, sans-serif; }
+  //     //  .bg-gray-100 {
+  //     //    background-color: #f3f4f6 !important;
+  //     //   }
+  //     // webkit-print-color-adjust: exact;
+  //     // print-color-adjust: exact;
+  //     // @page { margin: 20mm 5mm 5mm 5mm }
+  //     // div { page-break-inside: avoid; }
+  //   `,
+  // });
+
   const handlePrint = useReactToPrint({
-    contentRef: componentRef,
-    documentTitle: 'Invoice',
-    pageStyle: `
-      @page { margin: 5mm }
-      body { font-family: Arial, sans-serif; }
-      // webkit-print-color-adjust: exact;
-      // print-color-adjust: exact;
-      // @page { margin: 20mm 5mm 5mm 5mm }
-      // div { page-break-inside: avoid; }
-    `,
-  });
+  contentRef: componentRef,
+  documentTitle: 'Invoice',
+  pageStyle: `
+    @page { margin: 5mm }
+    body { font-family: Arial, sans-serif; }
+    
+    .invoice-section-container {
+      page-break-before: always;
+    }
+
+    @media print {
+      body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  `,
+});
 
   const [menuContexts, setMenuContexts] = useState(() => {
     const saved = localStorage.getItem('menuContexts');

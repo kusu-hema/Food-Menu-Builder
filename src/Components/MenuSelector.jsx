@@ -17,7 +17,8 @@ function MenuSelector({ context, onChange }) {
         <option value="">Select Meal</option>
         <option value="Breakfast">Breakfast</option>
         <option value="Lunch">Lunch</option>
-        <option value="Tiffin">Tiffin</option>
+        {/* <option value="Tiffin">Tiffin</option> */}
+        <option value="Snacks">Snacks</option>
         <option value="Dinner">Dinner</option>
       </select>
       <input

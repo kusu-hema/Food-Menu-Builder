@@ -47,13 +47,14 @@ const PreviewDocument = forwardRef(
     const [balance, setBalance] = useState(0);
     const [leadCounters, setLeadCounters] = useState(0);
     const [waterBottles, setWaterBottles] = useState(0);
+    const [CookingCharges, setCookingCharges] = useState(0);
     const [labourCharges, setLabourCharges] = useState(0);
     const [transportCharges, setTransportCharges] = useState(0);
 
     // Recalculates all totals based on the current state of invoiceRows and other charges
     const calculateTotals = () => {
       const calculatedSubtotalFromRows = invoiceRows.reduce((sum, row) => sum + row.total, 0);
-      const newSubtotal = calculatedSubtotalFromRows + leadCounters + waterBottles + labourCharges + transportCharges;
+      const newSubtotal = calculatedSubtotalFromRows + leadCounters + waterBottles  + CookingCharges  + labourCharges + transportCharges;
       const newGst = Math.round(newSubtotal * 0.5); // 10% GST
       const newTotalAmount = newSubtotal + newGst;
       const newBalance = newTotalAmount - advance;
@@ -144,6 +145,7 @@ const PreviewDocument = forwardRef(
 
     const handleLeadCountersChange = (e) => setLeadCounters(parseFloat(e.target.value) || 0);
     const handleWaterBottlesChange = (e) => setWaterBottles(parseFloat(e.target.value) || 0);
+    const handleCookingChargesChange = (e) => setCookingCharges(parseFloat(e.target.value) || 0);
     const handleLabourChargesChange = (e) => setLabourCharges(parseFloat(e.target.value) || 0);
     const handleTransportChargesChange = (e) => setTransportCharges(parseFloat(e.target.value) || 0);
 
@@ -264,6 +266,7 @@ const PreviewDocument = forwardRef(
         ))}
 
         {/* Invoice Section */}
+        <div className='invoice-section-container'>
         <h2 className="Mainheading text-center text-xl text-900 font-bold font-extrabold uppercase mb-2 text-[#FFC100]">
           SHAMMUKHA CATERERS PVT. LTD
         </h2>
@@ -337,7 +340,7 @@ const PreviewDocument = forwardRef(
               </tr>
             ))}
             <tr className="text-center text-black font-bold">
-              <td colSpan="4" className="border border-black p-2">Lead Counters</td>
+              <td colSpan="4" className="border border-black p-2">Led Counters</td>
               <td className="border border-black p-2">
                 <input
                   type="number"
@@ -354,6 +357,17 @@ const PreviewDocument = forwardRef(
                   type="number"
                   value={waterBottles}
                   onChange={handleWaterBottlesChange}
+                  className="w-full text-center bg-transparent border-none focus:outline-none"
+                />
+              </td>
+            </tr>
+             <tr className="text-center text-black font-bold">
+              <td colSpan="4" className="border border-black p-2">Cooking Charges</td>
+              <td className="border border-black p-2">
+                <input
+                  type="number"
+                  value={CookingCharges}
+                  onChange={handleCookingChargesChange}
                   className="w-full text-center bg-transparent border-none focus:outline-none"
                 />
               </td>
@@ -380,8 +394,8 @@ const PreviewDocument = forwardRef(
                 />
               </td>
             </tr>
-            <tr className="text-black font-bold">
-              <td colSpan="4" className="border border-black p-2">Subtotal</td>
+            <tr className="text-black font-bold" style={{ color: '#FF0000' }}>
+              <td colSpan="4" className="border border-black p-2">Total</td>
               <td className="border border-black p-2">
                 <input
                   type="number"
@@ -402,8 +416,8 @@ const PreviewDocument = forwardRef(
                 />
               </td>
             </tr>
-            <tr className="text-black font-bold">
-              <td colSpan="4" className="border border-black p-2">TOTAL AMOUNT</td>
+            <tr className="text-black font-bold" style={{ color: '#FF0000' }} >
+              <td colSpan="4" className="border border-black p-2">GRAND TOTAL</td>
               <td className="border border-black p-2">
                 <input
                   type="number"
@@ -445,6 +459,7 @@ const PreviewDocument = forwardRef(
           <h4 className="text-center text-black font-bold text-sm mb-4">
             Manager
           </h4>
+        </div>
         </div>
       </div>
     );
