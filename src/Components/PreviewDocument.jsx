@@ -74,18 +74,30 @@ const PreviewDocument = forwardRef(
     const [transportCharges, setTransportCharges] = useState(() => getFromLocalStorage('transportCharges', 0));
 
     // Recalculates all totals based on the current state of invoiceRows and other charges
-    const calculateTotals = () => {
-      const calculatedSubtotalFromRows = invoiceRows.reduce((sum, row) => sum + row.total, 0);
-      const newSubtotal = calculatedSubtotalFromRows + leadCounters + waterBottles + CookingCharges + labourCharges + transportCharges;
-      const newGst = Math.round(newSubtotal * 0.05);
-      const newTotalAmount = newSubtotal + newGst;
-      const newBalance = newTotalAmount - advance;
+    // const calculateTotals = () => {
+    //   const calculatedSubtotalFromRows = invoiceRows.reduce((sum, row) => sum + row.total, 0);
+    //   const newSubtotal = calculatedSubtotalFromRows + leadCounters + waterBottles + CookingCharges + labourCharges + transportCharges;
+    //   const newGst = Math.round(newSubtotal * 0.05);
+    //   const newTotalAmount = newSubtotal + newGst;
+    //   const newBalance = newTotalAmount - advance;
 
-      setSubtotal(newSubtotal);
-      setGst(newGst);
-      setTotalAmount(newTotalAmount);
-      setBalance(newBalance);
-    };
+    //   setSubtotal(newSubtotal);
+    //   setGst(newGst);
+    //   setTotalAmount(newTotalAmount);
+    //   setBalance(newBalance);
+    // };
+
+    const calculateTotals = () => {
+    const calculatedSubtotalFromRows = invoiceRows.reduce((sum, row) => sum + row.total, 0);
+    const newSubtotal = calculatedSubtotalFromRows + leadCounters + waterBottles + CookingCharges + labourCharges + transportCharges;
+    // The newTotalAmount now depends on the user-provided gst state
+    const newTotalAmount = newSubtotal + gst;
+    const newBalance = newTotalAmount - advance;
+
+    setSubtotal(newSubtotal);
+    setTotalAmount(newTotalAmount);
+    setBalance(newBalance);
+   };
 
     // Re-initialize rows and recalculate totals whenever menuContexts changes
     useEffect(() => {
@@ -108,7 +120,7 @@ const PreviewDocument = forwardRef(
     // Recalculate totals whenever any dependent state changes
     useEffect(() => {
       calculateTotals();
-    }, [invoiceRows, leadCounters, waterBottles, CookingCharges, labourCharges, transportCharges, advance]);
+    }, [invoiceRows, leadCounters, waterBottles, CookingCharges, labourCharges, transportCharges, advance, gst]);
 
     // Persist all state variables to local storage
     useEffect(() => {
@@ -207,7 +219,7 @@ const PreviewDocument = forwardRef(
         <div className="mb-2 text-sm font-medium text-black flex flex-wrap justify-between print:flex-row print:gap-0 uppercase">
           <div className="w-full md:w-[48%] print:w-[48%]">
             <div className="mb-1"><span style={{ fontWeight: '900', fontSize: 'larger' }}>Name:</span> {formData.name}</div>
-            <div className="mb-1"><span style={{ fontWeight: '900', fontSize: 'larger' }}>Contact:</span> {formData.contact}</div>
+            <div className="mb-1"><span style={{ fontWeight: '900', fontSize: 'larger' }}>Contact:</span> +91 {formData.contact}</div>
           </div>
           <div className="w-full md:w-[48%] print:w-[48%]">
             <div className="mb-1">
@@ -317,7 +329,7 @@ const PreviewDocument = forwardRef(
           <div className="mb-2 text-sm font-medium text-black flex flex-wrap justify-between print:flex-row print:gap-0 uppercase">
             <div className="w-full md:w-[48%] print:w-[48%]">
               <div className="mb-1"><span style={{ fontWeight: '900', fontSize: 'larger' }}>Name:</span> {formData.name}</div>
-              <div className="mb-1"><span style={{ fontWeight: '900', fontSize: 'larger' }}>Contact:</span> {formData.contact}</div>
+              <div className="mb-1"><span style={{ fontWeight: '900', fontSize: 'larger' }}>Contact:</span> +91  {formData.contact}</div>
             </div>
             <div className="w-full md:w-[48%] print:w-[48%]">
               <div className="mb-1">
@@ -421,7 +433,7 @@ const PreviewDocument = forwardRef(
               </tr>
               <tr className="text-black font-bold" style={{ color: '#FF0000' }}>
                 <td colSpan="4" className="border border-black p-2 uppercase ">Total</td>
-                <td className="border border-black p-2">
+                <td className="border border-black p-2" style={{ fontWeight: '600', fontSize: 'larger' }}>
                   <input
                     type="number"
                     value={subtotal === 0 ? '' : subtotal}
@@ -433,6 +445,7 @@ const PreviewDocument = forwardRef(
               <tr className="text-black font-bold">
                 <td colSpan="4" className="border border-black p-2 uppercase ">GST 5%</td>
                 <td className="border border-black p-2">
+                  
                   <input
                     type="number"
                     value={gst === 0 ? '' : gst}
@@ -443,7 +456,7 @@ const PreviewDocument = forwardRef(
               </tr>
               <tr className="text-black font-bold" style={{ color: '#FF0000' }} >
                 <td colSpan="4" className="border border-black p-2 uppercase ">GRAND TOTAL</td>
-                <td className="border border-black p-2">
+                <td className="border border-black p-2" style={{ fontWeight: '600', fontSize: 'larger' }}>
                   <input
                     type="number"
                     value={totalAmount === 0 ? '' : totalAmount}
@@ -464,8 +477,8 @@ const PreviewDocument = forwardRef(
                 </td>
               </tr>
               <tr className="text-black font-bold">
-                <td colSpan="4" className="border border-black p-2 uppercase ">BALANCE AMOUNT</td>
-                <td className="border border-black p-2">{formatNumber(balance)}</td>
+                <td colSpan="4" className="border border-black p-2 uppercase">BALANCE AMOUNT</td>
+                <td className="border border-black p-2" style={{ fontWeight: '600', fontSize: 'larger' }}>{formatNumber(balance)}</td>
               </tr>
             </tbody>
           </table>
