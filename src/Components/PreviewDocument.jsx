@@ -40,8 +40,8 @@ const PreviewDocument = forwardRef(
     const [invoiceRows, setInvoiceRows] = useState(initialInvoiceRows);
 
     // State for additional charges and final totals
-    const [subtotal, setSubtotal] = useState(0);
-    const [gst, setGst] = useState(0);
+    const [subtotal, setSubtotal] = useState(0);    
+    const [gst, setGst] = useState(0); 
     const [totalAmount, setTotalAmount] = useState(0);
     const [advance, setAdvance] = useState(50000);
     const [balance, setBalance] = useState(0);
@@ -57,7 +57,7 @@ const PreviewDocument = forwardRef(
       const newSubtotal = calculatedSubtotalFromRows + leadCounters + waterBottles  + CookingCharges  + labourCharges + transportCharges;
       const newGst = Math.round(newSubtotal * 0.5); // 10% GST
       const newTotalAmount = newSubtotal + newGst;
-      const newBalance = newTotalAmount - advance;
+      const newBalance = newTotalAmount - advance; 
 
       setSubtotal(newSubtotal);
       setGst(newGst);
@@ -339,7 +339,7 @@ const PreviewDocument = forwardRef(
                 </td>
               </tr>
             ))}
-            <tr className="text-center text-black font-bold">
+            <tr className="text-center text-black font-bold uppercase">
               <td colSpan="4" className="border border-black p-2">Led Counters</td>
               <td className="border border-black p-2">
                 <input
@@ -350,7 +350,7 @@ const PreviewDocument = forwardRef(
                 />
               </td>
             </tr>
-            <tr className="text-center text-black font-bold">
+            <tr className="text-center text-black font-bold uppercase ">
               <td colSpan="4" className="border border-black p-2">Water Bottles</td>
               <td className="border border-black p-2">
                 <input
@@ -361,7 +361,7 @@ const PreviewDocument = forwardRef(
                 />
               </td>
             </tr>
-             <tr className="text-center text-black font-bold">
+             <tr className="text-center text-black font-bold uppercase ">
               <td colSpan="4" className="border border-black p-2">Cooking Charges</td>
               <td className="border border-black p-2">
                 <input
@@ -372,7 +372,7 @@ const PreviewDocument = forwardRef(
                 />
               </td>
             </tr>
-            <tr className="text-center text-black font-bold">
+            <tr className="text-center text-black font-bold uppercase ">
               <td colSpan="4" className="border border-black p-2">Labour Charges</td>
               <td className="border border-black p-2">
                 <input
@@ -383,7 +383,7 @@ const PreviewDocument = forwardRef(
                 />
               </td>
             </tr>
-            <tr className="text-center text-black font-bold">
+            <tr className="text-center text-black font-bold uppercase ">
               <td colSpan="4" className="border border-black p-2">Transport Charges</td>
               <td className="border border-black p-2">
                 <input
@@ -395,7 +395,7 @@ const PreviewDocument = forwardRef(
               </td>
             </tr>
             <tr className="text-black font-bold" style={{ color: '#FF0000' }}>
-              <td colSpan="4" className="border border-black p-2">Total</td>
+              <td colSpan="4" className="border border-black p-2 uppercase ">Total</td>
               <td className="border border-black p-2">
                 <input
                   type="number"
@@ -406,7 +406,7 @@ const PreviewDocument = forwardRef(
               </td>
             </tr>
             <tr className="text-black font-bold">
-              <td colSpan="4" className="border border-black p-2">GST 5%</td>
+              <td colSpan="4" className="border border-black p-2 uppercase ">GST 5%</td>
               <td className="border border-black p-2">
                 <input
                   type="number"
@@ -417,7 +417,7 @@ const PreviewDocument = forwardRef(
               </td>
             </tr>
             <tr className="text-black font-bold" style={{ color: '#FF0000' }} >
-              <td colSpan="4" className="border border-black p-2">GRAND TOTAL</td>
+              <td colSpan="4" className="border border-black p-2 uppercase ">GRAND TOTAL</td>
               <td className="border border-black p-2">
                 <input
                   type="number"
@@ -428,7 +428,7 @@ const PreviewDocument = forwardRef(
               </td>
             </tr>
             <tr className="text-black font-bold">
-              <td colSpan="4" className="border border-black p-2">ADVANCE AMOUNT</td>
+              <td colSpan="4" className="border border-black p-2 uppercase ">ADVANCE AMOUNT</td>
               <td className="border border-black p-2">
                 <input
                   type="number"
@@ -439,7 +439,7 @@ const PreviewDocument = forwardRef(
               </td>
             </tr>
             <tr className="text-black font-bold">
-              <td colSpan="4" className="border border-black p-2">BALANCE AMOUNT</td>
+              <td colSpan="4" className="border border-black p-2 uppercase ">BALANCE AMOUNT</td>
               <td className="border border-black p-2">₹{balance}</td>
             </tr>
           </tbody>
