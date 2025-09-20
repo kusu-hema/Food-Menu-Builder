@@ -27,7 +27,7 @@ const PreviewDocument = forwardRef(
     const formatNumber = (num) => {
       if (num === 0) return '';
       return new Intl.NumberFormat('en-IN', {
-        style: 'currency',
+        // style: 'currency', 
         currency: 'INR',
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
