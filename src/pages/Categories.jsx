@@ -12,7 +12,7 @@ import React, { useState, useEffect } from 'react';
  * @param {function} props.onClose - A callback to close the modal.
  */
 const CategoryForm = ({ editingCategory, onCategorySaved, onClose }) => {
-  // State for the form fields
+  // State for the form fields 
   const [categoryName, setCategoryName] = useState('');
   const [image, setImage] = useState(null);
   const [message, setMessage] = useState(null);
@@ -335,11 +335,14 @@ const Categories = () => {
       const categoriesData = await categoriesResponse.json();
       const productsData = await productsResponse.json();
 
+      // Sort the categories data by sno (serial number) in ascending order
+      const sortedCategories = categoriesData.sort((a, b) => a.sno - b.sno);
+
       // Store the raw product data for the debug panel
       setProducts(productsData);
 
       // Log the raw data to the console for debugging
-      console.log('Categories data from API:', categoriesData);
+      console.log('Categories data from API:', sortedCategories);
       console.log('Products data from API:', productsData);
 
       // Calculate the product counts per category, converting names to lowercase for a consistent match
@@ -354,7 +357,7 @@ const Categories = () => {
       
       console.log('Calculated product counts:', counts);
 
-      setCategories(categoriesData);
+      setCategories(sortedCategories); // Set the calculated product counts
       setProductCounts(counts); // Set the calculated product counts
       setError(null);
     } catch (err) {

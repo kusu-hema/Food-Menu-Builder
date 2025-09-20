@@ -5,13 +5,30 @@ function MenuItems({ selectedItems, onAddItem }) {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [items, setItems] = useState([]);
 
+  // useEffect(() => {
+  //   fetch('http://localhost:4000/api/categories')
+  //     .then(res => res.json())
+  //     .then(data => {
+  //       const categoryList = data.map(item => item.category_name);
+  //       setCategories(categoryList);
+  //       setSelectedCategory(categoryList[0] || '');
+  //     });
+  // }, []);
+
+  // Add a useEffect hook to fetch categories and set the sorted list
   useEffect(() => {
     fetch('http://localhost:4000/api/categories')
       .then(res => res.json())
       .then(data => {
-        const categoryList = data.map(item => item.category_name);
+        // Sort the data by the 'sno' property in ascending order
+        const sortedData = data.sort((a, b) => a.sno - b.sno);
+        const categoryList = sortedData.map(item => item.category_name);
         setCategories(categoryList);
         setSelectedCategory(categoryList[0] || '');
+      })
+      .catch(error => {
+        console.error("Error fetching categories:", error);
+        // Optional: Handle error state in the UI
       });
   }, []);
 
