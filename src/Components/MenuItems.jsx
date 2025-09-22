@@ -4,23 +4,13 @@ function MenuItems({ selectedItems, onAddItem }) {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [items, setItems] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // useEffect(() => {
-  //   fetch('http://localhost:4000/api/categories')
-  //     .then(res => res.json())
-  //     .then(data => {
-  //       const categoryList = data.map(item => item.category_name);
-  //       setCategories(categoryList);
-  //       setSelectedCategory(categoryList[0] || '');
-  //     });
-  // }, []);
-
-  // Add a useEffect hook to fetch categories and set the sorted list
+  // Fetch categories
   useEffect(() => {
     fetch('http://localhost:4000/api/categories')
       .then(res => res.json())
       .then(data => {
-        // Sort the data by the 'sno' property in ascending order
         const sortedData = data.sort((a, b) => a.sno - b.sno);
         const categoryList = sortedData.map(item => item.category_name);
         setCategories(categoryList);
@@ -28,23 +18,30 @@ function MenuItems({ selectedItems, onAddItem }) {
       })
       .catch(error => {
         console.error("Error fetching categories:", error);
-        // Optional: Handle error state in the UI
       });
   }, []);
 
+  // Fetch products
   useEffect(() => {
     fetch('http://localhost:4000/api/products')
       .then(res => res.json())
       .then(data => setItems(data));
   }, []);
 
-  const filteredItems = items.filter(item =>
-    item.category?.trim().toLowerCase() === selectedCategory.trim().toLowerCase()
-  );
+  // Filter + Sort products alphabetically (A → Z) + search filter
+  const filteredItems = items
+    .filter(item =>
+      item.category?.trim().toLowerCase() === selectedCategory.trim().toLowerCase()
+    )
+    .filter(item =>
+      item.product.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => a.product.localeCompare(b.product));
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap gap-2 ">
+      {/* Category Buttons */}
+      <div className="mb-4 flex flex-wrap gap-2">
         {categories.map((cat) => (
           <button
             key={cat}
@@ -58,16 +55,28 @@ function MenuItems({ selectedItems, onAddItem }) {
         ))}
       </div>
 
-      <h3 className="text-lg font-semibold mb-4">Available Items</h3>
+      {/* Available Items */}
+      <h3 className="text-lg font-semibold mb-2">Available Items</h3>
+
+      {/* 🔍 Search Bar */}
+      <input
+        type="text"
+        placeholder="Search products..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        className="w-full p-2 border rounded-md mb-4 focus:outline-none focus:ring focus:ring-blue-400"
+      />
+
+      {/* Items Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {filteredItems.map((item) => (
           <div
             key={item.product}
-            // onClick={() => onAddItem(item.category, item.product)}
             onClick={() => onAddItem(selectedCategory, item.product)}
             className={`border rounded-lg p-3 cursor-pointer flex flex-col items-center text-center transition ${
-              selectedItems[selectedCategory]?.includes(item.product) ?
-               'bg-green-100' : 'bg-white'
+              selectedItems[selectedCategory]?.includes(item.product)
+                ? 'bg-green-100'
+                : 'bg-white'
             } hover:shadow-md`}
           >
             {item.image && (
