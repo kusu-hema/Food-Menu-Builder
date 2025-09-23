@@ -341,8 +341,13 @@ const Products = () => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
+      // const data = await response.json();
+      // setProducts(data);
+      // setLoading(false);
       const data = await response.json();
-      setProducts(data);
+      // Sort the products by serial number (sno) in ascending order
+      const sortedProducts = data.sort((a, b) => a.sno - b.sno);
+      setProducts(sortedProducts);
       setLoading(false);
     } catch (err) {
       console.error("Error fetching products:", err);
