@@ -13,11 +13,13 @@ import Products from '../pages/Products';
 import Invoice from '../pages/Invoice';
 import CorporateEvents from '../pages/CorporateEvents';
 import Packages from '../pages/Packages';
+import TotalMenu from '../pages/TotalMenus';
 import Logout from '../pages/Logout';
 import Footer from '../Components/Footer'
 
 // Login page.....                                                                                                                                                                                                                                                                                                                
 import Login from '../pages/Login';
+
 
 
 const AppRoutes = ({ isLoggedIn, setIsLoggedIn }) => {
@@ -48,6 +50,9 @@ const AppRoutes = ({ isLoggedIn, setIsLoggedIn }) => {
           <Route path="/invoice" element={<Invoice />} />
           <Route path="/events" element={<CorporateEvents />} />
           <Route path="/packages" element={<Packages />} />
+          <Route path="/totalmenu" element={<TotalMenu />} />
+
+
           <Route path="/footer" element={<Footer />} />
           <Route path="/logout" element={<Logout setIsLoggedIn={setIsLoggedIn} />} />
         </>
