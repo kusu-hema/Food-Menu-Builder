@@ -10,7 +10,7 @@ function MenuItems({ selectedItems, onAddItem }) {
   useEffect(() => {
     fetch('http://localhost:4000/api/categories')
       .then(res => res.json())
-      .then(data => {
+      .then(data => { 
         const sortedData = data.sort((a, b) => a.sno - b.sno);
         const categoryList = sortedData.map(item => item.category_name);
         setCategories(categoryList);
@@ -58,7 +58,7 @@ function MenuItems({ selectedItems, onAddItem }) {
       {/* Available Items */}
       <h3 className="text-lg font-semibold mb-2">Available Items</h3>
 
-      {/* 🔍 Search Bar */}
+      {/*   Search Bar */}
       <input
         type="text"
         placeholder="Search products..."

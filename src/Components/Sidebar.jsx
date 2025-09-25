@@ -40,7 +40,7 @@ const menuItems = [
       { label: 'Total Customers', path: '/customers/total' },
     ],
   },
-    {
+  {
     label: 'Menu',
     icon: <FaUsers />,
     children: [

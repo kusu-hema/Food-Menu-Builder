@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 
+// Helper function to get a value from local storage or return a default
+const getFromLocalStorage = (key, defaultValue) => {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : defaultValue;
+  } catch (error) {
+    console.error(`Error retrieving ${key} from local storage`, error);
+    return defaultValue;
+  }
+};
+
 /**
  * Renders the form to create or edit a product with a better UI.
  *
@@ -210,9 +221,6 @@ const ProductsTable = ({ products, loading, error, onEdit, onDelete }) => {
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Category Name
                   </th>
-                  {/* <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Action
-                  </th> */}
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Actions
                   </th>
@@ -246,9 +254,6 @@ const ProductsTable = ({ products, loading, error, onEdit, onDelete }) => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 capitalize">
                       {product.category}
                     </td>
-                    {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 capitalize">
-                      {product.action}
-                    </td> */}
                     <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
                       <button
                         onClick={() => onEdit(product)}
@@ -295,7 +300,6 @@ const ProductsTable = ({ products, loading, error, onEdit, onDelete }) => {
                 </div>
                 <div className="space-y-2 text-sm text-gray-600">
                   <div><span className="font-semibold text-gray-800">Category:</span> <span className="capitalize">{product.category}</span></div>
-                  {/* <div><span className="font-semibold text-gray-800">Action:</span> <span className="capitalize">{product.action}</span></div> */}
                 </div>
                 <div className="mt-4 flex space-x-2">
                   <button
@@ -333,6 +337,8 @@ const Products = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [message, setMessage] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage] = useState(10); // Or any other number you prefer
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -341,14 +347,12 @@ const Products = () => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      // const data = await response.json();
-      // setProducts(data);
-      // setLoading(false);
       const data = await response.json();
-      // Sort the products by serial number (sno) in ascending order
       const sortedProducts = data.sort((a, b) => a.sno - b.sno);
       setProducts(sortedProducts);
       setLoading(false);
+      // Reset to page 1 after fetching new data
+      setCurrentPage(1); 
     } catch (err) {
       console.error("Error fetching products:", err);
       setError('Failed to fetch data. Please ensure your backend is running.');
@@ -375,7 +379,7 @@ const Products = () => {
     setEditingProduct(product);
     setIsModalOpen(true);
   };
-  
+ 
   const closeModalAndReset = () => {
     setIsModalOpen(false);
     setEditingProduct(null);
@@ -450,6 +454,44 @@ const Products = () => {
     fetchProducts();
   }, []);
 
+  // Pagination Logic
+  const totalPages = Math.ceil(products.length / productsPerPage);
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+
+  const paginate = (pageNumber) => {
+    if (pageNumber > 0 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
+    }
+  };
+
+  // Logic to generate a limited set of page numbers (e.g., 4)
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    let startPage;
+    const maxVisiblePages = 4;
+
+    if (totalPages <= maxVisiblePages) {
+      startPage = 1;
+    } else if (currentPage <= Math.floor(maxVisiblePages / 2) + 1) {
+      startPage = 1;
+    } else if (currentPage + Math.floor(maxVisiblePages / 2) >= totalPages) {
+      startPage = totalPages - maxVisiblePages + 1;
+    } else {
+      startPage = currentPage - Math.floor(maxVisiblePages / 2);
+    }
+
+    for (let i = 0; i < Math.min(totalPages, maxVisiblePages); i++) {
+      pageNumbers.push(startPage + i);
+    }
+
+    return pageNumbers;
+  };
+
+  const pageNumbers = getPageNumbers();
+  const showEllipsis = totalPages > 4 && currentPage + Math.floor(4 / 2) < totalPages;
+
   return (
     <div className="bg-gray-50 min-h-screen p-8 font-sans antialiased">
       <div className="max-w-7xl mx-auto">
@@ -499,12 +541,49 @@ const Products = () => {
           </div>
         )}
         <ProductsTable
-          products={products}
+          products={currentProducts}
           loading={loading}
           error={error}
           onEdit={handleEdit}
           onDelete={handleDelete}
         />
+        
+        {/* Pagination Controls */}
+        {!loading && !error && products.length > productsPerPage && (
+          <div className="flex justify-center items-center mt-6 space-x-2">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-4 py-2 border rounded-full text-sm font-semibold text-gray-700 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Previous
+            </button>
+            {pageNumbers.map((number) => (
+              <button
+                key={number}
+                onClick={() => paginate(number)}
+                className={`px-4 py-2 border rounded-full text-sm font-semibold transition-colors ${
+                  currentPage === number
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                {number}
+              </button>
+            ))}
+            {showEllipsis && (
+              <span className="px-4 py-2 text-gray-500 text-sm">...</span>
+            )}
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 border rounded-full text-sm font-semibold text-gray-700 bg-white hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Next
+            </button>
+          </div>
+        )}
+
       </div>
       
       <Modal isOpen={isModalOpen} onClose={closeModalAndReset}>
@@ -517,7 +596,6 @@ const Products = () => {
     </div>
   );
 };
-
 
 
 export default Products;

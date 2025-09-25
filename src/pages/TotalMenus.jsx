@@ -41,7 +41,7 @@ function Invoice() {
       }
     }
   `,
-});
+  });
 
   const [menuContexts, setMenuContexts] = useState(() => {
     const saved = localStorage.getItem('menuContexts');

@@ -14,7 +14,7 @@ function Invoice() {
   //     @page { margin: 5mm }
   //     body { font-family: Arial, sans-serif; }
   //     //  .bg-gray-100 {
-  //     //    background-color: #f3f4f6 !important;
+  //     //    background-color: #ffffffff !important;
   //     //   }
   //     // webkit-print-color-adjust: exact;
   //     // print-color-adjust: exact;
@@ -41,7 +41,7 @@ function Invoice() {
       }
     }
   `,
-});
+  });
 
   const [menuContexts, setMenuContexts] = useState(() => {
     const saved = localStorage.getItem('menuContexts');
