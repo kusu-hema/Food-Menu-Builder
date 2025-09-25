@@ -6,10 +6,10 @@ const Logout = ({ setIsLoggedIn }) => {
 
   useEffect(() => {
     localStorage.clear();
-    setIsLoggedIn(false); // 🔐 Important: log user out in app state
+    setIsLoggedIn(false); // Important: log user out in app state
 
     setTimeout(() => {
-      navigate('/'); // ✅ Redirect to login (which is '/')
+      navigate('/'); // Redirect to login (which is '/')
     }, 1500);
   }, [navigate, setIsLoggedIn]);
 

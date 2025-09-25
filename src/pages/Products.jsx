@@ -82,6 +82,7 @@ const ProductForm = ({ editingProduct, onProductSaved, onClose }) => {
   };
 
   return (
+    // Add new product model 
     <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg">
       <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
         {editingProduct ? 'Edit Product' : 'Add New Product'}
@@ -110,14 +111,14 @@ const ProductForm = ({ editingProduct, onProductSaved, onClose }) => {
           />
         </div>
         <div>
-          <label htmlFor="action" className="block text-sm font-semibold text-gray-700">Action</label>
-          <input
+          {/* <label htmlFor="action" className="block text-sm font-semibold text-gray-700">Action</label> */}
+          {/* <input
             type="text"
             id="action"
             value={action}
             onChange={(e) => setAction(e.target.value)}
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          />
+          /> */}
         </div>
         <div>
           <label htmlFor="image" className="block text-sm font-semibold text-gray-700">Image</label>
@@ -163,6 +164,7 @@ const Modal = ({ isOpen, onClose, children }) => {
   }
 
   return (
+    // Remove button for model popup
     <div className="fixed inset-0 bg-gray-900 bg-opacity-75 overflow-y-auto h-full w-full flex items-center justify-center z-50 animate-fade-in-backdrop">
       <div className="relative p-6 rounded-lg shadow-2xl transform transition-all duration-300 animate-fade-in-up">
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white rounded-full p-1">
@@ -329,7 +331,7 @@ const ProductsTable = ({ products, loading, error, onEdit, onDelete }) => {
   );
 };
 
-// Main parent component with a cleaner layout
+// ############################# Main parent component with a cleaner layout 
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -496,6 +498,8 @@ const Products = () => {
     <div className="bg-gray-50 min-h-screen p-8 font-sans antialiased">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row justify-center sm:justify-start items-center mb-6 space-y-4 sm:space-y-0 sm:space-x-4">
+
+          {/* Add New Product button */}
           <button
             onClick={() => {
               setEditingProduct(null);
@@ -508,6 +512,8 @@ const Products = () => {
             </svg>
             Add New Product
           </button>
+
+           {/* Export to Excel button  */}
           <button
             onClick={handleExport}
             className="w-full sm:w-auto flex items-center justify-center py-3 px-6 border border-transparent rounded-full shadow-lg text-sm font-semibold text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all transform hover:scale-105"
@@ -517,6 +523,8 @@ const Products = () => {
             </svg>
             Export to Excel
           </button>
+  
+         {/* Import from Excel button  */}
           <label
             htmlFor="excel-import"
             className="w-full sm:w-auto flex items-center justify-center py-3 px-6 border border-transparent rounded-full shadow-lg text-sm font-semibold text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all transform hover:scale-105 cursor-pointer"
@@ -535,11 +543,16 @@ const Products = () => {
             />
           </label>
         </div>
+        
+        {/* Alert message when uploading prducts  */}
         {message && (
           <div className={`mt-4 px-4 py-3 rounded-lg text-center font-medium ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
             {message.text}
           </div>
         )}
+
+        {/* Main Products table  */}
+        
         <ProductsTable
           products={currentProducts}
           loading={loading}
@@ -586,6 +599,7 @@ const Products = () => {
 
       </div>
       
+      {/* Modal */}
       <Modal isOpen={isModalOpen} onClose={closeModalAndReset}>
         <ProductForm
           editingProduct={editingProduct}
@@ -593,6 +607,8 @@ const Products = () => {
           onClose={closeModalAndReset}
         />
       </Modal>
+
+
     </div>
   );
 };
