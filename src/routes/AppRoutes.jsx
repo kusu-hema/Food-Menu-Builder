@@ -19,6 +19,7 @@ import Footer from '../Components/Footer'
 
 // Login page.....                                                                                                                                                                                                                                                                                                                
 import Login from '../pages/Login';
+import EditMenu from '../pages/EditMenu';
 
 
 
@@ -49,6 +50,8 @@ const AppRoutes = ({ isLoggedIn, setIsLoggedIn }) => {
           <Route path="/products" element={<Products />} />
           <Route path="/invoice" element={<Invoice />} />
           <Route path="/events" element={<CorporateEvents />} />
+          <Route path="/editmenu" element={<EditMenu />} />
+
           <Route path="/packages" element={<Packages />} />
           <Route path="/totalmenu" element={<TotalMenu />} />
 
