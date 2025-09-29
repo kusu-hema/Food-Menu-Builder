@@ -1,4 +1,3 @@
- 
 import React, { useState } from 'react';
 import '../assets/css/style.css';
 
@@ -8,12 +7,12 @@ const EditMenu = () => {
     { id: 1, name: 'Ravi Kumar', phone: '9876543210' , EventDate : '15-Aug'},
     { id: 2, name: 'Anjali Sharma', phone: '9123456780', EventDate : '16-Aug'},
     { id: 3, name: 'Arjun Patel', phone: '9988776655', EventDate : '17-Aug' },
-  ]);
+  ]); 
 
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
-    EventDate : ''
+    EventDate : '' 
   });
 
   const handleChange = (e) => {
@@ -68,4 +67,3 @@ const EditMenu = () => {
 };
 
 export default EditMenu;
- 
