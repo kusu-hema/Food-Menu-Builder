@@ -342,35 +342,67 @@ const Products = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(10); // Or any other number you prefer
 
-  const fetchProducts = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('http://localhost:4000/api/products');
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const data = await response.json();
-      const sortedProducts = data.sort((a, b) => a.sno - b.sno);
-      setProducts(sortedProducts);
-      setLoading(false);
-      // Reset to page 1 after fetching new data
-      setCurrentPage(1); 
-    } catch (err) {
-      console.error("Error fetching products:", err);
-      setError('Failed to fetch data. Please ensure your backend is running.');
-      setLoading(false);
+  // const fetchProducts = async () => {
+  //   setLoading(true);
+  //   try {
+  //     const response = await fetch('http://localhost:4000/api/products');
+  //     if (!response.ok) {
+  //       throw new Error('Network response was not ok');
+  //     }
+  //     const data = await response.json();
+  //     const sortedProducts = data.sort((a, b) => a.sno - b.sno);
+  //     setProducts(sortedProducts);
+  //     setLoading(false);
+  //     // Reset to page 1 after fetching new data
+  //     setCurrentPage(1); 
+  //   } catch (err) {
+  //     console.error("Error fetching products:", err);
+  //     setError('Failed to fetch data. Please ensure your backend is running.');
+  //     setLoading(false);
+  //   }
+  // };
+
+
+
+  const fetchProducts = async (keepPage = false) => {
+  setLoading(true);
+  try {
+    const response = await fetch('http://localhost:4000/api/products');
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
     }
-  };
+    const data = await response.json();
+    const sortedProducts = data.sort((a, b) => a.sno - b.sno);
+    setProducts(sortedProducts);
+    setLoading(false);
+
+    // ✅ Only reset to page 1 if not keeping the current page
+    if (!keepPage) {
+      setCurrentPage(1);
+    }
+  } catch (err) {
+    console.error("Error fetching products:", err);
+    setError('Failed to fetch data. Please ensure your backend is running.');
+    setLoading(false);
+  }
+};
+
 
   const handleDelete = async (sno) => {
     try {
-      const response = await fetch(`http://localhost:4000/api/products/${sno}`, {
+      // const response = await fetch(`http://localhost:4000/api/products/${sno}`, {
+      //   method: 'DELETE',
+      // });
+      // if (!response.ok) {
+      //   throw new Error('Failed to delete product.');
+      // }
+      // fetchProducts();
+      await fetch(`http://localhost:4000/api/products/${sno}`, {
         method: 'DELETE',
       });
-      if (!response.ok) {
-        throw new Error('Failed to delete product.');
-      }
-      fetchProducts();
+      if (!response.ok) throw new Error('Failed to delete product.');
+      fetchProducts(true); // ✅ keep current page
+
     } catch (err) {
       console.error("Error deleting product:", err);
       setError('Failed to delete product. Please try again.');
@@ -425,9 +457,12 @@ const Products = () => {
             body: JSON.stringify(productData),
           });
 
+          // if (response.ok) {
+          //   setMessage({ text: 'Products imported successfully! ✨', type: 'success' });
+          //   fetchProducts();
           if (response.ok) {
-            setMessage({ text: 'Products imported successfully! ✨', type: 'success' });
-            fetchProducts();
+          setMessage({ text: 'Products imported successfully! ✨', type: 'success' });
+          fetchProducts(true); // ✅ keep page after import
           } else {
             const errorData = await response.json();
             setMessage({ text: `Error: ${errorData.message}`, type: 'error' });
@@ -601,9 +636,14 @@ const Products = () => {
       
       {/* Modal */}
       <Modal isOpen={isModalOpen} onClose={closeModalAndReset}>
-        <ProductForm
+        {/* <ProductForm
           editingProduct={editingProduct}
           onProductSaved={fetchProducts}
+          onClose={closeModalAndReset}
+        /> */}
+        <ProductForm
+          editingProduct={editingProduct}
+          onProductSaved={() => fetchProducts(true)} // ✅ keep current page
           onClose={closeModalAndReset}
         />
       </Modal>
