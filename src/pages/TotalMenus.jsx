@@ -5,7 +5,7 @@ import MenuItems from '../Components/MenuItems';
 import PreviewDocument from '../Components/PreviewDocument';
 
 function Invoice() {
-  const componentRef = useRef(null);
+  const componentRef = useRef(null);  
 
   // const handlePrint = useReactToPrint({
   //   contentRef: componentRef,

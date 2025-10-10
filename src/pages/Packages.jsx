@@ -1,6 +1,6 @@
 import React from 'react';
 
-const    Packages = () => {
+const   Packages = () => {
   const styles = {
     container: {
       padding: '30px',

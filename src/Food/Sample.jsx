@@ -32,7 +32,7 @@ function App() {
         <Food onAdd={addSnack} />
       </div>
       <div style={{ width: '50%', padding: '10px' }}>
-        <h2>📝 Selected Snacks</h2>
+        <h2> Selected Snacks</h2>
         <Snack
           snacks={selectedSnacks}
           onDelete={deleteSnack}
