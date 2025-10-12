@@ -376,7 +376,7 @@ const Products = () => {
     setProducts(sortedProducts);
     setLoading(false);
 
-    // ✅ Only reset to page 1 if not keeping the current page
+    //  Only reset to page 1 if not keeping the current page
     if (!keepPage) {
       setCurrentPage(1);
     }
@@ -401,7 +401,7 @@ const Products = () => {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete product.');
-      fetchProducts(true); // ✅ keep current page
+      fetchProducts(true); //  keep current page
 
     } catch (err) {
       console.error("Error deleting product:", err);
@@ -475,7 +475,8 @@ const Products = () => {
       reader.readAsArrayBuffer(file);
     }
   };
-
+  
+  // Exporting  & Importing the data in Excel sheet 
   const handleExport = () => {
     if (products.length === 0) {
       setMessage({ text: 'No products to export.', type: 'error' });
@@ -643,7 +644,7 @@ const Products = () => {
         /> */}
         <ProductForm
           editingProduct={editingProduct}
-          onProductSaved={() => fetchProducts(true)} // ✅ keep current page
+          onProductSaved={() => fetchProducts(true)} //  keep current page
           onClose={closeModalAndReset}
         />
       </Modal>

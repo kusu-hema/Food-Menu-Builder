@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-
+    
 // pages......
 import Dashboard from '../pages/Dashboard';
 import Leads from '../pages/Leads';
