@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+// Make sure you have installed this package: npm install xlsx
 import * as XLSX from 'xlsx';
 
 // Helper function to get a value from local storage or return a default
+// (This function is defined but not used in the main component, but is kept for completeness)
 const getFromLocalStorage = (key, defaultValue) => {
   try {
     const value = localStorage.getItem(key);
@@ -12,13 +14,12 @@ const getFromLocalStorage = (key, defaultValue) => {
   }
 };
 
+// ----------------------------------------------------------------------------------
+// PRODUCT FORM COMPONENT
+// ----------------------------------------------------------------------------------
+
 /**
- * Renders the form to create or edit a product with a better UI.
- *
- * @param {object} props - The component props.
- * @param {object} props.editingProduct - The product object to edit, or null for a new product.
- * @param {function} props.onProductSaved - A callback function to call after a successful save (create/update).
- * @param {function} props.onClose - A callback to close the modal.
+ * Renders the form to create or edit a product.
  */
 const ProductForm = ({ editingProduct, onProductSaved, onClose }) => {
   const [product, setProduct] = useState('');
@@ -31,7 +32,7 @@ const ProductForm = ({ editingProduct, onProductSaved, onClose }) => {
     if (editingProduct) {
       setProduct(editingProduct.product);
       setCategory(editingProduct.category);
-      setAction(editingProduct.action);
+      setAction(editingProduct.action || ''); // Initialize action, since it's in the state
     } else {
       setProduct('');
       setCategory('');
@@ -50,7 +51,7 @@ const ProductForm = ({ editingProduct, onProductSaved, onClose }) => {
     }
     formData.append('product', product);
     formData.append('category', category);
-    formData.append('action', action);
+    formData.append('action', action); // Send action, even if input is commented out
 
     const isEditing = !!editingProduct;
     const url = isEditing
@@ -70,7 +71,7 @@ const ProductForm = ({ editingProduct, onProductSaved, onClose }) => {
           : 'Product created successfully! ✨';
         setMessage({ text: successMessage, type: 'success' });
         onProductSaved();
-        setTimeout(onClose, 1500); // Increased delay for better user feedback
+        setTimeout(onClose, 1500);
       } else {
         const errorData = await response.json();
         setMessage({ text: `Error: ${errorData.message}`, type: 'error' });
@@ -82,7 +83,6 @@ const ProductForm = ({ editingProduct, onProductSaved, onClose }) => {
   };
 
   return (
-    // Add new product model 
     <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg">
       <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
         {editingProduct ? 'Edit Product' : 'Add New Product'}
@@ -109,16 +109,6 @@ const ProductForm = ({ editingProduct, onProductSaved, onClose }) => {
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
             required
           />
-        </div>
-        <div>
-          {/* <label htmlFor="action" className="block text-sm font-semibold text-gray-700">Action</label> */}
-          {/* <input
-            type="text"
-            id="action"
-            value={action}
-            onChange={(e) => setAction(e.target.value)}
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          /> */}
         </div>
         <div>
           <label htmlFor="image" className="block text-sm font-semibold text-gray-700">Image</label>
@@ -157,14 +147,16 @@ const ProductForm = ({ editingProduct, onProductSaved, onClose }) => {
   );
 };
 
-// Modal component with a nicer backdrop and animation
+// ----------------------------------------------------------------------------------
+// MODAL COMPONENT
+// ----------------------------------------------------------------------------------
+
 const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) {
     return null;
   }
 
   return (
-    // Remove button for model popup
     <div className="fixed inset-0 bg-gray-900 bg-opacity-75 overflow-y-auto h-full w-full flex items-center justify-center z-50 animate-fade-in-backdrop">
       <div className="relative p-6 rounded-lg shadow-2xl transform transition-all duration-300 animate-fade-in-up">
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-white rounded-full p-1">
@@ -178,15 +170,12 @@ const Modal = ({ isOpen, onClose, children }) => {
   );
 };
 
+// ----------------------------------------------------------------------------------
+// PRODUCTS TABLE COMPONENT
+// ----------------------------------------------------------------------------------
+
 /**
- * Renders the table of products with edit and delete buttons with a better UI.
- *
- * @param {object} props - The component props.
- * @param {Array<object>} props.products - The list of products to display.
- * @param {boolean} props.loading - Loading state.
- * @param {string} props.error - Error message.
- * @param {function} props.onEdit - Callback for editing a product.
- * @param {function} props.onDelete - Callback for deleting a product.
+ * Renders the table of products with edit and delete buttons.
  */
 const ProductsTable = ({ products, loading, error, onEdit, onDelete }) => {
   return (
@@ -331,7 +320,11 @@ const ProductsTable = ({ products, loading, error, onEdit, onDelete }) => {
   );
 };
 
-// ############################# Main parent component with a cleaner layout 
+
+// ----------------------------------------------------------------------------------
+// MAIN PRODUCTS COMPONENT (WITH SEARCH AND FILTERS)
+// ----------------------------------------------------------------------------------
+
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -340,52 +333,54 @@ const Products = () => {
   const [editingProduct, setEditingProduct] = useState(null);
   const [message, setMessage] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [productsPerPage] = useState(10); // Or any other number you prefer
+  const [productsPerPage] = useState(10); 
+  
+  // STATE FOR SEARCH AND FILTERING
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All'); 
 
   const fetchProducts = async (keepPage = false) => {
-  setLoading(true);
-  try {
-    const response = await fetch('http://localhost:4000/api/products');
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    const data = await response.json();
-    const sortedProducts = data.sort((a, b) => a.sno - b.sno);
-    setProducts(sortedProducts);
-    setLoading(false);
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:4000/api/products');
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      const sortedProducts = data.sort((a, b) => a.sno - b.sno);
+      setProducts(sortedProducts);
+      setLoading(false);
 
-    // Only reset to page 1 if not keeping the current page
-    if (!keepPage) {
-      setCurrentPage(1);
+      if (!keepPage) {
+        setCurrentPage(1);
+      }
+    } catch (err) {
+      console.error("Error fetching products:", err);
+      setError('Failed to fetch data. Please ensure your backend is running.');
+      setLoading(false);
     }
-  } catch (err) {
-    console.error("Error fetching products:", err);
-    setError('Failed to fetch data. Please ensure your backend is running.');
-    setLoading(false);
-  }
-};
+  };
 
 
   const handleDelete = async (sno) => {
+    if (!window.confirm("Are you sure you want to delete this product?")) return;
     try {
       const response = await fetch(`http://localhost:4000/api/products/${sno}`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Failed to delete product.');
       
-      // Check if the deletion empties the current page and moves back if necessary
-      const newTotalPages = Math.ceil((products.length - 1) / productsPerPage);
-      const newCurrentPage = currentPage > newTotalPages ? newTotalPages : currentPage;
-      
-      // Update page number if it changed, then fetch products.
-      if (newCurrentPage < currentPage && newCurrentPage >= 1) {
-        setCurrentPage(newCurrentPage);
-        // We still call fetchProducts with false or no argument, as currentPage change will re-run pagination logic
-        fetchProducts(false);
-      } else {
-        // Keep the current page, and fetch data
-        fetchProducts(true); 
-      }
+      // Optimistically update the list for a faster UI experience
+      const updatedProducts = products.filter(p => p.sno !== sno);
+      setProducts(updatedProducts);
+      
+      setMessage({ text: 'Product deleted successfully! 🗑️', type: 'success' });
+      setTimeout(() => setMessage(null), 3000); 
+
+      // Re-fetch to ensure data consistency, while keeping the pagination logic simple.
+      // We call fetchProducts without argument, which resets the page to 1 on success.
+      fetchProducts(); 
+      
 
     } catch (err) {
       console.error("Error deleting product:", err);
@@ -425,6 +420,7 @@ const Products = () => {
           const productData = json.slice(1).map(row => {
             const productObject = {};
             headers.forEach((header, index) => {
+              // Map headers to expected keys
               if (header === 'sno') productObject.sno = row[index];
               if (header === 'product' || header === 'productname') productObject.product = row[index];
               if (header === 'category' || header === 'categoryname') productObject.category = row[index];
@@ -442,8 +438,8 @@ const Products = () => {
           });
 
           if (response.ok) {
-          setMessage({ text: 'Products imported successfully! ✨', type: 'success' });
-          fetchProducts(true); // ✅ keep page after import
+            setMessage({ text: 'Products imported successfully! ✨', type: 'success' });
+            fetchProducts(false); // Reset to page 1 after import
           } else {
             const errorData = await response.json();
             setMessage({ text: `Error: ${errorData.message}`, type: 'error' });
@@ -451,13 +447,15 @@ const Products = () => {
         } catch (error) {
           console.error("Error importing products:", error);
           setMessage({ text: 'Failed to import file. Please check the file format.', type: 'error' });
-        }
+        } finally {
+            // Clear the file input after processing
+            event.target.value = null; 
+        }
       };
       reader.readAsArrayBuffer(file);
     }
   };
   
-  // Exporting  & Importing the data in Excel sheet 
   const handleExport = () => {
     if (products.length === 0) {
       setMessage({ text: 'No products to export.', type: 'error' });
@@ -473,15 +471,49 @@ const Products = () => {
     fetchProducts();
   }, []);
 
-  // Pagination Logic
-  const totalPages = Math.ceil(products.length / productsPerPage);
+  // CATEGORY & SEARCH FILTERING LOGIC
+  const filteredProducts = useMemo(() => {
+    let result = products;
+    const lowerSearchTerm = searchTerm.toLowerCase();
+
+    // 1. Filter by Category
+    if (selectedCategory !== 'All') {
+      result = result.filter(product => product.category && product.category.toLowerCase() === selectedCategory.toLowerCase());
+    }
+
+    // 2. Filter by Search Term (on product or category name)
+    if (searchTerm) {
+      result = result.filter(product => {
+        const productText = (product.product || '').toLowerCase();
+        const categoryText = (product.category || '').toLowerCase();
+        return productText.includes(lowerSearchTerm) || categoryText.includes(lowerSearchTerm);
+    });
+    }
+
+    return result;
+  }, [products, selectedCategory, searchTerm]);
+
+
+  // Get all unique categories for the filter buttons
+  const categories = useMemo(() => {
+    const uniqueCategories = new Set(products.map(p => p.category).filter(Boolean));
+    return ['All', ...Array.from(uniqueCategories).sort()];
+  }, [products]);
+
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filteredProducts]);
+
+
+  // Pagination Logic now uses filteredProducts
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
 
-  // ******************************************************
-  //       THE FIX IS HERE: ADD window.scrollTo(0, 0)
-  // ******************************************************
+
   const paginate = (pageNumber) => {
     if (pageNumber > 0 && pageNumber <= totalPages) {
       setCurrentPage(pageNumber);
@@ -489,9 +521,8 @@ const Products = () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
-  // ******************************************************
 
-  // Logic to generate a limited set of page numbers (e.g., 4)
+  // Logic to generate a limited set of page numbers
   const getPageNumbers = () => {
     const pageNumbers = [];
     let startPage;
@@ -511,7 +542,7 @@ const Products = () => {
       pageNumbers.push(startPage + i);
     }
 
-    return pageNumbers;
+    return pageNumbers.filter(num => num >= 1); // Filter out potential < 1 numbers if totalPages is small
   };
 
   const pageNumbers = getPageNumbers();
@@ -520,6 +551,8 @@ const Products = () => {
   return (
     <div className="bg-gray-50 min-h-screen p-8 font-sans antialiased">
       <div className="max-w-7xl mx-auto">
+        
+        {/* ACTION BUTTONS (ADD, EXPORT, IMPORT) */}
         <div className="flex flex-col sm:flex-row justify-center sm:justify-start items-center mb-6 space-y-4 sm:space-y-0 sm:space-x-4">
 
           {/* Add New Product button */}
@@ -536,7 +569,7 @@ const Products = () => {
             Add New Product
           </button>
 
-           {/* Export to Excel button  */}
+          {/* Export to Excel button */}
           <button
             onClick={handleExport}
             className="w-full sm:w-auto flex items-center justify-center py-3 px-6 border border-transparent rounded-full shadow-lg text-sm font-semibold text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all transform hover:scale-105"
@@ -547,7 +580,7 @@ const Products = () => {
             Export to Excel
           </button>
   
-         {/* Import from Excel button  */}
+          {/* Import from Excel button */}
           <label
             htmlFor="excel-import"
             className="w-full sm:w-auto flex items-center justify-center py-3 px-6 border border-transparent rounded-full shadow-lg text-sm font-semibold text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all transform hover:scale-105 cursor-pointer"
@@ -566,16 +599,51 @@ const Products = () => {
             />
           </label>
         </div>
+
+        {/* SEARCH INPUT */}
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Search by Product Name or Category..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          />
+        </div>
+
+        {/* CATEGORY BUTTONS */}
+        <div className="mb-6 flex flex-wrap gap-2 justify-start items-center">
+          <span className="text-sm font-semibold text-gray-700 self-center hidden sm:block">Filter by Category:</span>
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`px-4 py-2 text-sm font-medium rounded-full transition-colors border ${
+                selectedCategory.toLowerCase() === category.toLowerCase()
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-md'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
         
-        {/* Alert message when uploading prducts  */}
+        {/* Alert message */}
         {message && (
           <div className={`mt-4 px-4 py-3 rounded-lg text-center font-medium ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
             {message.text}
           </div>
         )}
+        
+        {/* No Results Message */}
+        {!loading && !error && filteredProducts.length === 0 && (searchTerm || selectedCategory !== 'All') && (
+            <div className="text-center py-12 text-xl text-gray-600">
+                No products found matching your search or filter criteria. 🧐
+            </div>
+        )}
 
-        {/* Main Products table  */}
-        
+        {/* Main Products table */}
         <ProductsTable
           products={currentProducts}
           loading={loading}
@@ -585,7 +653,7 @@ const Products = () => {
         />
         
         {/* Pagination Controls */}
-        {!loading && !error && products.length > productsPerPage && (
+        {!loading && !error && filteredProducts.length > productsPerPage && (
           <div className="flex justify-center items-center mt-6 space-x-2">
             <button
               onClick={() => paginate(currentPage - 1)}
@@ -626,7 +694,7 @@ const Products = () => {
       <Modal isOpen={isModalOpen} onClose={closeModalAndReset}>
         <ProductForm
           editingProduct={editingProduct}
-          onProductSaved={() => fetchProducts(true)} //  keep current page
+          onProductSaved={() => fetchProducts(true)} // Keep current page
           onClose={closeModalAndReset}
         />
       </Modal>
