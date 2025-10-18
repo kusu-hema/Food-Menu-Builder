@@ -297,6 +297,7 @@ const Preview = forwardRef(
                 ))}
               </tbody>
             </table>
+
           </div>
         ))}
 
@@ -499,6 +500,8 @@ const Preview = forwardRef(
             </h4>
           </div>
         </div>
+
+        
       </div>
     );
   }
