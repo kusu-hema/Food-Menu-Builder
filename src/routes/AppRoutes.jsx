@@ -14,12 +14,13 @@ import Invoice from '../pages/Invoice';
 import CorporateEvents from '../pages/CorporateEvents';
 import Packages from '../pages/Packages';
 import TotalMenu from '../pages/TotalMenus';
+import EditMenu from '../pages/EditMenu';
 
 
 import Items from '../MenuEdit/Items';
-import EditMenu from '../pages/EditMenu';
+import Menu from '../MenuEdit/Menu';
 import Preview from '../MenuEdit/Preview';
-import MenuSelector from '../Components/MenuSelector';
+import Selector from '../MenuEdit/Selector';
 
 
 
@@ -64,9 +65,9 @@ const AppRoutes = ({ isLoggedIn, setIsLoggedIn }) => {
 
 
           <Route path="/items" element={<Items />} />
-          <Route path="/items" element={<Menu />} />
-          <Route path="/items" element={<Preview />} />
-          <Route path="/items" element={<MenuSelector />} />
+          <Route path="/menu" element={<Menu />} />
+          <Route path="/preview" element={<Preview />} />
+          <Route path="/items" element={<Selector />} />
 
 
 

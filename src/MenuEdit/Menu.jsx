@@ -4,39 +4,53 @@ import MenuSelector from '../Components/MenuSelector';
 import MenuItems from '../Components/MenuItems';
 import PreviewDocument from '../Components/PreviewDocument';
 
-function  Menu() {
-  const componentRef = useRef(null);  
+function Menu() {
+  const componentRef = useRef(null);
 
+  // -------------------------------
+  // 📌 Print Setup
+  // -------------------------------
   const handlePrint = useReactToPrint({
-  contentRef: componentRef,
-  documentTitle: 'Invoice',
-  pageStyle: `
-    @page { margin: 5mm }
-    body { font-family: Arial, sans-serif; }
-    
-    .invoice-section-container {
-      page-break-before: always;
-    }
-
-    @media print {
-      body {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
+    contentRef: componentRef,
+    documentTitle: 'Invoice',
+    pageStyle: `
+      @page { margin: 5mm }
+      body { font-family: Arial, sans-serif; }
+      .invoice-section-container {
+        page-break-before: always;
       }
-    }
-  `,
+      @media print {
+        body {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+      }
+    `,
   });
 
+  // -------------------------------
+  // 📌 States
+  // -------------------------------
   const [menuContexts, setMenuContexts] = useState(() => {
     const saved = localStorage.getItem('menuContexts');
-    return saved ? JSON.parse(saved) : [{ date: '', meal: '', members: '', buffet: '', items: {} }];
+    return saved
+      ? JSON.parse(saved)
+      : [{ date: '', meal: '', members: '', buffet: '', items: {} }];
   });
 
   const [formData, setFormData] = useState(() => {
     const saved = localStorage.getItem('formData');
-    return saved ? JSON.parse(saved) : { date: '', place: '', name: '', contact: '' };
+    return saved
+      ? JSON.parse(saved)
+      : { date: '', place: '', name: '', contact: '' };
   });
 
+  const [formExpanded, setFormExpanded] = useState(true);
+  const [expandedIndex, setExpandedIndex] = useState(null);
+
+  // -------------------------------
+  // 📌 Local Storage Sync
+  // -------------------------------
   useEffect(() => {
     localStorage.setItem('menuContexts', JSON.stringify(menuContexts));
   }, [menuContexts]);
@@ -45,6 +59,9 @@ function  Menu() {
     localStorage.setItem('formData', JSON.stringify(formData));
   }, [formData]);
 
+  // -------------------------------
+  // 📌 Helper Functions
+  // -------------------------------
   const updateContext = (index, field, value) => {
     const updated = [...menuContexts];
     updated[index][field] = value;
@@ -56,17 +73,18 @@ function  Menu() {
     const context = updated[index];
     const existingItems = context.items[category] || [];
     if (existingItems.includes(itemName)) return;
-    const updatedItems = {
+    updated[index].items = {
       ...context.items,
       [category]: [...existingItems, itemName],
     };
-    updated[index].items = updatedItems;
     setMenuContexts(updated);
   };
 
   const handleRemoveItem = (contextIndex, category, itemName) => {
     const updated = [...menuContexts];
-    const filtered = updated[contextIndex].items[category].filter(i => i !== itemName);
+    const filtered = updated[contextIndex].items[category].filter(
+      (i) => i !== itemName
+    );
     if (filtered.length === 0) {
       delete updated[contextIndex].items[category];
     } else {
@@ -82,7 +100,10 @@ function  Menu() {
   };
 
   const addMenuContext = () => {
-    setMenuContexts([...menuContexts, { date: '', meal: '', members: '', buffet: '', items: {} }]);
+    setMenuContexts([
+      ...menuContexts,
+      { date: '', meal: '', members: '', buffet: '', items: {} },
+    ]);
   };
 
   const handleFormChange = (e) => {
@@ -90,37 +111,77 @@ function  Menu() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-
   const toggleAccordion = (index) => {
-    setExpandedIndex(prev => (prev === index ? null : index));
+    setExpandedIndex((prev) => (prev === index ? null : index));
   };
 
-  const [formExpanded, setFormExpanded] = useState(true);
-  const [expandedIndex, setExpandedIndex] = useState(null);
+  // -------------------------------
+  // 📌 API Save Function
+  // -------------------------------
+  const saveClientDetails = async () => {
+    try {
+      const response = await fetch('http://localhost:4000/api/menus', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customer_name: formData.name,
+          contact: formData.contact,
+          place: formData.place,
+          date: formData.date,
+        }),
+      });
 
+      if (!response.ok) {
+        throw new Error('Failed to save client details');
+      }
+
+      const data = await response.json();
+      console.log('✅ Saved client details:', data);
+      return data;
+    } catch (error) {
+      console.error('❌ Error saving client details:', error);
+      alert('Error saving client details!');
+    }
+  };
+
+  // -------------------------------
+  // 📌 Save First → Then Print
+  // -------------------------------
+  const handleSaveAndPrint = async () => {
+    await saveClientDetails();
+    handlePrint();
+  };
+
+  // -------------------------------
+  // 📄 UI
+  // -------------------------------
   return (
     <div className="min-h-screen bg-gray-100 p-6 overflow-x-auto">
       <div className="flex flex-row gap-6 min-w-[1000px]">
-
-        {/* Left Panel */}
+        {/* LEFT PANEL */}
         <div className="w-[500px] bg-white rounded-lg shadow-md p-4 overflow-y-auto max-h-[calc(100vh-3rem)]">
-          <h2 className="text-lg font-semibold mb-4 text-gray-800">Select Menu</h2>
+          <h2 className="text-lg font-semibold mb-4 text-gray-800">
+            Select Menu
+          </h2>
 
           <div
             className="flex justify-between items-center mb-2 cursor-pointer bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded border"
-            onClick={() => setFormExpanded(prev => !prev)}
+            onClick={() => setFormExpanded((prev) => !prev)}
           >
-            <h2 className="text-lg font-semibold text-gray-800 ">Customer Details</h2>
+            <h2 className="text-lg font-semibold text-gray-800">
+              Customer Details
+            </h2>
             <span className="text-sm text-blue-600">
               {formExpanded ? '▲ Collapse' : '▼ Expand'}
             </span>
           </div>
 
-          {/* Form Inputs */}
           {formExpanded && (
-            <div className="mb-4 ">
+            <div className="mb-4">
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-800 mb-1">Date</label>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Date
+                </label>
                 <input
                   type="date"
                   name="date"
@@ -131,7 +192,9 @@ function  Menu() {
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-800 mb-1">Place</label>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Place
+                </label>
                 <input
                   type="text"
                   name="place"
@@ -143,7 +206,9 @@ function  Menu() {
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-800 mb-1">Name</label>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Name
+                </label>
                 <input
                   type="text"
                   name="name"
@@ -155,7 +220,9 @@ function  Menu() {
               </div>
 
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-800 mb-1">Contact</label>
+                <label className="block text-sm font-semibold text-gray-800 mb-1">
+                  Contact
+                </label>
                 <input
                   type="number"
                   name="contact"
@@ -178,7 +245,8 @@ function  Menu() {
                   onClick={() => toggleAccordion(index)}
                 >
                   <div className="font-semibold text-gray-800">
-                    {context.date || 'Select Date'} - {context.meal || 'Meal'} - {context.members || 'Members'}
+                    {context.date || 'Select Date'} - {context.meal || 'Meal'} -{' '}
+                    {context.members || 'Members'}
                   </div>
                   <div className="text-sm text-blue-600">
                     {isOpen ? '▲ Collapse' : '▼ Expand'}
@@ -189,11 +257,15 @@ function  Menu() {
                   <div className="p-4 border-t">
                     <MenuSelector
                       context={context}
-                      onChange={(field, value) => updateContext(index, field, value)}
+                      onChange={(field, value) =>
+                        updateContext(index, field, value)
+                      }
                     />
                     <MenuItems
                       selectedItems={context.items}
-                      onAddItem={(category, itemName) => handleAddItem(index, category, itemName)}
+                      onAddItem={(category, itemName) =>
+                        handleAddItem(index, category, itemName)
+                      }
                     />
                   </div>
                 )}
@@ -209,12 +281,14 @@ function  Menu() {
           </button>
         </div>
 
-        {/* Right Panel */}
+        {/* RIGHT PANEL */}
         <div className="flex-1 bg-white rounded-lg shadow-md p-4 overflow-y-auto max-h-[calc(100vh-3rem)]">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-gray-800">Invoice Preview</h2>
+            <h2 className="text-lg font-semibold text-gray-800">
+              Invoice Preview
+            </h2>
             <button
-              onClick={handlePrint}
+              onClick={handleSaveAndPrint}
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
             >
               Print Invoice
@@ -237,4 +311,4 @@ function  Menu() {
   );
 }
 
-export default  Menu;
+export default Menu;
