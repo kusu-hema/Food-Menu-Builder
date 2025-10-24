@@ -9,7 +9,7 @@ const getFromLocalStorage = (key, defaultValue) => {
     console.error(`Error retrieving ${key} from local storage`, error);
     return defaultValue;
   }
-};
+}
 
 const Preview = forwardRef(
   ({ menuContexts, onRemoveItem, onRemoveContext, formData }, ref) => {
@@ -146,7 +146,7 @@ const Preview = forwardRef(
       updatedRow.total = updatedRow.members * newPrice;
       setInvoiceRows(newRows);
     };
-
+   
     // Handler for individual row total change
     const handleTotalChange = (index, e) => {
       const newTotal = parseFloat(e.target.value) || 0;

@@ -14,12 +14,21 @@ import Invoice from '../pages/Invoice';
 import CorporateEvents from '../pages/CorporateEvents';
 import Packages from '../pages/Packages';
 import TotalMenu from '../pages/TotalMenus';
+
+
+import Items from '../MenuEdit/Items';
+import EditMenu from '../pages/EditMenu';
+import Preview from '../MenuEdit/Preview';
+import MenuSelector from '../Components/MenuSelector';
+
+
+
 import Logout from '../pages/Logout';
 import Footer from '../Components/Footer'
 
 // Login page.....                                                                                                                                                                                                                                                                                                                
 import Login from '../pages/Login';
-import EditMenu from '../pages/EditMenu';
+
 
 
 
@@ -51,6 +60,15 @@ const AppRoutes = ({ isLoggedIn, setIsLoggedIn }) => {
           <Route path="/invoice" element={<Invoice />} />
           <Route path="/events" element={<CorporateEvents />} />
           <Route path="/editmenu" element={<EditMenu />} />
+
+
+
+          <Route path="/items" element={<Items />} />
+          <Route path="/items" element={<Menu />} />
+          <Route path="/items" element={<Preview />} />
+          <Route path="/items" element={<MenuSelector />} />
+
+
 
           <Route path="/packages" element={<Packages />} />
           <Route path="/totalmenu" element={<TotalMenu />} />
