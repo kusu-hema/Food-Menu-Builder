@@ -8,7 +8,7 @@ function Menu() {
   const componentRef = useRef(null);
 
   // -------------------------------
-  // 📌 Print Setup
+  // Print Setup
   // -------------------------------
   const handlePrint = useReactToPrint({
     contentRef: componentRef,
@@ -29,7 +29,7 @@ function Menu() {
   });
 
   // -------------------------------
-  // 📌 States
+  // States
   // -------------------------------
   const [menuContexts, setMenuContexts] = useState(() => {
     const saved = localStorage.getItem('menuContexts');
@@ -49,7 +49,7 @@ function Menu() {
   const [expandedIndex, setExpandedIndex] = useState(null);
 
   // -------------------------------
-  // 📌 Local Storage Sync
+  // Local Storage Sync
   // -------------------------------
   useEffect(() => {
     localStorage.setItem('menuContexts', JSON.stringify(menuContexts));
@@ -60,7 +60,7 @@ function Menu() {
   }, [formData]);
 
   // -------------------------------
-  // 📌 Helper Functions
+  // Helper Functions
   // -------------------------------
   const updateContext = (index, field, value) => {
     const updated = [...menuContexts];
@@ -116,7 +116,7 @@ function Menu() {
   };
 
   // -------------------------------
-  // 📌 API Save Function
+  // API Save Function
   // -------------------------------
   const saveClientDetails = async () => {
     try {
@@ -145,7 +145,7 @@ function Menu() {
   };
 
   // -------------------------------
-  // 📌 Save First → Then Print
+  // Save First → Then Print
   // -------------------------------
   const handleSaveAndPrint = async () => {
     await saveClientDetails();
