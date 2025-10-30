@@ -2,23 +2,19 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import MenuSelector from '../Components/MenuSelector';
 import MenuItems from '../Components/MenuItems';
-import PreviewDocument from '../Components/PreviewDocument';
+import Preview from '../MenuEdit/Preview';
 
 function Menu() {
   const componentRef = useRef(null);
 
-  // -------------------------------
-  // Print Setup
-  // -------------------------------
+  // Print setup
   const handlePrint = useReactToPrint({
     contentRef: componentRef,
     documentTitle: 'Invoice',
     pageStyle: `
       @page { margin: 5mm }
       body { font-family: Arial, sans-serif; }
-      .invoice-section-container {
-        page-break-before: always;
-      }
+      .invoice-section-container { page-break-before: always; }
       @media print {
         body {
           -webkit-print-color-adjust: exact;
@@ -28,9 +24,7 @@ function Menu() {
     `,
   });
 
-  // -------------------------------
   // States
-  // -------------------------------
   const [menuContexts, setMenuContexts] = useState(() => {
     const saved = localStorage.getItem('menuContexts');
     return saved
@@ -48,9 +42,10 @@ function Menu() {
   const [formExpanded, setFormExpanded] = useState(true);
   const [expandedIndex, setExpandedIndex] = useState(null);
 
-  // -------------------------------
-  // Local Storage Sync
-  // -------------------------------
+  // Invoice state (will come from Preview component)
+  const [invoiceData, setInvoiceData] = useState(null);
+
+  // Local storage sync
   useEffect(() => {
     localStorage.setItem('menuContexts', JSON.stringify(menuContexts));
   }, [menuContexts]);
@@ -59,9 +54,7 @@ function Menu() {
     localStorage.setItem('formData', JSON.stringify(formData));
   }, [formData]);
 
-  // -------------------------------
-  // Helper Functions
-  // -------------------------------
+  // Helpers
   const updateContext = (index, field, value) => {
     const updated = [...menuContexts];
     updated[index][field] = value;
@@ -116,11 +109,12 @@ function Menu() {
   };
 
   // -------------------------------
-  // API Save Function
+  // Backend Save Functions
   // -------------------------------
-  const saveClientDetails = async () => {
+  const saveClientAndFullMenu = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/menus', {
+      // 1️⃣ Save client (menu)
+      const menuResponse = await fetch('http://localhost:4000/api/menus', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -131,46 +125,117 @@ function Menu() {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to save client details');
+      if (!menuResponse.ok) throw new Error('Failed to save client details');
+      const menuData = await menuResponse.json();
+      const menuId = menuData.id;
+      console.log('✅ Menu saved:', menuData);
+
+      // 2️⃣ Save each Menu Context
+      for (const ctx of menuContexts) {
+        const contextResponse = await fetch('http://localhost:4000/api/menucontext', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            menu_id: menuId,
+            event_date: ctx.date,
+            meal: ctx.meal,
+            members: ctx.members,
+            buffet: ctx.buffet,
+          }),
+        });
+
+        if (!contextResponse.ok) throw new Error('Failed to save menu context');
+        const contextData = await contextResponse.json();
+        const contextId = contextData.id;
+
+        console.log('✅ Context saved:', contextData);
+
+        // 3️⃣ Save Menu Items under this context
+        for (const category of Object.keys(ctx.items)) {
+          for (const itemName of ctx.items[category]) {
+            await fetch('http://localhost:4000/api/menuitems', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                menu_context_id: contextId,
+                category_name: category,
+                item_name: itemName,
+              }),
+            });
+          }
+        }
       }
 
-      const data = await response.json();
-      console.log('✅ Saved client details:', data);
-      return data;
+      alert('✅ All menu data saved successfully!');
+      return menuId;
     } catch (error) {
-      console.error('❌ Error saving client details:', error);
-      alert('Error saving client details!');
+      console.error('❌ Error saving menu data:', error);
+      alert('Error saving menu data!');
+      return null;
+    }
+  };
+
+  // Save Invoice + Download PDF
+  const saveInvoiceAndDownload = async (menuId) => {
+    try {
+      const response = await fetch('http://localhost:4000/api/menuinvoice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          menu_id: menuId,
+          customer_name: formData.name,
+          contact: formData.contact,
+          place: formData.place,
+          ...invoiceData, // subtotal, gst, total_amount, etc.
+          items: invoiceData?.invoiceRows || [],
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success && data.pdfUrl) {
+        alert('✅ Invoice saved & PDF generated successfully!');
+
+        // Auto download PDF
+        const link = document.createElement('a');
+        link.href = data.pdfUrl;
+        link.download = `Invoice_${formData.name}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        alert('❌ Error saving invoice');
+      }
+    } catch (err) {
+      console.error('❌ Error saving invoice:', err);
+      alert('Server error, please check backend.');
+    }
+  };
+
+  // Combined Save + Print + PDF
+  const handleSavePrintDownload = async () => {
+    const menuId = await saveClientAndFullMenu();
+    if (menuId) {
+      await saveInvoiceAndDownload(menuId);
+      handlePrint();
     }
   };
 
   // -------------------------------
-  // Save First → Then Print
-  // -------------------------------
-  const handleSaveAndPrint = async () => {
-    await saveClientDetails();
-    handlePrint();
-  };
-
-  // -------------------------------
-  // 📄 UI
+  // UI
   // -------------------------------
   return (
     <div className="min-h-screen bg-gray-100 p-6 overflow-x-auto">
       <div className="flex flex-row gap-6 min-w-[1000px]">
         {/* LEFT PANEL */}
         <div className="w-[500px] bg-white rounded-lg shadow-md p-4 overflow-y-auto max-h-[calc(100vh-3rem)]">
-          <h2 className="text-lg font-semibold mb-4 text-gray-800">
-            Select Menu
-          </h2>
+          <h2 className="text-lg font-semibold mb-4 text-gray-800">Select Menu</h2>
 
+          {/* Customer Details */}
           <div
             className="flex justify-between items-center mb-2 cursor-pointer bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded border"
             onClick={() => setFormExpanded((prev) => !prev)}
           >
-            <h2 className="text-lg font-semibold text-gray-800">
-              Customer Details
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-800">Customer Details</h2>
             <span className="text-sm text-blue-600">
               {formExpanded ? '▲ Collapse' : '▼ Expand'}
             </span>
@@ -178,60 +243,38 @@ function Menu() {
 
           {formExpanded && (
             <div className="mb-4">
-              <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-800 mb-1">
-                  Date
-                </label>
-                <input
-                  type="date"
-                  name="date"
-                  value={formData.date}
-                  onChange={handleFormChange}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-800 mb-1">
-                  Place
-                </label>
-                <input
-                  type="text"
-                  name="place"
-                  value={formData.place}
-                  onChange={handleFormChange}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                  placeholder="Enter place"
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-800 mb-1">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleFormChange}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                  placeholder="Enter name"
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-800 mb-1">
-                  Contact
-                </label>
-                <input
-                  type="number"
-                  name="contact"
-                  value={formData.contact}
-                  onChange={handleFormChange}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                  placeholder="Enter contact number"
-                />
-              </div>
+              <label className="block text-sm font-semibold mb-1">Date</label>
+              <input
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleFormChange}
+                className="w-full border rounded px-3 py-2 text-sm mb-3"
+              />
+              <label className="block text-sm font-semibold mb-1">Place</label>
+              <input
+                type="text"
+                name="place"
+                value={formData.place}
+                onChange={handleFormChange}
+                className="w-full border rounded px-3 py-2 text-sm mb-3"
+              />
+              <label className="block text-sm font-semibold mb-1">Name</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleFormChange}
+                className="w-full border rounded px-3 py-2 text-sm mb-3"
+              />
+              <label className="block text-sm font-semibold mb-1">Contact</label>
+              <input
+                type="number"
+                name="contact"
+                value={formData.contact}
+                onChange={handleFormChange}
+                className="w-full border rounded px-3 py-2 text-sm"
+              />
             </div>
           )}
 
@@ -257,9 +300,7 @@ function Menu() {
                   <div className="p-4 border-t">
                     <MenuSelector
                       context={context}
-                      onChange={(field, value) =>
-                        updateContext(index, field, value)
-                      }
+                      onChange={(field, value) => updateContext(index, field, value)}
                     />
                     <MenuItems
                       selectedItems={context.items}
@@ -284,25 +325,23 @@ function Menu() {
         {/* RIGHT PANEL */}
         <div className="flex-1 bg-white rounded-lg shadow-md p-4 overflow-y-auto max-h-[calc(100vh-3rem)]">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-gray-800">
-              Invoice Preview
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-800">Invoice Preview</h2>
             <button
-              onClick={handleSaveAndPrint}
+              onClick={handleSavePrintDownload}
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
             >
-              Print Invoice
+              💾 Save & Print Invoice
             </button>
           </div>
 
           <div className="mt-4">
-            <PreviewDocument
+            <Preview
               ref={componentRef}
               menuContexts={menuContexts}
               onRemoveItem={handleRemoveItem}
               onRemoveContext={handleRemoveContext}
               formData={formData}
-              onFormChange={handleFormChange}
+              onInvoiceDataChange={setInvoiceData} // 👈 Collect invoice totals from Preview
             />
           </div>
         </div>
