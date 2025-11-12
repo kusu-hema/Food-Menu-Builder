@@ -20,7 +20,7 @@ import {
 import Shanmukhalogo from '../assets/img/shanmukhalogo.png';
 
 
-// Menu Items Paaths 
+// Menu Items Paths 
 const menuItems = [
   { label: 'Dashboard', icon: <FaTachometerAlt />, path: '/dashboard' },
   {
@@ -46,6 +46,7 @@ const menuItems = [
     children: [
       { label: 'Create Menu', path: '/invoice' },
       { label: 'Total Menus', path: '/totalmenu' },
+      { label: 'Save Menu', path: '/menu'},
       { label: 'Total Customers', path: '/editmenu' },
     ],
   },
