@@ -136,6 +136,7 @@ const Preview = forwardRef(
       localStorage.setItem('labourCharges', JSON.stringify(labourCharges));
       localStorage.setItem('transportCharges', JSON.stringify(transportCharges));
     }, [invoiceRows, subtotal, gst, totalAmount, advance, balance, leadCounters, waterBottles, CookingCharges, labourCharges, transportCharges]);
+    
 
     // Handler for individual row price change
     const handlePriceChange = (index, e) => {
