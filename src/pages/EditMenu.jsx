@@ -1,31 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import '../assets/css/style.css';
 
 const EditMenu = () => {
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [leads, setLeads] = useState([
-    { id: 1, name: 'Ravi Kumar', phone: '9876543210' , EventDate : '15-Aug'},
-    { id: 2, name: 'Anjali Sharma', phone: '9123456780', EventDate : '16-Aug'},
-    { id: 3, name: 'Arjun Patel', phone: '9988776655', EventDate : '17-Aug' },
-  ]); 
+  const [leads, setLeads] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    EventDate : '' 
-  });
+  // Fetch clients from API
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const response = await axios.get('http://localhost:4000/api/menus');
+        // Map API data to match your table structure
+        const clients = response.data.map(client => ({
+          id: client.id,
+          name: client.customer_name,
+          phone: client.contact,
+          EventDate: new Date(client.date).toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+          }),
+          place: client.place,
+        }));
+        setLeads(clients);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching clients:', error);
+        setLoading(false);
+      }
+    };
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newLead = { id: leads.length + 1, ...formData };
-    setLeads([...leads, newLead]);
-    setFormData({ name: '', phone: '', type: '', location: '', status: '' });
-    setModalOpen(false);
-  };
+    fetchClients();
+  }, []);
 
   return (
     <div className="leads-container">
@@ -38,14 +44,18 @@ const EditMenu = () => {
               <th>SNo</th>
               <th>Name</th>
               <th>Phone</th>
-              <th>Event Date </th>
+              <th>Event Date</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {leads.length === 0 ? (
+            {loading ? (
               <tr>
-                <td colSpan="7">No data available</td>
+                <td colSpan="5">Loading...</td>
+              </tr>
+            ) : leads.length === 0 ? (
+              <tr>
+                <td colSpan="5">No data available</td>
               </tr>
             ) : (
               leads.map((lead, i) => (
@@ -54,14 +64,16 @@ const EditMenu = () => {
                   <td>{lead.name}</td>
                   <td>{lead.phone}</td>
                   <td>{lead.EventDate}</td>
-                  <td>Edit | Share</td>
+                  <td>
+                    <button className="action-btn">Edit</button> |{' '}
+                    <button className="action-btn">Share</button>
+                  </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
       </div>
-
     </div>
   );
 };
