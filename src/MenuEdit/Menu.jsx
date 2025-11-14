@@ -181,14 +181,27 @@ function Menu() {
       const response = await fetch('http://localhost:4000/api/menuinvoice', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // body: JSON.stringify({
+        //   menu_id: menuId,
+        //   customer_name: formData.name,
+        //   contact: formData.contact,
+        //   place: formData.place,
+        //   ...invoiceData, // subtotal, gst, total_amount, etc.
+        //   items: invoiceData?.invoiceRows || [],
+        // }),
         body: JSON.stringify({
-          menu_id: menuId,
-          customer_name: formData.name,
-          contact: formData.contact,
-          place: formData.place,
-          ...invoiceData, // subtotal, gst, total_amount, etc.
-          items: invoiceData?.invoiceRows || [],
-        }),
+        menu_id: menuId,
+        subtotal: Number(invoiceData?.subtotal || 0),
+        gst: Number(invoiceData?.gst || 0),
+        grand_total: Number(invoiceData?.grand_total || 0),
+        advance: Number(invoiceData?.advance || 0),
+        balance: Number(invoiceData?.balance || 0),
+        lead_counters: Number(invoiceData?.lead_counters || 0),
+        water_bottles: Number(invoiceData?.water_bottles || 0),
+        cooking_charges: Number(invoiceData?.cooking_charges || 0),
+        labour_charges: Number(invoiceData?.labour_charges || 0),
+        transport_charges: Number(invoiceData?.transport_charges || 0),
+      }),
       });
 
       const data = await response.json();
