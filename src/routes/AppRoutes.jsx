@@ -71,7 +71,7 @@ const AppRoutes = ({ isLoggedIn, setIsLoggedIn }) => {
           <Route path="/preview" element={<Preview />} />
           <Route path="/items" element={<Selector />} />
 
-          <Route path="/displaymenu" element={<DisplayMenu />} />
+          <Route path="/displaymenu/:id" element={<DisplayMenu />} />
 
 
 

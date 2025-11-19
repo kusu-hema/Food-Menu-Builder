@@ -39,34 +39,30 @@ const EditMenu = () => {
     fetchClients();
   }, [fetchClients]);
 
-  // Open Delete modal
   const openDeleteModal = (lead) => {
     setLeadToDelete(lead);
     setIsModalOpen(true);
   };
 
-  // Close Delete modal
   const closeDeleteModal = () => {
     setIsModalOpen(false);
     setLeadToDelete(null);
   };
 
-  // Close alert modal
   const closeAlert = () => {
     setAlertMessage(null);
   };
 
-  // Handle Delete action
   const handleDelete = async () => {
     if (!leadToDelete) return;
     try {
       const menuId = leadToDelete.id;
       await axios.delete(`http://localhost:4000/api/menus/${menuId}`);
       closeDeleteModal();
-      fetchClients(); // Refresh list after deletion
+      fetchClients();
     } catch (error) {
       console.error('Error deleting client:', error);
-      setAlertMessage('Failed to delete the client record or related data. Check server logs.');
+      setAlertMessage('Failed to delete the client record or related data.');
       closeDeleteModal();
     }
   };
@@ -90,48 +86,45 @@ const EditMenu = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">#</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client Name / Place</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Phone</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">Actions</th>
+                <th className="px-6 py-3">#</th>
+                <th className="px-6 py-3">Client Name / Place</th>
+                <th className="px-6 py-3 hidden sm:table-cell">Phone</th>
+                <th className="px-6 py-3">Event Date</th>
+                <th className="px-6 py-3 w-40">Actions</th>
               </tr>
             </thead>
 
             <tbody className="bg-white divide-y divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center text-sm text-gray-500">
-                    <div className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent mr-2 text-indigo-600"></div>
-                    Loading data...
-                  </td>
+                  <td colSpan="5" className="px-6 py-12 text-center">Loading...</td>
                 </tr>
               ) : leads.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center text-sm font-medium text-red-500">
-                    No data available.
-                  </td>
+                  <td colSpan="5" className="px-6 py-12 text-center">No data available.</td>
                 </tr>
               ) : (
                 leads.map((lead, i) => (
-                  <tr key={lead.id} className="hover:bg-indigo-50 transition duration-150 ease-in-out">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{i + 1}.</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-semibold text-gray-900">{lead.name}</div>
+                  <tr key={lead.id} className="hover:bg-indigo-50">
+                    <td className="px-6 py-4">{i + 1}.</td>
+                    <td className="px-6 py-4">
+                      <div className="font-semibold">{lead.name}</div>
                       <div className="text-xs text-gray-500">{lead.place}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">{lead.phone}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{lead.EventDate}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-left text-sm font-medium flex items-center space-x-2">
+
+                    <td className="px-6 py-4 hidden sm:table-cell">{lead.phone}</td>
+                    <td className="px-6 py-4">{lead.EventDate}</td>
+
+                    <td className="px-6 py-4 flex space-x-3">
                       <button
-                        className="text-indigo-600 hover:text-indigo-900 font-medium"
-                        onClick={() => navigate(`/displaymenu`)}
+                        className="text-indigo-600 hover:text-indigo-900"
+                        onClick={() => navigate(`/displaymenu/${lead.id}`)}
                       >
                         Edit/View
                       </button>
-                      <span className="text-gray-300">|</span>
+
                       <button
-                        className="text-red-600 hover:text-red-900 font-medium"
+                        className="text-red-600 hover:text-red-900"
                         onClick={() => openDeleteModal(lead)}
                       >
                         Delete
@@ -145,25 +138,17 @@ const EditMenu = () => {
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
       {isModalOpen && leadToDelete && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 transition-opacity">
-          <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-sm m-4">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Confirm Deletion</h3>
-            <p className="text-sm text-gray-700 mb-6">
-              Are you sure you want to delete the invoice for <strong>{leadToDelete.name}</strong> ({leadToDelete.EventDate})? This action cannot be undone and will delete all related menu and invoice data.
-            </p>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={closeDeleteModal}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition"
-              >
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-xl max-w-sm">
+            <h3 className="text-xl font-bold">Confirm Deletion</h3>
+            <p>Are you sure you want to delete this record?</p>
+
+            <div className="flex justify-end space-x-3 mt-4">
+              <button onClick={closeDeleteModal} className="px-4 py-2 bg-gray-200 rounded">
                 Cancel
               </button>
-              <button
-                onClick={handleDelete}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition shadow-md"
-              >
+              <button onClick={handleDelete} className="px-4 py-2 bg-red-600 text-white rounded">
                 Yes, Delete
               </button>
             </div>
@@ -171,23 +156,21 @@ const EditMenu = () => {
         </div>
       )}
 
-      {/* Custom Alert Message Modal */}
       {alertMessage && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 transition-opacity">
-          <div className="bg-white rounded-lg shadow-2xl p-6 w-full max-w-sm m-4">
-            <h3 className="text-xl font-bold text-red-600 mb-4">Operation Failed</h3>
-            <p className="text-sm text-gray-700 mb-6">{alertMessage}</p>
-            <div className="flex justify-end">
-              <button
-                onClick={closeAlert}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 transition shadow-md"
-              >
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-xl max-w-sm">
+            <h3 className="text-xl font-bold text-red-600">Error</h3>
+            <p>{alertMessage}</p>
+
+            <div className="flex justify-end mt-4">
+              <button onClick={closeAlert} className="px-4 py-2 bg-red-600 text-white rounded">
                 Close
               </button>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 };
