@@ -28,7 +28,7 @@ const menuItems = [
     icon: <FaUserFriends />,
     children: [
       { label: 'Total leads', path: '/leads' },
-      { label: 'Create Customer', path: '/dashboard' },
+      // { label: 'Create Customer', path: '/dashboard' },
     ],
   },
   {
@@ -37,7 +37,7 @@ const menuItems = [
     children: [
       { label: 'Create Customer', path: '/dashboard' },
       { label: 'Customer Profile', path: '/customerprofile' },
-      { label: 'Total Customers', path: '/customers/total' },
+      // { label: 'Total Customers', path: '/customers/total' },
     ],
   },
   {
@@ -51,19 +51,11 @@ const menuItems = [
     ],
   },
   {
-    label: 'Orders',
-    icon: <FaShoppingCart />,
-    children: [
-      { label: 'Create Order', path: '/orders/create' },
-      { label: 'Total Orders', path: '/orders/total' },
-    ],
-  },
-  {
     label: 'Categories',
     icon: <FaLayerGroup />,
     children: [
       { label: 'Add Category', path: '/categories' },
-      { label: 'All Categories', path: '/events' },
+      // { label: 'All Categories', path: '/events' },
     ],
   },
   {
@@ -71,39 +63,47 @@ const menuItems = [
     icon: <FaBoxOpen />,
     children: [
       { label: 'Add Product', path: '/products' },
-      { label: 'All Products', path: '/products/all' },
+      // { label: 'All Products', path: '/products/all' },
     ],
   },
   {
     label: 'Invoice',
     icon: <FaFileInvoice />,
     children: [
-      { label: 'Create Invoice', path: '/invoice' },
-      { label: 'All Invoices', path: '/invoice/all' },
+      // { label: 'Create Invoice', path: '/invoice' },
+      // { label: 'All Invoices', path: '/invoice/all' },
+    ],
+  },
+  {
+    label: 'Orders',
+    icon: <FaShoppingCart />,
+    children: [
+      // { label: 'Create Order', path: '/orders/create' },
+      // { label: 'Total Orders', path: '/orders/total' },
     ],
   },
   {
     label: 'Corporate Events',
     icon: <FaCalendarAlt />,
     children: [
-      { label: 'Add Event', path: '/events' },
-      { label: 'All Events', path: '/events/all' },
+      // { label: 'Add Event', path: '/events' },
+      // { label: 'All Events', path: '/events/all' },
     ],
   },
   {
     label: 'Packages',
     icon: <FaList />,
     children: [
-      { label: 'Create Package', path: '/packages/create' },
-      { label: 'All Packages', path: '/packages/all' },
+      // { label: 'Create Package', path: '/packages/create' },
+      // { label: 'All Packages', path: '/packages/all' },
     ],
   },
   {
     label: 'HR',
     icon: <FaList />,
     children: [
-      { label: 'Create Package', path: '/packages/create' },
-      { label: 'All Packages', path: '/packages/all' },
+      // { label: 'Create Package', path: '/packages/create' },
+      // { label: 'All Packages', path: '/packages/all' },
     ],
   },
   { label: 'Logout', icon: <FaSignOutAlt />, path: '/logout' },
