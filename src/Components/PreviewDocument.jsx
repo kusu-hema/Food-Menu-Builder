@@ -208,7 +208,8 @@ const PreviewDocument = forwardRef(
             </a>
           </h4>
           <h4 className="text-center text-sm text-gray-700 mb-4">
-            VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: 1800 890 3081.
+            VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: +91 98661 76781, +91 40-27656781.
+            
           </h4>
           <h3 className="subheading text-center font-black uppercase text-base mb-6 text-[#00B254]">
             WE CATER TO YOUR HEALTH
@@ -319,7 +320,9 @@ const PreviewDocument = forwardRef(
             </a>
           </h4>
           <h4 className="text-center text-sm text-gray-700 mb-4">
-            VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: 1800 890 3081.
+            {/* VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: 1800 890 3081. */}
+            VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: +91 98661 76781, +91 40-27656781.
+
           </h4>
           <h3 className="subheading text-center font-black uppercase text-base mb-6 text-[#00B254]">
             WE CATER TO YOUR HEALTH
