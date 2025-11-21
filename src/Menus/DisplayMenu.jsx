@@ -1,185 +1,558 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-// =========================================================
-//  UTILITY FUNCTIONS - MUST BE DEFINED
-// =========================================================
+/**
+ * DisplayMenuInvoice.js
+ * - UI is copied from Preview.js (visual/layout parity)
+ * - Data comes from backend GET /api/menus/details/:id
+ * - Read-only invoice (inputs are readonly so layout stays identical)
+ * - Print button provided
+ */
 
-// Utility function to format the ISO date string into a readable local date
-const formatDate = (isoString) => {
-    if (!isoString) return 'N/A';
-    try {
-        const dateObj = new Date(isoString);
-        
-        // Check if the date object is valid
-        if (isNaN(dateObj.getTime())) {
-            return 'Invalid Date Format';
-        }
-        
-        // Format to a readable local date string (e.g., Nov 19, 2025)
-        return dateObj.toLocaleDateString('en-IN', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            // Use UTC to prevent local timezone shift issues that can break Date()
-            timeZone: 'UTC' 
+const DisplayMenuInvoice = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const printRef = useRef();
+
+  const [menuContexts, setMenuContexts] = useState([]);
+  const [formData, setFormData] = useState({
+    name: "",
+    contact: "",
+    date: "",
+    place: "",
+  });
+
+  // Charges & totals from backend
+  const [leadCounters, setLeadCounters] = useState(0);
+  const [waterBottles, setWaterBottles] = useState(0);
+  const [CookingCharges, setCookingCharges] = useState(0);
+  const [labourCharges, setLabourCharges] = useState(0);
+  const [transportCharges, setTransportCharges] = useState(0);
+
+  const [subtotal, setSubtotal] = useState(0);
+  const [gst, setGst] = useState(0);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [advance, setAdvance] = useState(0);
+  const [balance, setBalance] = useState(0);
+
+  const [invoiceRows, setInvoiceRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Pricing map same as Preview.js (kept for invoice rows logic)
+  const pricingMap = {
+    BREAKFAST: 0,
+    LUNCH: 0,
+    EVENING_SNACKS: 0,
+    DINNER: 0,
+    TIFFIN: 0,
+  };
+
+  // Helpers
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    // support ISO date with/without time and date-only like 2026-03-15
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = d.toLocaleString("en-US", { month: "long" }).toUpperCase();
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+  const formatNumber = (num) => {
+    const n = Number(num || 0);
+    if (isNaN(n)) return 0;
+    return new Intl.NumberFormat("en-IN", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(n);
+  };
+
+  const formatCurrencyTwo = (val) => {
+    const n = Number(val || 0);
+    if (isNaN(n)) return "0.00";
+    return n.toFixed(2);
+  };
+
+  // Fetch menu details from backend
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    axios
+      .get(`http://localhost:4000/api/menus/details/${id}`)
+      .then((res) => {
+        if (cancelled) return;
+        const data = res.data || {};
+
+        // Map the backend shape to Preview.js shape
+        setFormData({
+          name: data.customer_name || "",
+          contact: data.contact || "",
+          date: data.booking_date || data.date || "",
+          place: data.place || "",
         });
-    } catch (e) {
-        return 'Invalid Date';
+
+        // Map menu_contexts (backend) -> menuContexts (Preview.js)
+        // Backend sample shows menu_contexts as array of contexts; each has categories array where each category has items[]
+        const contexts = (data.menu_contexts || []).map((ctx) => {
+          // convert categories array -> items object keyed by category_name (to match Preview.js rendering)
+          const itemsObj = {};
+          if (Array.isArray(ctx.categories)) {
+            ctx.categories.forEach((cat) => {
+              const key = cat.category_name || "UNNAMED";
+              itemsObj[key] = Array.isArray(cat.items) ? cat.items : [];
+            });
+          }
+          return {
+            date: ctx.event_date || ctx.date || ctx.eventDate || formData.date,
+            meal: ctx.meal || "",
+            members: ctx.members || 0,
+            buffet: ctx.buffet === true || ctx.buffet === "true" ? "YES" : String(ctx.buffet || ""),
+            // match Preview.js expects ctx.items as an object keyed by category
+            items: itemsObj,
+          };
+        });
+
+        setMenuContexts(contexts);
+
+        // Totals and charges
+        setSubtotal(parseFloat(data.subtotal || 0));
+        setGst(parseFloat(data.gst || 0));
+        setTotalAmount(parseFloat(data.grand_total || data.total || 0));
+        setAdvance(parseFloat(data.advance || 0));
+        setBalance(parseFloat(data.balance || 0));
+
+        setLeadCounters(parseFloat(data.lead_counters || data.leadCounters || 0));
+        setWaterBottles(parseFloat(data.water_bottles || data.waterBottles || 0));
+        setCookingCharges(parseFloat(data.cooking_charges || data.cookingCharges || 0));
+        setLabourCharges(parseFloat(data.labour_charges || data.labourCharges || 0));
+        setTransportCharges(parseFloat(data.transport_charges || data.transportCharges || 0));
+      })
+      .catch((err) => {
+        console.error("Failed to fetch menu details:", err);
+        setError("Failed to load invoice from server.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  // Build invoiceRows from menuContexts similar to Preview.js
+  useEffect(() => {
+    const rows = menuContexts.map((ctx, i) => {
+      const meal = (ctx.meal || "").toString().toUpperCase();
+      const members = parseInt(ctx.members, 10) || 0;
+      const price = pricingMap[meal] || 0;
+      const total = members * price;
+      return {
+        sno: i + 1,
+        event: `${formatDate(ctx.date)} ${meal}`,
+        members,
+        price,
+        total,
+      };
+    });
+    setInvoiceRows(rows);
+  }, [menuContexts]);
+
+  // If backend provided subtotal/gst/balance, keep them; else compute from rows + charges
+  useEffect(() => {
+    // calculate if backend didn't provide subtotal
+    if (!subtotal || subtotal === 0) {
+      const rowsTotal = invoiceRows.reduce((s, r) => s + Number(r.total || 0), 0);
+      const newSubtotal = rowsTotal + Number(leadCounters || 0) + Number(waterBottles || 0) + Number(CookingCharges || 0) + Number(labourCharges || 0) + Number(transportCharges || 0);
+      setSubtotal(newSubtotal);
+      const newTotal = newSubtotal + Number(gst || 0);
+      setTotalAmount(newTotal);
+      setBalance(newTotal - Number(advance || 0));
     }
-};
+  }, [invoiceRows, leadCounters, waterBottles, CookingCharges, labourCharges, transportCharges, gst, advance]); // eslint-disable-line
 
-// Utility function to safely parse and display currency, ensuring 0.00 is shown.
-const formatCurrency = (valueString) => {
-    // Check for null/undefined strings
-    if (valueString === null || valueString === undefined || valueString === '') {
-        return '0.00';
-    }
-    
-    // Safely parse the string (e.g., "560000.00") to a floating-point number
-    const number = parseFloat(valueString);
+  const handlePrint = () => {
+    window.print();
+  };
 
-    if (isNaN(number)) {
-        return '0.00'; // Fallback if the string is corrupted
-    }
-    
-    // Always format to two decimal places
-    return number.toFixed(2);
-};
+  if (loading) {
+    return <div className="p-6 text-center">Loading invoice...</div>;
+  }
 
-// =========================================================
-// 🚀 DISPLAY MENU COMPONENT
-// =========================================================
+  if (error) {
+    return <div className="p-6 text-center text-red-600">{error}</div>;
+  }
 
-const DisplayMenu = () => {
-    // 💡 IMPORTANT: This URL should match the complex join endpoint
-    const { id } = useParams();
-    const [menu, setMenu] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  return (
+    <div ref={printRef} className="max-w-4xl mx-auto bg-white p-6 text-black font-serif border border-black print:border-none my-6">
+      {/* Print & Back controls (not printed) */}
+      <div className="flex justify-end gap-2 mb-4 print:hidden">
+        <button onClick={() => navigate(-1)} className="px-3 py-1 border rounded">Back</button>
+        <button onClick={handlePrint} className="px-3 py-1 bg-indigo-600 text-white rounded">Print</button>
+      </div>
 
-    useEffect(() => {
-        // 💡 CRITICAL: Ensure the correct details endpoint is used here
-        axios
-          .get(`http://localhost:4000/api/menus/details/${id}`)
-          .then((res) => {
-            setMenu(res.data);
-          })
-          .catch((err) => {
-            console.error("Error fetching menu:", err);
-            setError(`Failed to fetch menu details. ${err.response?.data?.message || err.message}`);
-          })
-          .finally(() => {
-            setLoading(false);
-          });
-    }, [id]);
+      {/* ---------------- HEADER ---------------- */}
+      <div className="header section">
+        <h2 className="Mainheading text-center text-xl text-900 font-bold font-extrabold uppercase mb-2 text-[#FFC100]">
+          SHAMMUKHA CATERERS PVT. LTD
+        </h2>
+        <h4 className="text-center text-sm text-gray-700 mb-1 break-words">
+          <span className="block sm:inline text-[#00B254]">
+            An ISO 22000:2018 CERTIFIED COMPANY, Visit :
+          </span>{" "}
+          <a
+            href="https://www.shanmukhacaterers.co.in/"
+            target="_blank"
+            rel="noreferrer"
+            className="text-blue-600 hover:underline block sm:inline underline-offset-2"
+          >
+            www.shammukhacaterers.co.in
+          </a>
+        </h4>
+        <h4 className="text-center text-sm text-gray-700 mb-4">
+          VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: 1800 890 3081.
+        </h4>
+        <h3 className="subheading text-center font-black uppercase text-base mb-6 text-[#00B254]">
+          WE CATER TO YOUR HEALTH
+        </h3>
+      </div>
 
-    if (loading) return <p className="p-6 text-lg">Loading invoice...</p>;
-    if (error) return <p className="p-6 text-lg text-red-600">Error: {error}</p>;
-    if (!menu) return <p className="p-6 text-lg text-red-600">Invoice not found.</p>;
-
-    // Destructuring fields for clarity
-    const {
-        customer_name, contact, place, booking_date,
-        subtotal, gst, grand_total, advance, balance,
-        lead_counters, water_bottles, cooking_charges, labour_charges, transport_charges,
-        menu_contexts
-    } = menu;
-
-
-    return (
-        <div className="p-6 max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold mb-6">Invoice Details</h2>
-
-            {/* Main Card */}
-            <div className="bg-white shadow-xl p-8 rounded-xl space-y-6">
-
-                {/* Client Details */}
-                <section>
-                    <h3 className="text-xl font-bold mb-3">Client Information</h3>
-                    <p><strong>Client Name:</strong> {customer_name}</p>
-                    <p><strong>Phone:</strong> {contact}</p>
-                    <p><strong>Place:</strong> {place}</p>
-                    <p>
-                        <strong>Booking Date:</strong>{" "}
-                        {/* 📅 FIX APPLIED: Use formatDate utility */}
-                        {formatDate(booking_date)}
-                    </p>
-                </section>
-
-                <hr />
-
-                {/* Invoice */}
-                <section>
-                    <h3 className="text-xl font-bold mb-3">Invoice Summary</h3>
-                    {/* 💰 FIXES APPLIED: Use formatCurrency utility */}
-                    <p><strong>Subtotal:</strong> ₹{formatCurrency(subtotal)}</p>
-                    <p><strong>GST:</strong> ₹{formatCurrency(gst)}</p>
-                    <p><strong>Grand Total:</strong> ₹{formatCurrency(grand_total)}</p>
-                    <p><strong>Advance Paid:</strong> ₹{formatCurrency(advance)}</p>
-                    <p><strong>Balance:</strong> ₹{formatCurrency(balance)}</p>
-                </section>
-
-                <hr />
-
-                {/* Extra Charges */}
-                <section>
-                    <h3 className="text-xl font-bold mb-3">Additional Charges</h3>
-                    {/* 💰 FIXES APPLIED: Ensure numerical fields are treated as currency */}
-                    <p><strong>Lead Counters:</strong> {formatCurrency(lead_counters)}</p>
-                    <p><strong>Water Bottles:</strong> {formatCurrency(water_bottles)}</p>
-                    <p><strong>Cooking Charges:</strong> ₹{formatCurrency(cooking_charges)}</p>
-                    <p><strong>Labour Charges:</strong> ₹{formatCurrency(labour_charges)}</p>
-                    <p><strong>Transport Charges:</strong> ₹{formatCurrency(transport_charges)}</p>
-                </section>
-
-                <hr />
-
-                {/* Menu Contexts */}
-                <section>
-                    <h3 className="text-xl font-bold mb-3">Menu Items</h3>
-
-                    {/* Check if menu_contexts exists before mapping */}
-                    {menu_contexts?.length > 0 ? (
-                        menu_contexts.map((ctx, idx) => (
-                            <div key={idx} className="bg-gray-50 p-4 rounded-lg mb-4">
-                                <p><strong>Event Date:</strong> {ctx.event_date}</p>
-                                <p><strong>Meal:</strong> {ctx.meal}</p>
-                                <p><strong>Members:</strong> {ctx.members}</p>
-                                {/* Note: Assuming Buffet field is a string or boolean handled by the backend */}
-                                <p><strong>Buffet:</strong> {ctx.buffet === true || ctx.buffet === "true" ? "Yes" : "No"}</p>
-
-                                <div className="mt-3">
-                                    {/* Check if categories exists before mapping */}
-                                    {ctx.categories?.length > 0 ? (
-                                        ctx.categories.map((cat, cIdx) => (
-                                            <div key={cIdx} className="mb-3">
-                                                <h4 className="text-lg font-semibold text-indigo-700">
-                                                    {cat.category_name}
-                                                </h4>
-
-                                                <ul className="list-disc ml-6 text-gray-700">
-                                                    {/* Check if items exists before mapping */}
-                                                    {cat.items?.map((item, iIdx) => (
-                                                        <li key={iIdx}>{item}</li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <p className="text-gray-500">No categories defined for this meal.</p>
-                                    )}
-                                </div>
-                            </div>
-                        ))
-                    ) : (
-                        <p className="text-gray-500">No menu contexts defined for this invoice.</p>
-                    )}
-                </section>
-            </div>
+      {/* ---------------- CUSTOMER INFO ---------------- */}
+      <div className="mb-2 text-sm font-medium text-black flex flex-wrap justify-between print:flex-row print:gap-0 uppercase">
+        <div className="w-full md:w-[48%] print:w-[48%]">
+          <div className="mb-1">
+            <span style={{ fontWeight: "900", fontSize: "larger" }}>
+              Name:
+            </span>{" "}
+            {formData.name}
+          </div>
+          <div className="mb-1">
+            <span style={{ fontWeight: "900", fontSize: "larger" }}>
+              Contact:
+            </span>{" "}
+            +91 {formData.contact}
+          </div>
         </div>
-    );
+        <div className="w-full md:w-[48%] print:w-[48%]">
+          <div className="mb-1">
+            <span style={{ fontWeight: "900", fontSize: "larger" }}>
+              Date:
+            </span>{" "}
+            {formatDate(formData.date)}
+          </div>
+          <div className="mb-1">
+            <span style={{ fontWeight: "900", fontSize: "larger" }}>
+              Place:
+            </span>{" "}
+            {formData.place}
+          </div>
+        </div>
+      </div>
+
+      {/* ---------------- CONTEXT LIST ---------------- */}
+      {menuContexts.map((ctx, index) => (
+        <div
+          key={index}
+          className="mb-8 relative border border-black p-2 bg-white print:no-border"
+        >
+          {/* preview had remove buttons; for display we hide them */}
+          <h4
+            style={{
+              fontWeight: 900,
+              fontSize: "larger",
+              textTransform: "uppercase",
+              color: "#1a1a1a",
+              marginBottom: "1rem",
+              letterSpacing: "1.3px",
+            }}
+            className="font-bold mb-2"
+          >
+            {formatDate(ctx.date)} {ctx.meal} FOR {ctx.members} MEMBERS{" "}
+            <span style={{ color: "#FF0000" }}>
+              {String(ctx.buffet || "").toUpperCase()}
+            </span>
+          </h4>
+
+          {/* Category Table */}
+          <table className="w-full text-sm border border-black">
+            <tbody>
+              {Object.entries(ctx.items || {}).map(([cat, items]) => (
+                <tr
+                  key={cat}
+                  className="border-b border-black align-top"
+                >
+                  <td className="menuheaing p-2 font-bold text-black w-1/4 text-base uppercase border-r border-black">
+                    {cat}
+                  </td>
+                  <td className="p-1 font-bold text-base text-black w-2/3 uppercase">
+                    <div className="flex flex-wrap gap-x-4 gap-y-1">
+                      {items.map((item, i) => (
+                        <span
+                          key={i}
+                          className="inline-flex items-center gap-1"
+                        >
+                          * {item}{" "}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
+
+      {/* ---------------- INVOICE SECTION ---------------- */}
+      <div className="invoice-section-container">
+        <h2 className="Mainheading text-center text-xl text-900 font-bold font-extrabold uppercase mb-2 text-[#FFC100]">
+          SHAMMUKHA CATERERS PVT. LTD
+        </h2>
+        <h4 className="text-center text-sm text-gray-700 mb-1 break-words">
+          <span className="block sm:inline text-[#00B254]">
+            An ISO 22000:2018 CERTIFIED COMPANY, Visit :
+          </span>{" "}
+          <a
+            href="https://www.shanmukhacaterers.co.in/"
+            target="_blank"
+            rel="noreferrer"
+            className="text-blue-600 hover:underline block sm:inline underline-offset-2"
+          >
+            www.shammukhacaterers.co.in
+          </a>
+        </h4>
+        <h4 className="text-center text-sm text-gray-700 mb-4">
+          VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: 1800 890 3081.
+        </h4>
+        <h3 className="subheading text-center font-black uppercase text-base mb-6 text-[#00B254]">
+          WE CATER TO YOUR HEALTH
+        </h3>
+
+        {/* Customer Info */}
+        <div className="mb-2 text-sm font-medium text-black flex flex-wrap justify-between print:flex-row print:gap-0 uppercase">
+          <div className="w-full md:w-[48%] print:w-[48%]">
+            <div className="mb-1">
+              <span style={{ fontWeight: "900", fontSize: "larger" }}>Name:</span>{" "}
+              {formData.name}
+            </div>
+            <div className="mb-1">
+              <span style={{ fontWeight: "900", fontSize: "larger" }}>Contact:</span>{" "}
+              +91 {formData.contact}
+            </div>
+          </div>
+          <div className="w-full md:w-[48%] print:w-[48%]">
+            <div className="mb-1">
+              <span style={{ fontWeight: "900", fontSize: "larger" }}>Date:</span>{" "}
+              {formatDate(formData.date)}
+            </div>
+            <div className="mb-1">
+              <span style={{ fontWeight: "900", fontSize: "larger" }}>Place:</span>{" "}
+              {formData.place}
+            </div>
+          </div>
+        </div>
+
+        {/* ---------------- Invoice Table ---------------- */}
+        <table className="w-full text-sm border border-black mt-6">
+          <thead>
+            <tr className="bg-[#FFC100] text-black font-bold text-center">
+              <th className="border border-black p-2">SNO</th>
+              <th className="border border-black p-2">EVENT</th>
+              <th className="border border-black p-2">MEMBERS</th>
+              <th className="border border-black p-2">PRICE</th>
+              <th className="border border-black p-2">TOTAL</th>
+            </tr>
+          </thead>
+
+          <tbody className="bg-[#f2dcdb] text-black font-bold text-center">
+            {invoiceRows.map((row, i) => (
+              <tr key={i} className="text-center text-black font-semibold">
+                <td className="border border-black p-2">{row.sno}</td>
+                <td className="border border-black p-2">{row.event}</td>
+                <td className="border border-black p-2">{row.members}</td>
+                <td className="border border-black p-2">
+                  <input
+                    type="number"
+                    value={row.price}
+                    readOnly
+                    className="w-full text-center bg-transparent border-none focus:outline-none"
+                  />
+                </td>
+                <td className="border border-black p-2">
+                  <input
+                    type="number"
+                    value={row.total}
+                    readOnly
+                    className="w-full text-center bg-transparent border-none focus:outline-none"
+                  />
+                </td>
+              </tr>
+            ))}
+
+            {/* Extra Charges */}
+            <tr className="text-center text-black font-bold uppercase">
+              <td colSpan="4" className="border border-black p-2">
+                LED Counters
+              </td>
+              <td className="border border-black p-2">
+                <input
+                  type="text"
+                  value={formatCurrencyTwo(leadCounters)}
+                  readOnly
+                  className="w-full text-center bg-transparent border-none focus:outline-none"
+                />
+              </td>
+            </tr>
+
+            <tr className="text-center text-black font-bold uppercase">
+              <td colSpan="4" className="border border-black p-2">
+                Water Bottles
+              </td>
+              <td className="border border-black p-2">
+                <input
+                  type="text"
+                  value={formatCurrencyTwo(waterBottles)}
+                  readOnly
+                  className="w-full text-center bg-transparent border-none focus:outline-none"
+                />
+              </td>
+            </tr>
+
+            <tr className="text-center text-black font-bold uppercase">
+              <td colSpan="4" className="border border-black p-2">
+                Cooking Charges
+              </td>
+              <td className="border border-black p-2">
+                <input
+                  type="text"
+                  value={formatCurrencyTwo(CookingCharges)}
+                  readOnly
+                  className="w-full text-center bg-transparent border-none focus:outline-none"
+                />
+              </td>
+            </tr>
+
+            <tr className="text-center text-black font-bold uppercase">
+              <td colSpan="4" className="border border-black p-2">
+                Labour Charges
+              </td>
+              <td className="border border-black p-2">
+                <input
+                  type="text"
+                  value={formatCurrencyTwo(labourCharges)}
+                  readOnly
+                  className="w-full text-center bg-transparent border-none focus:outline-none"
+                />
+              </td>
+            </tr>
+
+            <tr className="text-center text-black font-bold uppercase">
+              <td colSpan="4" className="border border-black p-2">
+                Transport Charges
+              </td>
+              <td className="border border-black p-2">
+                <input
+                  type="text"
+                  value={formatCurrencyTwo(transportCharges)}
+                  readOnly
+                  className="w-full text-center bg-transparent border-none focus:outline-none"
+                />
+              </td>
+            </tr>
+
+            {/* TOTAL */}
+            <tr className="text-black font-bold" style={{ color: "#FF0000" }}>
+              <td colSpan="4" className="border border-black p-2 uppercase">
+                TOTAL
+              </td>
+              <td className="border border-black p-2" style={{ fontWeight: "600", fontSize: "larger" }}>
+                <input
+                  type="text"
+                  value={formatCurrencyTwo(subtotal)}
+                  readOnly
+                  className="w-full text-center bg-transparent border-none focus:outline-none"
+                />
+              </td>
+            </tr>
+
+            {/* GST */}
+            <tr className="text-black font-bold">
+              <td colSpan="4" className="border border-black p-2 uppercase">
+                GST
+              </td>
+              <td className="border border-black p-2">
+                <input
+                  type="text"
+                  value={formatCurrencyTwo(gst)}
+                  readOnly
+                  className="w-full text-center bg-transparent border-none focus:outline-none"
+                />
+              </td>
+            </tr>
+
+            {/* GRAND TOTAL */}
+            <tr className="text-black font-bold" style={{ color: "#FF0000" }}>
+              <td colSpan="4" className="border border-black p-2 uppercase">
+                GRAND TOTAL
+              </td>
+              <td className="border border-black p-2" style={{ fontWeight: "600", fontSize: "larger" }}>
+                <input
+                  type="text"
+                  value={formatCurrencyTwo(totalAmount)}
+                  readOnly
+                  className="w-full text-center bg-transparent border-none focus:outline-none"
+                />
+              </td>
+            </tr>
+
+            {/* ADVANCE */}
+            <tr className="text-black font-bold">
+              <td colSpan="4" className="border border-black p-2 uppercase">
+                ADVANCE
+              </td>
+              <td className="border border-black p-2">
+                <input
+                  type="text"
+                  value={formatCurrencyTwo(advance)}
+                  readOnly
+                  className="w-full text-center bg-transparent border-none focus:outline-none"
+                />
+              </td>
+            </tr>
+
+            {/* BALANCE */}
+            <tr className="text-black font-bold">
+              <td colSpan="4" className="border border-black p-2 uppercase">
+                BALANCE AMOUNT
+              </td>
+              <td className="border border-black p-2" style={{ fontWeight: "600", fontSize: "larger" }}>
+                {formatNumber(balance)}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        {/* Last Section / Notes */}
+        <div className="last-section">
+          <h4 className="text-center text-black font-bold text-sm mb-4 mt-4">
+            NOTE: ADDITIONAL WILL BE CHARGED FOR EXTRA PLATES
+          </h4>
+          <h4 className="text-center text-black font-bold text-sm mb-4">
+            *** With best Wishes from Shanmukha Caterers Pvt.Ltd and Service....
+          </h4>
+          <h4 className="text-center text-black font-bold text-sm mb-4">
+            From Shanmukha Caterers Pvt.Ltd
+          </h4>
+          <h4 className="text-center text-black font-bold text-sm mb-4">
+            Manager
+          </h4>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-export default DisplayMenu;
+export default DisplayMenuInvoice;
