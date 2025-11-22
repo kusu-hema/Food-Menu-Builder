@@ -15,7 +15,7 @@ function  Items({ selectedItems, onAddItem }) {
         const categoryList = sortedData.map(item => item.category_name);
         setCategories(categoryList);
         setSelectedCategory(categoryList[0] || '');
-      })
+      })     
       .catch(error => {
         console.error("Error fetching categories:", error);
       });

@@ -1,92 +1,49 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import MenuSelector from "../MenuEdit/Selector";
+import MenuItems from "../MenuEdit/Items";
+import Preview from "../MenuEdit/Preview";
 
-/**
- * DisplayMenuInvoice.js
- * - UI is copied from Preview.js (visual/layout parity)
- * - Data comes from backend GET /api/menus/details/:id
- * - Read-only invoice (inputs are readonly so layout stays identical)
- * - Print button provided
+/** 
+ * EditMenuById.js
+ *
+ * - Loads menu by id using GET http://localhost:4000/api/menus/details/${id}
+ * - Lets user edit using the same Preview.js UI pattern
+ * - On Save:
+ *    * tries PUT http://localhost:4000/api/menus/${id}
+ *    * if PUT fails (404 or server error), falls back to POST http://localhost:4000/api/menus (create new)
+ * - No external endpoints file; URLs are inline as requested
+ * - Converts backend menu_contexts (categories[]) -> Preview format (items:{})
  */
 
-const DisplayMenuInvoice = () => {
+const EditMenuById = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const printRef = useRef();
+  const previewRef = useRef(null);
 
-  const [menuContexts, setMenuContexts] = useState([]);
-  const [formData, setFormData] = useState({
-    name: "",
-    contact: "",
-    date: "",
-    place: "",
-  });
+  const [formData, setFormData] = useState({ name: "", contact: "", date: "", place: "" });
+  const [menuContexts, setMenuContexts] = useState([{ date: "", meal: "", members: "", buffet: "", items: {} }]);
+  const [invoiceData, setInvoiceData] = useState(null);
 
-  // Charges & totals from backend
-  const [leadCounters, setLeadCounters] = useState(0);
-  const [waterBottles, setWaterBottles] = useState(0);
-  const [CookingCharges, setCookingCharges] = useState(0);
-  const [labourCharges, setLabourCharges] = useState(0);
-  const [transportCharges, setTransportCharges] = useState(0);
-
-  const [subtotal, setSubtotal] = useState(0);
-  const [gst, setGst] = useState(0);
-  const [totalAmount, setTotalAmount] = useState(0);
-  const [advance, setAdvance] = useState(0);
-  const [balance, setBalance] = useState(0);
-
-  const [invoiceRows, setInvoiceRows] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
-  // Pricing map same as Preview.js (kept for invoice rows logic)
-  const pricingMap = {
-    BREAKFAST: 0,
-    LUNCH: 0,
-    EVENING_SNACKS: 0,
-    DINNER: 0,
-    TIFFIN: 0,
-  };
-
-  // Helpers
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "";
-    // support ISO date with/without time and date-only like 2026-03-15
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return dateStr;
-    const day = String(d.getDate()).padStart(2, "0");
-    const month = d.toLocaleString("en-US", { month: "long" }).toUpperCase();
-    const year = d.getFullYear();
-    return `${day}-${month}-${year}`;
-  };
-
-  const formatNumber = (num) => {
-    const n = Number(num || 0);
-    if (isNaN(n)) return 0;
-    return new Intl.NumberFormat("en-IN", {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(n);
-  };
-
-  const formatCurrencyTwo = (val) => {
-    const n = Number(val || 0);
-    if (isNaN(n)) return "0.00";
-    return n.toFixed(2);
-  };
-
-  // Fetch menu details from backend
+  // ---- Load detail by ID and convert backend -> Preview format
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    axios
-      .get(`http://localhost:4000/api/menus/details/${id}`)
-      .then((res) => {
+    fetch(`http://localhost:4000/api/menus/details/${id}`)
+      .then(async (res) => {
+        if (!res.ok) {
+          const txt = await res.text().catch(() => "");
+          throw new Error(`Failed to fetch menu: ${res.status} ${txt}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
         if (cancelled) return;
-        const data = res.data || {};
 
-        // Map the backend shape to Preview.js shape
         setFormData({
           name: data.customer_name || "",
           contact: data.contact || "",
@@ -94,45 +51,44 @@ const DisplayMenuInvoice = () => {
           place: data.place || "",
         });
 
-        // Map menu_contexts (backend) -> menuContexts (Preview.js)
-        // Backend sample shows menu_contexts as array of contexts; each has categories array where each category has items[]
         const contexts = (data.menu_contexts || []).map((ctx) => {
-          // convert categories array -> items object keyed by category_name (to match Preview.js rendering)
           const itemsObj = {};
           if (Array.isArray(ctx.categories)) {
             ctx.categories.forEach((cat) => {
               const key = cat.category_name || "UNNAMED";
-              itemsObj[key] = Array.isArray(cat.items) ? cat.items : [];
+              itemsObj[key] = Array.isArray(cat.items) ? [...cat.items] : [];
             });
           }
           return {
-            date: ctx.event_date || ctx.date || ctx.eventDate || formData.date,
+            date: ctx.event_date || ctx.date || "",
             meal: ctx.meal || "",
             members: ctx.members || 0,
             buffet: ctx.buffet === true || ctx.buffet === "true" ? "YES" : String(ctx.buffet || ""),
-            // match Preview.js expects ctx.items as an object keyed by category
             items: itemsObj,
+            context_id: ctx.context_id || ctx.id || null,
           };
         });
 
-        setMenuContexts(contexts);
+        setMenuContexts(contexts.length ? contexts : [{ date: "", meal: "", members: "", buffet: "", items: {} }]);
 
-        // Totals and charges
-        setSubtotal(parseFloat(data.subtotal || 0));
-        setGst(parseFloat(data.gst || 0));
-        setTotalAmount(parseFloat(data.grand_total || data.total || 0));
-        setAdvance(parseFloat(data.advance || 0));
-        setBalance(parseFloat(data.balance || 0));
+        setInvoiceData({
+          subtotal: Number(data.subtotal || 0),
+          gst: Number(data.gst || 0),
+          grand_total: Number(data.grand_total || data.totalAmount || 0),
+          advance: Number(data.advance || 0),
+          balance: Number(data.balance || 0),
+          lead_counters: Number(data.lead_counters || 0),
+          water_bottles: Number(data.water_bottles || 0),
+          cooking_charges: Number(data.cooking_charges || 0),
+          labour_charges: Number(data.labour_charges || 0),
+          transport_charges: Number(data.transport_charges || 0),
+        });
 
-        setLeadCounters(parseFloat(data.lead_counters || data.leadCounters || 0));
-        setWaterBottles(parseFloat(data.water_bottles || data.waterBottles || 0));
-        setCookingCharges(parseFloat(data.cooking_charges || data.cookingCharges || 0));
-        setLabourCharges(parseFloat(data.labour_charges || data.labourCharges || 0));
-        setTransportCharges(parseFloat(data.transport_charges || data.transportCharges || 0));
+        setError(null);
       })
       .catch((err) => {
-        console.error("Failed to fetch menu details:", err);
-        setError("Failed to load invoice from server.");
+        console.error("Fetch detail error:", err);
+        if (!cancelled) setError(err.message || "Failed to load details");
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -143,416 +99,243 @@ const DisplayMenuInvoice = () => {
     };
   }, [id]);
 
-  // Build invoiceRows from menuContexts similar to Preview.js
-  useEffect(() => {
-    const rows = menuContexts.map((ctx, i) => {
-      const meal = (ctx.meal || "").toString().toUpperCase();
-      const members = parseInt(ctx.members, 10) || 0;
-      const price = pricingMap[meal] || 0;
-      const total = members * price;
-      return {
-        sno: i + 1,
-        event: `${formatDate(ctx.date)} ${meal}`,
-        members,
-        price,
-        total,
-      };
+  // ---- helpers to update UI state
+  const updateContext = (index, field, value) => {
+    setMenuContexts((prev) => {
+      const copy = [...prev];
+      copy[index] = { ...copy[index], [field]: value };
+      return copy;
     });
-    setInvoiceRows(rows);
-  }, [menuContexts]);
-
-  // If backend provided subtotal/gst/balance, keep them; else compute from rows + charges
-  useEffect(() => {
-    // calculate if backend didn't provide subtotal
-    if (!subtotal || subtotal === 0) {
-      const rowsTotal = invoiceRows.reduce((s, r) => s + Number(r.total || 0), 0);
-      const newSubtotal = rowsTotal + Number(leadCounters || 0) + Number(waterBottles || 0) + Number(CookingCharges || 0) + Number(labourCharges || 0) + Number(transportCharges || 0);
-      setSubtotal(newSubtotal);
-      const newTotal = newSubtotal + Number(gst || 0);
-      setTotalAmount(newTotal);
-      setBalance(newTotal - Number(advance || 0));
-    }
-  }, [invoiceRows, leadCounters, waterBottles, CookingCharges, labourCharges, transportCharges, gst, advance]); // eslint-disable-line
-
-  const handlePrint = () => {
-    window.print();
   };
 
-  if (loading) {
-    return <div className="p-6 text-center">Loading invoice...</div>;
-  }
+  const handleAddItem = (index, category, itemName) => {
+    setMenuContexts((prev) => {
+      const copy = [...prev];
+      const ctx = { ...copy[index] };
+      const existing = Array.isArray(ctx.items?.[category]) ? ctx.items[category] : [];
+      if (!existing.includes(itemName)) {
+        ctx.items = { ...ctx.items, [category]: [...existing, itemName] };
+        copy[index] = ctx;
+      }
+      return copy;
+    });
+  };
 
-  if (error) {
-    return <div className="p-6 text-center text-red-600">{error}</div>;
-  }
+  const handleRemoveItem = (ctxIndex, category, itemName) => {
+    setMenuContexts((prev) => {
+      const copy = [...prev];
+      const items = Array.isArray(copy[ctxIndex].items[category]) ? copy[ctxIndex].items[category] : [];
+      const filtered = items.filter((it) => it !== itemName);
+      if (filtered.length === 0) {
+        const { [category]: _, ...rest } = copy[ctxIndex].items;
+        copy[ctxIndex].items = rest;
+      } else {
+        copy[ctxIndex].items[category] = filtered;
+      }
+      return copy;
+    });
+  };
+
+  const handleRemoveContext = (index) => {
+    if (!window.confirm("Are you sure you want to remove this menu context?")) return;
+    setMenuContexts((prev) => {
+      const copy = [...prev];
+      copy.splice(index, 1);
+      return copy.length ? copy : [{ date: "", meal: "", members: "", buffet: "", items: {} }];
+    });
+  };
+
+  const addMenuContext = () =>
+    setMenuContexts((prev) => [...prev, { date: "", meal: "", members: "", buffet: "", items: {} }]);
+
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((p) => ({ ...p, [name]: value }));
+  };
+
+  // convert Preview shape back into backend shape (categories array)
+  const convertToBackend = () => {
+    const backendContexts = menuContexts.map((ctx) => {
+      const categoriesArr = Object.entries(ctx.items || {}).map(([category_name, items]) => ({
+        category_name,
+        items: Array.isArray(items) ? items : [],
+      }));
+      return {
+        context_id: ctx.context_id || null,
+        event_date: ctx.date,
+        meal: ctx.meal,
+        members: ctx.members,
+        buffet: ctx.buffet,
+        categories: categoriesArr,
+      };
+    });
+
+    return {
+      customer_name: formData.name,
+      contact: formData.contact,
+      place: formData.place,
+      booking_date: formData.date,
+      menu_contexts: backendContexts,
+      ...(invoiceData || {}),
+    };
+  };
+
+  // ---- Save flow:
+  // Try PUT /api/menus/:id; if it fails (404 or server returns no ok),
+  // fallback to POST /api/menus to create a new menu.
+  const handleSaveAll = async () => {
+    try {
+      setSaving(true);
+      const payload = convertToBackend();
+
+      // Try PUT to update (common case)
+      try {
+        const putRes = await fetch(`http://localhost:4000/api/menus/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (putRes.ok) {
+          const json = await putRes.json().catch(() => null);
+          alert("✅ Menu & Invoice updated successfully (PUT).");
+          return;
+        }
+
+        // If PUT returned 404 or not ok, we'll fall back
+        console.warn("PUT failed, will try POST. PUT status:", putRes.status);
+      } catch (putErr) {
+        console.warn("PUT request error, will try POST:", putErr);
+      }
+
+      // Fallback: POST to create new menu
+      const postRes = await fetch("http://localhost:4000/api/menus", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!postRes.ok) {
+        const txt = await postRes.text().catch(() => "");
+        throw new Error(`Create failed: ${postRes.status} ${txt}`);
+      }
+
+      const created = await postRes.json().catch(() => null);
+      const createdId = created?.id || created?.menu_id || null;
+      alert(`✅ No update API found. Created new menu ${createdId ? `with id ${createdId}` : ""}.`);
+      // optionally navigate to new id page
+      if (createdId) {
+        navigate(`/menu/edit/${createdId}`);
+      }
+    } catch (err) {
+      console.error("Save error:", err);
+      alert("❌ Failed to save. See console for details.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <div className="p-6">Loading menu...</div>;
+  if (error) return <div className="p-6 text-red-600">Error: {error}</div>;
 
   return (
-    <div ref={printRef} className="max-w-4xl mx-auto bg-white p-6 text-black font-serif border border-black print:border-none my-6">
-      {/* Print & Back controls (not printed) */}
-      <div className="flex justify-end gap-2 mb-4 print:hidden">
-        <button onClick={() => navigate(-1)} className="px-3 py-1 border rounded">Back</button>
-        <button onClick={handlePrint} className="px-3 py-1 bg-indigo-600 text-white rounded">Print</button>
-      </div>
+    <div className="min-h-screen p-6 bg-gray-100">
+      <div className="flex gap-6 min-w-[1000px]">
+        {/* Left editor panel */}
+        <div className="w-[480px] bg-white rounded-lg shadow p-4 max-h-[calc(100vh-3rem)] overflow-y-auto">
+          <h2 className="text-xl font-semibold mb-4">Edit Menu</h2>
 
-      {/* ---------------- HEADER ---------------- */}
-      <div className="header section">
-        <h2 className="Mainheading text-center text-xl text-900 font-bold font-extrabold uppercase mb-2 text-[#FFC100]">
-          SHAMMUKHA CATERERS PVT. LTD
-        </h2>
-        <h4 className="text-center text-sm text-gray-700 mb-1 break-words">
-          <span className="block sm:inline text-[#00B254]">
-            An ISO 22000:2018 CERTIFIED COMPANY, Visit :
-          </span>{" "}
-          <a
-            href="https://www.shanmukhacaterers.co.in/"
-            target="_blank"
-            rel="noreferrer"
-            className="text-blue-600 hover:underline block sm:inline underline-offset-2"
-          >
-            www.shammukhacaterers.co.in
-          </a>
-        </h4>
-        <h4 className="text-center text-sm text-gray-700 mb-4">
-          VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: 1800 890 3081.
-        </h4>
-        <h3 className="subheading text-center font-black uppercase text-base mb-6 text-[#00B254]">
-          WE CATER TO YOUR HEALTH
-        </h3>
-      </div>
-
-      {/* ---------------- CUSTOMER INFO ---------------- */}
-      <div className="mb-2 text-sm font-medium text-black flex flex-wrap justify-between print:flex-row print:gap-0 uppercase">
-        <div className="w-full md:w-[48%] print:w-[48%]">
-          <div className="mb-1">
-            <span style={{ fontWeight: "900", fontSize: "larger" }}>
-              Name:
-            </span>{" "}
-            {formData.name}
+          <div className="mb-4">
+            <label className="block text-sm font-semibold mb-1">Date</label>
+            <input
+              type="date"
+              name="date"
+              value={formData.date?.slice(0, 10) || ""}
+              onChange={handleFormChange}
+              className="w-full border rounded px-3 py-2 mb-3"
+            />
+            <label className="block text-sm font-semibold mb-1">Place</label>
+            <input type="text" name="place" value={formData.place || ""} onChange={handleFormChange} className="w-full border rounded px-3 py-2 mb-3" />
+            <label className="block text-sm font-semibold mb-1">Name</label>
+            <input type="text" name="name" value={formData.name || ""} onChange={handleFormChange} className="w-full border rounded px-3 py-2 mb-3" />
+            <label className="block text-sm font-semibold mb-1">Contact</label>
+            <input type="text" name="contact" value={formData.contact || ""} onChange={handleFormChange} className="w-full border rounded px-3 py-2" />
           </div>
-          <div className="mb-1">
-            <span style={{ fontWeight: "900", fontSize: "larger" }}>
-              Contact:
-            </span>{" "}
-            +91 {formData.contact}
-          </div>
-        </div>
-        <div className="w-full md:w-[48%] print:w-[48%]">
-          <div className="mb-1">
-            <span style={{ fontWeight: "900", fontSize: "larger" }}>
-              Date:
-            </span>{" "}
-            {formatDate(formData.date)}
-          </div>
-          <div className="mb-1">
-            <span style={{ fontWeight: "900", fontSize: "larger" }}>
-              Place:
-            </span>{" "}
-            {formData.place}
-          </div>
-        </div>
-      </div>
 
-      {/* ---------------- CONTEXT LIST ---------------- */}
-      {menuContexts.map((ctx, index) => (
-        <div
-          key={index}
-          className="mb-8 relative border border-black p-2 bg-white print:no-border"
-        >
-          {/* preview had remove buttons; for display we hide them */}
-          <h4
-            style={{
-              fontWeight: 900,
-              fontSize: "larger",
-              textTransform: "uppercase",
-              color: "#1a1a1a",
-              marginBottom: "1rem",
-              letterSpacing: "1.3px",
-            }}
-            className="font-bold mb-2"
-          >
-            {formatDate(ctx.date)} {ctx.meal} FOR {ctx.members} MEMBERS{" "}
-            <span style={{ color: "#FF0000" }}>
-              {String(ctx.buffet || "").toUpperCase()}
-            </span>
-          </h4>
+          <div>
+            <h3 className="text-md font-semibold mb-2">Menu Contexts</h3>
+            {menuContexts.map((ctx, idx) => (
+              <div key={idx} className="mb-4 border rounded p-3">
+                <div className="flex justify-between items-center mb-2">
+                  <strong>{ctx.date || "No date"} - {ctx.meal || "No meal"}</strong>
+                  <div className="space-x-2">
+                    <button onClick={() => handleRemoveContext(idx)} className="px-2 py-1 bg-red-600 text-white rounded text-sm">
+                      Remove
+                    </button>
+                  </div>
+                </div>
 
-          {/* Category Table */}
-          <table className="w-full text-sm border border-black">
-            <tbody>
-              {Object.entries(ctx.items || {}).map(([cat, items]) => (
-                <tr
-                  key={cat}
-                  className="border-b border-black align-top"
-                >
-                  <td className="menuheaing p-2 font-bold text-black w-1/4 text-base uppercase border-r border-black">
-                    {cat}
-                  </td>
-                  <td className="p-1 font-bold text-base text-black w-2/3 uppercase">
-                    <div className="flex flex-wrap gap-x-4 gap-y-1">
-                      {items.map((item, i) => (
-                        <span
-                          key={i}
-                          className="inline-flex items-center gap-1"
-                        >
-                          * {item}{" "}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ))}
+                <MenuSelector context={ctx} onChange={(field, value) => updateContext(idx, field, value)} />
 
-      {/* ---------------- INVOICE SECTION ---------------- */}
-      <div className="invoice-section-container">
-        <h2 className="Mainheading text-center text-xl text-900 font-bold font-extrabold uppercase mb-2 text-[#FFC100]">
-          SHAMMUKHA CATERERS PVT. LTD
-        </h2>
-        <h4 className="text-center text-sm text-gray-700 mb-1 break-words">
-          <span className="block sm:inline text-[#00B254]">
-            An ISO 22000:2018 CERTIFIED COMPANY, Visit :
-          </span>{" "}
-          <a
-            href="https://www.shanmukhacaterers.co.in/"
-            target="_blank"
-            rel="noreferrer"
-            className="text-blue-600 hover:underline block sm:inline underline-offset-2"
-          >
-            www.shammukhacaterers.co.in
-          </a>
-        </h4>
-        <h4 className="text-center text-sm text-gray-700 mb-4">
-          VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: 1800 890 3081.
-        </h4>
-        <h3 className="subheading text-center font-black uppercase text-base mb-6 text-[#00B254]">
-          WE CATER TO YOUR HEALTH
-        </h3>
+                <MenuItems selectedItems={ctx.items} onAddItem={(category, itemName) => handleAddItem(idx, category, itemName)} />
 
-        {/* Customer Info */}
-        <div className="mb-2 text-sm font-medium text-black flex flex-wrap justify-between print:flex-row print:gap-0 uppercase">
-          <div className="w-full md:w-[48%] print:w-[48%]">
-            <div className="mb-1">
-              <span style={{ fontWeight: "900", fontSize: "larger" }}>Name:</span>{" "}
-              {formData.name}
-            </div>
-            <div className="mb-1">
-              <span style={{ fontWeight: "900", fontSize: "larger" }}>Contact:</span>{" "}
-              +91 {formData.contact}
-            </div>
-          </div>
-          <div className="w-full md:w-[48%] print:w-[48%]">
-            <div className="mb-1">
-              <span style={{ fontWeight: "900", fontSize: "larger" }}>Date:</span>{" "}
-              {formatDate(formData.date)}
-            </div>
-            <div className="mb-1">
-              <span style={{ fontWeight: "900", fontSize: "larger" }}>Place:</span>{" "}
-              {formData.place}
-            </div>
-          </div>
-        </div>
-
-        {/* ---------------- Invoice Table ---------------- */}
-        <table className="w-full text-sm border border-black mt-6">
-          <thead>
-            <tr className="bg-[#FFC100] text-black font-bold text-center">
-              <th className="border border-black p-2">SNO</th>
-              <th className="border border-black p-2">EVENT</th>
-              <th className="border border-black p-2">MEMBERS</th>
-              <th className="border border-black p-2">PRICE</th>
-              <th className="border border-black p-2">TOTAL</th>
-            </tr>
-          </thead>
-
-          <tbody className="bg-[#f2dcdb] text-black font-bold text-center">
-            {invoiceRows.map((row, i) => (
-              <tr key={i} className="text-center text-black font-semibold">
-                <td className="border border-black p-2">{row.sno}</td>
-                <td className="border border-black p-2">{row.event}</td>
-                <td className="border border-black p-2">{row.members}</td>
-                <td className="border border-black p-2">
-                  <input
-                    type="number"
-                    value={row.price}
-                    readOnly
-                    className="w-full text-center bg-transparent border-none focus:outline-none"
-                  />
-                </td>
-                <td className="border border-black p-2">
-                  <input
-                    type="number"
-                    value={row.total}
-                    readOnly
-                    className="w-full text-center bg-transparent border-none focus:outline-none"
-                  />
-                </td>
-              </tr>
+                <div className="mt-2 text-sm">
+                  <div className="font-semibold">Selected:</div>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {Object.entries(ctx.items || {}).flatMap(([cat, items]) =>
+                      (items || []).map((it) => (
+                        <div key={cat + it} className="bg-gray-100 px-2 py-1 rounded flex items-center gap-2">
+                          <span className="text-xs font-semibold">{cat}:</span>
+                          <span className="text-xs">{it}</span>
+                          <button onClick={() => handleRemoveItem(idx, cat, it)} className="ml-2 text-red-600 text-xs">x</button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
             ))}
 
-            {/* Extra Charges */}
-            <tr className="text-center text-black font-bold uppercase">
-              <td colSpan="4" className="border border-black p-2">
-                LED Counters
-              </td>
-              <td className="border border-black p-2">
-                <input
-                  type="text"
-                  value={formatCurrencyTwo(leadCounters)}
-                  readOnly
-                  className="w-full text-center bg-transparent border-none focus:outline-none"
-                />
-              </td>
-            </tr>
+            <div className="flex gap-2">
+              <button onClick={addMenuContext} className="px-3 py-2 bg-green-600 text-white rounded">+ Add Context</button>
+            </div>
+          </div>
 
-            <tr className="text-center text-black font-bold uppercase">
-              <td colSpan="4" className="border border-black p-2">
-                Water Bottles
-              </td>
-              <td className="border border-black p-2">
-                <input
-                  type="text"
-                  value={formatCurrencyTwo(waterBottles)}
-                  readOnly
-                  className="w-full text-center bg-transparent border-none focus:outline-none"
-                />
-              </td>
-            </tr>
+          <div className="mt-6">
+            <button onClick={handleSaveAll} disabled={saving} className="px-4 py-2 bg-blue-600 text-white rounded mr-2">
+              {saving ? "Saving..." : "Save Menu & Invoice"}
+            </button>
+            <button onClick={() => window.print()} className="px-4 py-2 border rounded">Print</button>
+          </div>
+        </div>
 
-            <tr className="text-center text-black font-bold uppercase">
-              <td colSpan="4" className="border border-black p-2">
-                Cooking Charges
-              </td>
-              <td className="border border-black p-2">
-                <input
-                  type="text"
-                  value={formatCurrencyTwo(CookingCharges)}
-                  readOnly
-                  className="w-full text-center bg-transparent border-none focus:outline-none"
-                />
-              </td>
-            </tr>
+        {/* Right preview panel (exact Preview.js UI) */}
+        <div className="flex-1 bg-white rounded-lg shadow p-4 overflow-auto max-h-[calc(100vh-3rem)]">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold">Invoice Preview</h2>
+            <div className="space-x-2">
+              <button onClick={() => window.print()} className="px-3 py-1 bg-indigo-600 text-white rounded">Print</button>
+              <button onClick={() => navigate(-1)} className="px-3 py-1 border rounded">Back</button>
+            </div>
+          </div>
 
-            <tr className="text-center text-black font-bold uppercase">
-              <td colSpan="4" className="border border-black p-2">
-                Labour Charges
-              </td>
-              <td className="border border-black p-2">
-                <input
-                  type="text"
-                  value={formatCurrencyTwo(labourCharges)}
-                  readOnly
-                  className="w-full text-center bg-transparent border-none focus:outline-none"
-                />
-              </td>
-            </tr>
-
-            <tr className="text-center text-black font-bold uppercase">
-              <td colSpan="4" className="border border-black p-2">
-                Transport Charges
-              </td>
-              <td className="border border-black p-2">
-                <input
-                  type="text"
-                  value={formatCurrencyTwo(transportCharges)}
-                  readOnly
-                  className="w-full text-center bg-transparent border-none focus:outline-none"
-                />
-              </td>
-            </tr>
-
-            {/* TOTAL */}
-            <tr className="text-black font-bold" style={{ color: "#FF0000" }}>
-              <td colSpan="4" className="border border-black p-2 uppercase">
-                TOTAL
-              </td>
-              <td className="border border-black p-2" style={{ fontWeight: "600", fontSize: "larger" }}>
-                <input
-                  type="text"
-                  value={formatCurrencyTwo(subtotal)}
-                  readOnly
-                  className="w-full text-center bg-transparent border-none focus:outline-none"
-                />
-              </td>
-            </tr>
-
-            {/* GST */}
-            <tr className="text-black font-bold">
-              <td colSpan="4" className="border border-black p-2 uppercase">
-                GST
-              </td>
-              <td className="border border-black p-2">
-                <input
-                  type="text"
-                  value={formatCurrencyTwo(gst)}
-                  readOnly
-                  className="w-full text-center bg-transparent border-none focus:outline-none"
-                />
-              </td>
-            </tr>
-
-            {/* GRAND TOTAL */}
-            <tr className="text-black font-bold" style={{ color: "#FF0000" }}>
-              <td colSpan="4" className="border border-black p-2 uppercase">
-                GRAND TOTAL
-              </td>
-              <td className="border border-black p-2" style={{ fontWeight: "600", fontSize: "larger" }}>
-                <input
-                  type="text"
-                  value={formatCurrencyTwo(totalAmount)}
-                  readOnly
-                  className="w-full text-center bg-transparent border-none focus:outline-none"
-                />
-              </td>
-            </tr>
-
-            {/* ADVANCE */}
-            <tr className="text-black font-bold">
-              <td colSpan="4" className="border border-black p-2 uppercase">
-                ADVANCE
-              </td>
-              <td className="border border-black p-2">
-                <input
-                  type="text"
-                  value={formatCurrencyTwo(advance)}
-                  readOnly
-                  className="w-full text-center bg-transparent border-none focus:outline-none"
-                />
-              </td>
-            </tr>
-
-            {/* BALANCE */}
-            <tr className="text-black font-bold">
-              <td colSpan="4" className="border border-black p-2 uppercase">
-                BALANCE AMOUNT
-              </td>
-              <td className="border border-black p-2" style={{ fontWeight: "600", fontSize: "larger" }}>
-                {formatNumber(balance)}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        {/* Last Section / Notes */}
-        <div className="last-section">
-          <h4 className="text-center text-black font-bold text-sm mb-4 mt-4">
-            NOTE: ADDITIONAL WILL BE CHARGED FOR EXTRA PLATES
-          </h4>
-          <h4 className="text-center text-black font-bold text-sm mb-4">
-            *** With best Wishes from Shanmukha Caterers Pvt.Ltd and Service....
-          </h4>
-          <h4 className="text-center text-black font-bold text-sm mb-4">
-            From Shanmukha Caterers Pvt.Ltd
-          </h4>
-          <h4 className="text-center text-black font-bold text-sm mb-4">
-            Manager
-          </h4>
+          <Preview
+            ref={previewRef}
+            menuContexts={menuContexts}
+            onRemoveItem={handleRemoveItem}
+            onRemoveContext={handleRemoveContext}
+            formData={{
+              name: formData.name,
+              contact: formData.contact,
+              date: formData.date,
+              place: formData.place,
+            }}
+            onInvoiceDataChange={setInvoiceData}
+          />
         </div>
       </div>
     </div>
   );
 };
 
-export default DisplayMenuInvoice;
+export default EditMenuById;
