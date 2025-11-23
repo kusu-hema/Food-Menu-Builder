@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
-import MenuSelector from '../Components/MenuSelector';
-import MenuItems from '../Components/MenuItems';
+import MenuSelector from '../MenuEdit/Selector';
+import MenuItems from '../MenuEdit/Items';
 import Preview from '../MenuEdit/Preview';
 
 function Menu() {
@@ -17,7 +17,7 @@ function Menu() {
       .invoice-section-container { page-break-before: always; }
       @media print {
         body {
-          -webkit-print-color-adjust: exact;
+              -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
         }
       }
