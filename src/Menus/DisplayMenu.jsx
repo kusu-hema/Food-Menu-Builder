@@ -5,7 +5,7 @@ import MenuItems from "../MenuEdit/Items";
 import Preview from "../MenuEdit/Preview";
 
 /** 
- * EditMenuById.js
+ * EditMenuById.js 
  *
  * - Loads menu by id using GET http://localhost:4000/api/menus/details/${id}
  * - Lets user edit using the same Preview.js UI pattern
@@ -16,7 +16,7 @@ import Preview from "../MenuEdit/Preview";
  * - Converts backend menu_contexts (categories[]) -> Preview format (items:{})
  */
 
-const EditMenuById = () => {
+const EditMenuById = () => {  
   const { id } = useParams();
   const navigate = useNavigate();
   const previewRef = useRef(null);
