@@ -264,7 +264,7 @@ const CategoriesTable = ({ categories, productCounts, loading, error, onEdit, on
                       className="h-16 w-16 rounded-full object-cover"
                       onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/64x64?text=N/A"; }}
                     />
-                  )}
+                  )}  
                   {!category.image && (
                     <img
                       src="https://placehold.co/64x64?text=N/A"
