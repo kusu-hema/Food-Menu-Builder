@@ -27,7 +27,7 @@ const CategoryForm = ({ editingCategory, onCategorySaved, onClose }) => {
     } else {
       // Clear form for new category creation
       setCategoryName('');
-      setImage(null);
+      setImage(null);     
     }
   }, [editingCategory]); // This effect runs whenever editingCategory changes
 

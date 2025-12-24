@@ -14,7 +14,7 @@ import React, { useState, useEffect } from 'react';
 const CategoryForm = ({ editingCategory, onCategorySaved, onClose }) => {
   // State for the form fields 
   const [categoryName, setCategoryName] = useState('');
-  const [image, setImage] = useState(null);       
+  const [image, setImage] = useState(null);
   const [message, setMessage] = useState(null);
 
   // Use a useEffect hook to populate the form fields when a category is selected for editing
