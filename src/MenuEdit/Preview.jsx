@@ -10,7 +10,7 @@ const getFromLocalStorage = (key, defaultValue) => {
   }
 };
 
-const Preview = forwardRef(
+const Preview = forwardRef( 
   (
     {
       menuContexts,
@@ -435,7 +435,8 @@ const Preview = forwardRef(
                   <td className="border border-black p-2">
                     <input
                       type="number"
-                      value={row.price}
+                      // value={row.price}
+                      value={row.price === 0 ? "" : row.price}
                       onChange={(e) => handlePriceChange(i, e)}
                       className="w-full text-center bg-transparent border-none focus:outline-none"
                     />
@@ -443,7 +444,8 @@ const Preview = forwardRef(
                   <td className="border border-black p-2">
                     <input
                       type="number"
-                      value={row.total}
+                      // value={row.total}
+                      value={row.total === 0 ? "" : row.total}
                       onChange={(e) => handleTotalChange(i, e)}
                       className="w-full text-center bg-transparent border-none focus:outline-none"
                     />
@@ -459,7 +461,8 @@ const Preview = forwardRef(
                 <td className="border border-black p-2">
                   <input
                     type="number"
-                    value={leadCounters}
+                    // value={leadCounters}
+                    value={leadCounters === 0 ? "" : leadCounters}
                     onChange={(e) => setLeadCounters(parseFloat(e.target.value) || 0)}
                     className="w-full text-center bg-transparent border-none focus:outline-none"
                   />
@@ -473,7 +476,8 @@ const Preview = forwardRef(
                 <td className="border border-black p-2">
                   <input
                     type="number"
-                    value={waterBottles}
+                    // value={waterBottles}
+                    value={waterBottles === 0 ? "" : waterBottles}
                     onChange={(e) => setWaterBottles(parseFloat(e.target.value) || 0)}
                     className="w-full text-center bg-transparent border-none focus:outline-none"
                   />
@@ -487,7 +491,8 @@ const Preview = forwardRef(
                 <td className="border border-black p-2">
                   <input
                     type="number"
-                    value={CookingCharges}
+                    // value={CookingCharges}
+                    value={CookingCharges === 0 ? "" : CookingCharges}
                     onChange={(e) => setCookingCharges(parseFloat(e.target.value) || 0)}
                     className="w-full text-center bg-transparent border-none focus:outline-none"
                   />
@@ -501,7 +506,8 @@ const Preview = forwardRef(
                 <td className="border border-black p-2">
                   <input
                     type="number"
-                    value={labourCharges}
+                    // value={labourCharges}
+                    value={labourCharges === 0 ? "" : labourCharges}
                     onChange={(e) => setLabourCharges(parseFloat(e.target.value) || 0)}
                     className="w-full text-center bg-transparent border-none focus:outline-none"
                   />
@@ -515,7 +521,8 @@ const Preview = forwardRef(
                 <td className="border border-black p-2">
                   <input
                     type="number"
-                    value={transportCharges}
+                    // value={transportCharges}
+                    value={transportCharges === 0 ? "" : transportCharges}
                     onChange={(e) => setTransportCharges(parseFloat(e.target.value) || 0)}
                     className="w-full text-center bg-transparent border-none focus:outline-none"
                   />
@@ -530,7 +537,8 @@ const Preview = forwardRef(
                 <td className="border border-black p-2" style={{ fontWeight: "600", fontSize: "larger" }}>
                   <input
                     type="number"
-                    value={subtotal}
+                    // value={subtotal}
+                    value={subtotal === 0 ? "" : subtotal}
                     onChange={(e) => setSubtotal(parseFloat(e.target.value) || 0)}
                     className="w-full text-center bg-transparent border-none focus:outline-none"
                   />
@@ -545,7 +553,8 @@ const Preview = forwardRef(
                 <td className="border border-black p-2">
                   <input
                     type="number"
-                    value={gst}
+                    // value={gst}
+                    value={gst === 0 ? "" : gst}
                     onChange={(e) => setGst(parseFloat(e.target.value) || 0)}
                     className="w-full text-center bg-transparent border-none focus:outline-none"
                   />
@@ -560,7 +569,8 @@ const Preview = forwardRef(
                 <td className="border border-black p-2" style={{ fontWeight: "600", fontSize: "larger" }}>
                   <input
                     type="number"
-                    value={totalAmount}
+                    // value={totalAmount}
+                    value={totalAmount === 0 ? "" : totalAmount}
                     onChange={(e) => setTotalAmount(parseFloat(e.target.value) || 0)}
                     className="w-full text-center bg-transparent border-none focus:outline-none"
                   />
@@ -575,7 +585,8 @@ const Preview = forwardRef(
                 <td className="border border-black p-2">
                   <input
                     type="number"
-                    value={advance}
+                    // value={advance}
+                    value={advance === 0 ? "" : advance}
                     onChange={(e) => setAdvance(parseFloat(e.target.value) || 0)}
                     className="w-full text-center bg-transparent border-none focus:outline-none"
                   />
@@ -588,7 +599,8 @@ const Preview = forwardRef(
                   BALANCE AMOUNT
                 </td>
                 <td className="border border-black p-2" style={{ fontWeight: "600", fontSize: "larger" }}>
-                  {formatNumber(balance)}
+                  {/* {formatNumber(balance)} */}
+                {balance === 0 ? "" : formatNumber(balance)} 
                 </td>
               </tr>
             </tbody>

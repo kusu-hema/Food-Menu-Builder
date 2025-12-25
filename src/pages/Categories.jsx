@@ -132,7 +132,7 @@ const CategoryForm = ({ editingCategory, onCategorySaved, onClose }) => {
       {message && (
         <div className={`mt-4 px-4 py-3 rounded-lg text-center font-medium ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
           {message.text}
-        </div>
+        </div>    
       )}
     </div>
   );
