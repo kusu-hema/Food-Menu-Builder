@@ -17,7 +17,8 @@ const Preview = forwardRef(
       onRemoveItem,
       onRemoveContext,
       formData,
-      onInvoiceDataChange, // ✅ Important
+      onInvoiceDataChange, 
+      // ✅ Important
     },
     ref
   ) => {
