@@ -470,6 +470,7 @@ const Preview = forwardRef(
                 </td>
               </tr>
 
+              {/*  WATER BOTTLES */}
               <tr className="text-center text-black font-bold uppercase">
                 <td colSpan="4" className="border border-black p-2">
                   Water Bottles
@@ -485,6 +486,7 @@ const Preview = forwardRef(
                 </td>
               </tr>
 
+              {/* COOKING CHARGES */}
               <tr className="text-center text-black font-bold uppercase">
                 <td colSpan="4" className="border border-black p-2">
                   Cooking Charges
@@ -499,7 +501,8 @@ const Preview = forwardRef(
                   />
                 </td>
               </tr>
-
+              
+              {/* LABOUR CHARGES */}
               <tr className="text-center text-black font-bold uppercase">
                 <td colSpan="4" className="border border-black p-2">
                   Labour Charges
@@ -514,7 +517,8 @@ const Preview = forwardRef(
                   />
                 </td>
               </tr>
-
+              
+              {/* TRANSPORT CHANGES */}
               <tr className="text-center text-black font-bold uppercase">
                 <td colSpan="4" className="border border-black p-2">
                   Transport Charges
@@ -622,6 +626,7 @@ const Preview = forwardRef(
               Manager
             </h4>
           </div>
+
         </div>
       </div>
     );
