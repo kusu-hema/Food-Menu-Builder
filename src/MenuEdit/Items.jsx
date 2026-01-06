@@ -8,7 +8,8 @@ function  Items({ selectedItems, onAddItem }) {
 
   // Fetch categories
   useEffect(() => {
-    fetch('http://localhost:4000/api/categories')
+    // fetch('http://localhost:4000/api/categories')
+    fetch('http://localhost:4000/api/maincategory')
       .then(res => res.json())
       .then(data => { 
         const sortedData = data.sort((a, b) => a.sno - b.sno);

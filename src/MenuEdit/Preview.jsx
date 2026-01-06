@@ -18,7 +18,7 @@ const Preview = forwardRef(
       onRemoveContext,
       formData,
       onInvoiceDataChange, 
-      // ✅ Important
+      // Important
     },
     ref
   ) => {
@@ -628,6 +628,7 @@ const Preview = forwardRef(
           </div>
 
         </div>
+        
       </div>
     );
   }
