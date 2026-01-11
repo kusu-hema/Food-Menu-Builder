@@ -59,7 +59,7 @@ function  Items({ selectedItems, onAddItem }) {
       {/* Available Items */}
       <h3 className="text-lg font-semibold mb-2">Available Items</h3>
 
-      {/*   Search Bar */}
+      {/* Search Bar */}
       <input
         type="text"
         placeholder="Search products..."

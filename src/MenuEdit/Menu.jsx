@@ -112,69 +112,77 @@ function Menu() {
   // Backend Save Functions
   // -------------------------------
   const saveClientAndFullMenu = async () => {
-    try {
-      // 1️⃣ Save client (menu)
-      const menuResponse = await fetch('http://localhost:4000/api/menus', {
+  try {
+    // 1️⃣ Save client (menu)
+    const menuResponse = await fetch('http://localhost:4000/api/menus', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer_name: formData.name,
+        contact: formData.contact,
+        place: formData.place,
+        date: formData.date,
+      }),
+    });
+
+    if (!menuResponse.ok) throw new Error('Failed to save client details');
+    const menuData = await menuResponse.json();
+    const menuId = menuData.id;
+
+    // 2️⃣ Save each Menu Context
+    for (const ctx of menuContexts) {
+      const contextResponse = await fetch('http://localhost:4000/api/menucontext', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          customer_name: formData.name,
-          contact: formData.contact,
-          place: formData.place,
-          date: formData.date,
+          menu_id: menuId,
+          event_date: ctx.date,
+          meal: ctx.meal,
+          members: ctx.members,
+          buffet: ctx.buffet,
         }),
       });
 
-      if (!menuResponse.ok) throw new Error('Failed to save client details');
-      const menuData = await menuResponse.json();
-      const menuId = menuData.id;
-      console.log('✅ Menu saved:', menuData);
+      if (!contextResponse.ok) throw new Error('Failed to save menu context');
+      const contextData = await contextResponse.json();
+      const contextId = contextData.id;
 
-      // 2️⃣ Save each Menu Context
-      for (const ctx of menuContexts) {
-        const contextResponse = await fetch('http://localhost:4000/api/menucontext', {
+      // 3️⃣ NEW STEP: Save Menu Categories
+      for (const categoryName of Object.keys(ctx.items)) {
+        const categoryResponse = await fetch('http://localhost:4000/api/menucategories', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            menu_id: menuId,
-            event_date: ctx.date,
-            meal: ctx.meal,
-            members: ctx.members,
-            buffet: ctx.buffet,
-            price: ctx.price,
-            total: ctx.total
+            context_id: contextId,
+            category_name: categoryName,
           }),
         });
 
-        if (!contextResponse.ok) throw new Error('Failed to save menu context');
-        const contextData = await contextResponse.json();
-        const contextId = contextData.id;
+        if (!categoryResponse.ok) throw new Error('Failed to save category');
+        const categoryData = await categoryResponse.json();
+        const categoryId = categoryData.id; // Get the ID for the items
 
-        console.log('✅ Context saved:', contextData);
-
-        // 3️⃣ Save Menu Items under this context
-        for (const category of Object.keys(ctx.items)) {
-          for (const itemName of ctx.items[category]) {
-            await fetch('http://localhost:4000/api/menuitems', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                menu_context_id: contextId,
-                category_name: category,
-                item_name: itemName,
-              }),
-            });
-          }
+        // 4️⃣ Save Menu Items under this specific Category ID
+        for (const itemName of ctx.items[categoryName]) {
+          await fetch('http://localhost:4000/api/menuitems', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              category_id: categoryId, // Link to the category, not the context
+              item_name: itemName,
+            }),
+          });
         }
       }
-
-      alert('✅ All menu data saved successfully!');
-      return menuId;
-    } catch (error) {
-      console.error('❌ Error saving menu data:', error);
-      alert('Error saving menu data!');
-      return null;
     }
+
+    alert('✅ All menu data saved successfully!');
+    return menuId;
+  } catch (error) {
+    console.error('❌ Error saving menu data:', error);
+    alert('Error saving menu data!');
+    return null;
+  }
   };
 
   // Save Invoice + Download PDF
