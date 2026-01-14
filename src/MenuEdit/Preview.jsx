@@ -250,8 +250,11 @@ const Preview = forwardRef(
               www.shammukhacaterers.co.in
             </a>
           </h4>
-          <h4 className="text-center text-sm text-gray-700 mb-4">
+          {/* <h4 className="text-center text-sm text-gray-700 mb-4">
             VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: 1800 890 3081.
+          </h4> */}
+          <h4 className="text-center text-sm text-gray-700 mb-4">
+            VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: +91 98661 76781, +91 4027 656 781.
           </h4>
           <h3 className="subheading text-center font-black uppercase text-base mb-6 text-[#00B254]">
             WE CATER TO YOUR HEALTH
@@ -384,9 +387,13 @@ const Preview = forwardRef(
               www.shammukhacaterers.co.in
             </a>
           </h4>
-          <h4 className="text-center text-sm text-gray-700 mb-4">
+          {/* <h4 className="text-center text-sm text-gray-700 mb-4">
             VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: 1800 890 3081.
+          </h4> */}
+          <h4 className="text-center text-sm text-gray-700 mb-4">
+            VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: +91 98661 76781, +91 4027 656 781.
           </h4>
+           {/* +91 98661 76781, +91 4027 656 781. */}
           <h3 className="subheading text-center font-black uppercase text-base mb-6 text-[#00B254]">
             WE CATER TO YOUR HEALTH
           </h3>
@@ -618,6 +625,9 @@ const Preview = forwardRef(
             </h4>
             <h4 className="text-center text-black font-bold text-sm mb-4">
               *** With best Wishes from Shanmukha Caterers Pvt.Ltd and Service....
+            </h4>
+            <h4 className="text-center text-black font-bold text-sm mb-4" style={{ color: "#06ae06" }}>
+              ANUSHA. SALE’S TEAM’S
             </h4>
             <h4 className="text-center text-black font-bold text-sm mb-4">
               From Shanmukha Caterers Pvt.Ltd

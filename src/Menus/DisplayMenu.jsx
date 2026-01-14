@@ -279,7 +279,7 @@ const EditMenuById = () => {
 
                 <MenuItems selectedItems={ctx.items} onAddItem={(category, itemName) => handleAddItem(idx, category, itemName)} />
 
-                <div className="mt-2 text-sm">
+                {/* <div className="mt-2 text-sm">
                   <div className="font-semibold">Selected:</div>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {Object.entries(ctx.items || {}).flatMap(([cat, items]) =>
@@ -292,7 +292,7 @@ const EditMenuById = () => {
                       ))
                     )}
                   </div>
-                </div>
+                </div> */}
               </div>
             ))}
 
