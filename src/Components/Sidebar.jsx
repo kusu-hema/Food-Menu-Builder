@@ -44,8 +44,8 @@ const menuItems = [
     label: 'Menu',
     icon: <FaUsers />,
     children: [
-      { label: 'Create Menu', path: '/invoice' },
-      { label: 'Total Menus', path: '/totalmenu' },
+      // { label: 'Create Menu', path: '/invoice' },
+      // { label: 'Total Menus', path: '/totalmenu' },
       { label: 'Save Menu', path: '/menu'},
       { label: 'Total Customers', path: '/editmenu' },
     ],
