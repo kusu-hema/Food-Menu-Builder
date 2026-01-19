@@ -29,6 +29,16 @@ const EditMenuById = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
+
+  // Toggle Accordian 
+  const [formExpanded, setFormExpanded] = useState(true);
+  const [expandedIndex, setExpandedIndex] = useState(null);
+  
+  // Toggle Accordian 
+  const toggleAccordion = (index) => {
+  setExpandedIndex((prev) => (prev === index ? null : index));
+  };
+
   // ---- Load detail by ID and convert backend -> Preview format
   useEffect(() => {
     let cancelled = false;
@@ -108,6 +118,7 @@ const EditMenuById = () => {
     });
   };
 
+  //  Add Category & item  
   const handleAddItem = (index, category, itemName) => {
     setMenuContexts((prev) => {
       const copy = [...prev];
@@ -120,7 +131,8 @@ const EditMenuById = () => {
       return copy;
     });
   };
-
+  
+  // handle Remove Item 
   const handleRemoveItem = (ctxIndex, category, itemName) => {
     setMenuContexts((prev) => {
       const copy = [...prev];
@@ -136,6 +148,7 @@ const EditMenuById = () => {
     });
   };
 
+  // handle Remove context
   const handleRemoveContext = (index) => {
     if (!window.confirm("Are you sure you want to remove this menu context?")) return;
     setMenuContexts((prev) => {
@@ -145,6 +158,7 @@ const EditMenuById = () => {
     });
   };
 
+  // Add Menu context 
   const addMenuContext = () =>
     setMenuContexts((prev) => [...prev, { date: "", meal: "", members: "", buffet: "", items: {} }]);
 
@@ -241,73 +255,97 @@ const EditMenuById = () => {
   return (
     <div className="min-h-screen p-6 bg-gray-100">
       <div className="flex gap-6 min-w-[1000px]">
+        
         {/* Left editor panel */}
-        <div className="w-[480px] bg-white rounded-lg shadow p-4 max-h-[calc(100vh-3rem)] overflow-y-auto">
-          <h2 className="text-xl font-semibold mb-4">Edit Menu</h2>
+          <div className="w-[500px] bg-white rounded-lg shadow-md p-4 overflow-y-auto max-h-[calc(100vh-3rem)]">
+            <h2 className="text-lg font-semibold mb-4 text-gray-800">Edit Menu</h2>
 
-          <div className="mb-4">
-            <label className="block text-sm font-semibold mb-1">Date</label>
-            <input
-              type="date"
-              name="date"
-              value={formData.date?.slice(0, 10) || ""}
-              onChange={handleFormChange}
-              className="w-full border rounded px-3 py-2 mb-3"
-            />
-            <label className="block text-sm font-semibold mb-1">Place</label>
-            <input type="text" name="place" value={formData.place || ""} onChange={handleFormChange} className="w-full border rounded px-3 py-2 mb-3" />
-            <label className="block text-sm font-semibold mb-1">Name</label>
-            <input type="text" name="name" value={formData.name || ""} onChange={handleFormChange} className="w-full border rounded px-3 py-2 mb-3" />
-            <label className="block text-sm font-semibold mb-1">Contact</label>
-            <input type="text" name="contact" value={formData.contact || ""} onChange={handleFormChange} className="w-full border rounded px-3 py-2" />
-          </div>
+            {/* Customer Details Accordion */}
+            <div
+              className="flex justify-between items-center mb-2 cursor-pointer bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded border"
+              onClick={() => setFormExpanded((prev) => !prev)}
+            >
+              <h2 className="text-lg font-semibold text-gray-800">Customer Details</h2>
+              <span className="text-sm text-blue-600">
+                {formExpanded ? '▲ Collapse' : '▼ Expand'}
+              </span>
+            </div>
 
-          <div>
-            <h3 className="text-md font-semibold mb-2">Menu Contexts</h3>
-            {menuContexts.map((ctx, idx) => (
-              <div key={idx} className="mb-4 border rounded p-3">
-                <div className="flex justify-between items-center mb-2">
-                  <strong>{ctx.date || "No date"} - {ctx.meal || "No meal"}</strong>
-                  <div className="space-x-2">
-                    <button onClick={() => handleRemoveContext(idx)} className="px-2 py-1 bg-red-600 text-white rounded text-sm">
-                      Remove
-                    </button>
-                  </div>
-                </div>
-
-                <MenuSelector context={ctx} onChange={(field, value) => updateContext(idx, field, value)} />
-
-                <MenuItems selectedItems={ctx.items} onAddItem={(category, itemName) => handleAddItem(idx, category, itemName)} />
-
-                {/* <div className="mt-2 text-sm">
-                  <div className="font-semibold">Selected:</div>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {Object.entries(ctx.items || {}).flatMap(([cat, items]) =>
-                      (items || []).map((it) => (
-                        <div key={cat + it} className="bg-gray-100 px-2 py-1 rounded flex items-center gap-2">
-                          <span className="text-xs font-semibold">{cat}:</span>
-                          <span className="text-xs">{it}</span>
-                          <button onClick={() => handleRemoveItem(idx, cat, it)} className="ml-2 text-red-600 text-xs">x</button>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div> */}
+            {formExpanded && (
+              <div className="mb-4 p-2">
+                <label className="block text-sm font-semibold mb-1">Date</label>
+                <input
+                  type="date"
+                  name="date"
+                  value={formData.date?.slice(0, 10) || ""}
+                  onChange={handleFormChange}
+                  className="w-full border rounded px-3 py-2 text-sm mb-3"
+                />
+                <label className="block text-sm font-semibold mb-1">Place</label>
+                <input type="text" name="place" value={formData.place || ""} onChange={handleFormChange} className="w-full border rounded px-3 py-2 text-sm mb-3" />
+                <label className="block text-sm font-semibold mb-1">Name</label>
+                <input type="text" name="name" value={formData.name || ""} onChange={handleFormChange} className="w-full border rounded px-3 py-2 text-sm mb-3" />
+                <label className="block text-sm font-semibold mb-1">Contact</label>
+                <input type="text" name="contact" value={formData.contact || ""} onChange={handleFormChange} className="w-full border rounded px-3 py-2 text-sm" />
               </div>
-            ))}
+            )}
 
-            <div className="flex gap-2">
-              <button onClick={addMenuContext} className="px-3 py-2 bg-green-600 text-white rounded">+ Add Context</button>
+            {/* Menu Contexts Accordion */}
+            <h3 className="text-md font-semibold mb-2 mt-4 text-gray-800">Menu Contexts</h3>
+            
+            {menuContexts.map((ctx, idx) => {
+              const isOpen = expandedIndex === idx;
+              return (
+                <div key={idx} className="mb-4 border rounded bg-white shadow">
+                  <div
+                    className="flex justify-between items-center p-3 cursor-pointer bg-gray-100 hover:bg-gray-200"
+                    onClick={() => toggleAccordion(idx)}
+                  >
+                    <div className="font-semibold text-gray-800">
+                      {ctx.date || 'Select Date'} - {ctx.meal || 'Meal'} - {ctx.members || '0'}
+                    </div>
+                    <div className="text-sm text-blue-600">
+                      {isOpen ? '▲ Collapse' : '▼ Expand'}
+                    </div>
+                  </div>
+
+                  {isOpen && (
+                    <div className="p-4 border-t">
+                      <div className="flex justify-end mb-2">
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); handleRemoveContext(idx); }} 
+                          className="text-xs text-red-600 hover:underline"
+                        >
+                          Delete Context
+                        </button>
+                      </div>
+                      <MenuSelector 
+                        context={ctx} 
+                        onChange={(field, value) => updateContext(idx, field, value)} 
+                      />
+                      <MenuItems 
+                        selectedItems={ctx.items} 
+                        onAddItem={(category, itemName) => handleAddItem(idx, category, itemName)} 
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            <button
+              onClick={addMenuContext}
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition w-full mb-6"
+            >
+              ➕ Add Menu Context
+            </button>
+
+            <div className="bottom-0 bg-white pt-4 border-t flex gap-2">
+              <button onClick={handleSaveAll} disabled={saving} className="flex-1 px-4 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700">
+                {saving ? "Saving..." : "💾 Save Changes"}
+              </button>
             </div>
           </div>
-
-          <div className="mt-6">
-            <button onClick={handleSaveAll} disabled={saving} className="px-4 py-2 bg-blue-600 text-white rounded mr-2">
-              {saving ? "Saving..." : "Save Menu & Invoice"}
-            </button>
-            <button onClick={() => window.print()} className="px-4 py-2 border rounded">Print</button>
-          </div>
-        </div>
 
         {/* Right preview panel (exact Preview.js UI) */}
         <div className="flex-1 bg-white rounded-lg shadow p-4 overflow-auto max-h-[calc(100vh-3rem)]">
@@ -334,9 +372,12 @@ const EditMenuById = () => {
             onInvoiceDataChange={setInvoiceData}
           />
         </div>
+
       </div>
     </div>
   );
 };
+
+  
 
 export default EditMenuById;
