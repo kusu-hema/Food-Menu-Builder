@@ -314,7 +314,8 @@ const EditMenuById = () => {
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold">Invoice Preview</h2>
             <div className="space-x-2">
-              <button onClick={() => window.print()} className="px-3 py-1 bg-indigo-600 text-white rounded">Print</button>
+              <button 
+              onClick={() => window.print()} className="px-3 py-1 bg-indigo-600 text-white rounded">Print</button>
               <button onClick={() => navigate(-1)} className="px-3 py-1 border rounded">Back</button>
             </div>
           </div>
