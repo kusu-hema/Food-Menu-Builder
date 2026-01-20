@@ -33,9 +33,9 @@ function  Selector({ context, onChange }) {
       onChange={(e) => onChange('buffet', e.target.value)}
       className='border rounded px-2 py-1 '
       >
-        <option value=" ">Buf/Seat</option>
+        <option value=" ">Buffet/Seat</option>
         <option value="Buffet">Buffet</option>
-        <option value="SITTING">Sitting</option>
+        <option value="Sitting">Sitting</option>
       </select>
     </div>
   );

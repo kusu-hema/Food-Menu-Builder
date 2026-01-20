@@ -220,8 +220,10 @@ function Menu() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-      } else {
-        alert('❌ Error saving invoice');
+      } 
+      else 
+      {
+        // alert('❌ Error saving invoice');
       }
     } catch (err) {
       console.error('❌ Error saving invoice:', err);
