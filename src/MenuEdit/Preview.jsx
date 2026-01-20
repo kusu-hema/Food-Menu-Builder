@@ -1,14 +1,14 @@
 import React, { useState, forwardRef, useEffect } from "react";
 
-// Read from localStorage safely
-const getFromLocalStorage = (key, defaultValue) => {
-  try {
-    const value = localStorage.getItem(key);
-    return value ? JSON.parse(value) : defaultValue;
-  } catch {
-    return defaultValue;
-  }
-};
+  // Read from localStorage safely
+  const getFromLocalStorage = (key, defaultValue) => {
+    try {
+      const value = localStorage.getItem(key);
+      return value ? JSON.parse(value) : defaultValue;
+    } catch {
+      return defaultValue;
+    }
+  };
 
 const Preview = forwardRef( 
   (
@@ -227,12 +227,40 @@ const Preview = forwardRef(
       setInvoiceRows(rows);
     };
 
+
+    // Add this outside your component or at the top of the Preview file
+    const CATEGORY_ORDER = [
+      "PRASADAM",
+      "BREAKFAST",
+      "WELCOME DRINKS",
+      "WELCOME SNACKS",
+      "SALADS",
+      "CHINESE COUNTER",
+      "CHAT COUNTER",
+      "TIFFINS",
+      "ROTI",
+      "RICE",
+      "SOUTH CURRIES",
+      "NORTH CURRIES",
+      "DAL & LIQUIDS",
+      "PICKLES & POWDERS",
+      "SWEETS",
+      "HOT",
+      "SNACKS",
+      "DESSERT",
+      "FRUIT STALL",
+      "PAN COUNTER",
+      "COMMON ITEMS",
+      "SARRAY"
+    ];
+
     return (
       <div
         ref={ref}
         className="max-w-4xl mx-auto bg-white p-6 text-black font-serif border border-black print:border-none"
       >
         {/* ---------------- HEADER ---------------- */}
+
         <div className="header section">
           <h2 className="Mainheading text-center text-xl text-900 font-bold font-extrabold uppercase mb-2 text-[#FFC100]">
             SHAMMUKHA CATERERS PVT. LTD
@@ -262,6 +290,7 @@ const Preview = forwardRef(
         </div>
 
         {/* ---------------- CUSTOMER INFO ---------------- */}
+
         <div className="mb-2 text-sm font-medium text-black flex flex-wrap justify-between print:flex-row print:gap-0 uppercase">
           <div className="w-full md:w-[48%] print:w-[48%]">
             <div className="mb-1">
@@ -294,6 +323,7 @@ const Preview = forwardRef(
         </div>
 
         {/* ---------------- CONTEXT LIST ---------------- */}
+
         {menuContexts.map((ctx, index) => (
           <div
             key={index}
@@ -334,35 +364,44 @@ const Preview = forwardRef(
             {/* Category Table */}
             <table className="w-full text-sm border border-black">
               <tbody>
-                {Object.entries(ctx.items).map(([cat, items]) => (
-                  <tr
-                    key={cat}
-                    className="border-b border-black align-top"
-                  >
-                    <td className="menuheaing p-2 font-bold text-black w-1/4 text-base uppercase border-r border-black">
-                      {cat}
-                    </td>
-                    <td className="p-1 font-bold text-base text-black w-2/3 uppercase">
-                      <div className="flex flex-wrap gap-x-4 gap-y-1">
-                        {items.map((item, i) => (
-                          <span
-                            key={i}
-                            className="inline-flex items-center gap-1"
-                          >
-                            * {item}{" "}
-                            <button
-                              onClick={() => onRemoveItem(index, cat, item)}
-                              className="text-red-600 text-xs border border-gray-300 rounded px-1 py-0.5 hover:bg-red-50 transition print:hidden"
-                              title="Remove item"
-                            >
-                              ❌
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {Object.keys(ctx.items)
+                  // Sort keys based on our predefined order
+                  .sort((a, b) => {
+                    const indexA = CATEGORY_ORDER.indexOf(a.toUpperCase());
+                    const indexB = CATEGORY_ORDER.indexOf(b.toUpperCase());
+                    
+                    // If a category isn't in the list, move it to the end
+                    const finalA = indexA === -1 ? 999 : indexA;
+                    const finalB = indexB === -1 ? 999 : indexB;
+                    
+                    return finalA - finalB;
+                  })
+                  .map((cat) => {
+                    const items = ctx.items[cat];
+                    return (
+                      <tr key={cat} className="border-b border-black align-top">
+                        <td className="menuheaing p-2 font-bold text-black w-1/4 text-base uppercase border-r border-black">
+                          {cat}
+                        </td>
+                        <td className="p-1 font-bold text-base text-black w-2/3 uppercase">
+                          <div className="flex flex-wrap gap-x-4 gap-y-1">
+                            {items.map((item, i) => (
+                              <span key={i} className="inline-flex items-center gap-1">
+                                * {item}{" "}
+                                <button
+                                  onClick={() => onRemoveItem(index, cat, item)}
+                                  className="text-red-600 text-xs border border-gray-300 rounded px-1 py-0.5 hover:bg-red-50 transition print:hidden"
+                                  title="Remove item"
+                                >
+                                  ❌
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
               </tbody>
             </table>
           </div>
@@ -370,6 +409,7 @@ const Preview = forwardRef(
 
         {/* ---------------- INVOICE SECTION ---------------- */}
         {/* Invoice Table with all editable fields */}
+
         <div className="invoice-section-container">
           <h2 className="Mainheading text-center text-xl text-900 font-bold font-extrabold uppercase mb-2 text-[#FFC100]">
             SHAMMUKHA CATERERS PVT. LTD
