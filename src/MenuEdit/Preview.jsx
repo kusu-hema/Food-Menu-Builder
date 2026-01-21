@@ -661,7 +661,7 @@ const Preview = forwardRef(
           {/* Last Section / Notes */}
           <div className="last-section">
             <h4 className="text-center text-black font-bold text-sm mb-4 mt-4">
-              NOTE: ADDITIONAL WILL BE CHARGED FOR EXTRA PLATES
+              NOTE: ADDITIONAL AMOUNT WILL BE CHARGED FOR EXTRA PLATES
             </h4>
             <h4 className="text-center text-black font-bold text-sm mb-4">
               *** With best Wishes from Shanmukha Caterers Pvt.Ltd and Service....

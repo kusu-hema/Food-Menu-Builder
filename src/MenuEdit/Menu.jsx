@@ -240,6 +240,42 @@ function Menu() {
     }
   };
 
+
+  // 1. Separate Save Function
+    const handleJustSave = async () => {
+      const menuId = await saveClientAndFullMenu();
+      if (menuId) {
+        await saveInvoiceAndDownload(menuId);
+        alert("Menu and Invoice saved successfully!");
+      }
+    };
+
+    // 2. Separate Print Function
+    const handleJustPrint = () => {
+      handlePrint();
+    };
+
+    // 3. Clear Function
+    const handleClearMenu = () => {
+      const confirmClear = window.confirm("Are you sure you want to clear all data? This cannot be undone.");
+      if (confirmClear) {
+        // Reset States
+        const emptyContext = [{ date: '', meal: '', members: '', buffet: '', items: {} }];
+        const emptyFormData = { date: '', place: '', name: '', contact: '' };
+        
+        setMenuContexts(emptyContext);
+        setFormData(emptyFormData);
+        setInvoiceData(null);
+        
+        // Clear LocalStorage
+        localStorage.removeItem('menuContexts');
+        localStorage.removeItem('formData');
+        localStorage.removeItem('invoiceRows'); // From your Preview component
+        
+        alert("Data cleared successfully.");
+      }
+    };
+
   // -------------------------------
   // UI
   // -------------------------------
@@ -344,7 +380,7 @@ function Menu() {
 
         {/* RIGHT PANEL */}
         <div className="flex-1 bg-white rounded-lg shadow-md p-4 overflow-y-auto max-h-[calc(100vh-3rem)]">
-          <div className="flex justify-between items-center">
+          {/* <div className="flex justify-between items-center">
             <h2 className="text-lg font-semibold text-gray-800">Invoice Preview</h2>
             <button
               onClick={handleSavePrintDownload}
@@ -352,6 +388,37 @@ function Menu() {
             >
               💾 Save & Print Invoice
             </button>
+          </div> */}
+
+          {/* RIGHT PANEL HEADER */}
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold text-gray-800">Invoice Preview</h2>
+            
+            <div className="flex gap-2">
+              {/* SAVE BUTTON */}
+              <button
+                onClick={handleJustSave}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
+              >
+                💾 Save
+              </button>
+
+              {/* PRINT BUTTON */}
+              <button
+                onClick={handleJustPrint}
+                className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition flex items-center gap-1"
+              >
+                🖨️ Print
+              </button>
+
+              {/* CLEAR BUTTON */}
+              <button
+                onClick={handleClearMenu}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition flex items-center gap-1"
+              >
+                🗑️ Clear
+              </button>
+            </div>
           </div>
           
           {/* PREVIEW */}
