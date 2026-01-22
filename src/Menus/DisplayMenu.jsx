@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { useReactToPrint } from 'react-to-print';
 import { useParams, useNavigate } from "react-router-dom";
 import MenuSelector from "../MenuEdit/Selector";
 import MenuItems from "../MenuEdit/Items";
@@ -19,7 +20,7 @@ import Preview from "../MenuEdit/Preview";
 const EditMenuById = () => {  
   const { id } = useParams();
   const navigate = useNavigate();
-  const previewRef = useRef(null);
+  // const previewRef = useRef(null);
 
   const [formData, setFormData] = useState({ name: "", contact: "", date: "", place: "" });
   const [menuContexts, setMenuContexts] = useState([{ date: "", meal: "", members: "", buffet: "", items: {} }]);
@@ -38,6 +39,23 @@ const EditMenuById = () => {
   const toggleAccordion = (index) => {
   setExpandedIndex((prev) => (prev === index ? null : index));
   };
+  
+  const componentRef = useRef(null);
+  const handlePrint = useReactToPrint({
+    contentRef: componentRef,
+    documentTitle: 'Menu',
+    pageStyle: `
+      @page { margin: 5mm }
+      body { font-family: Arial, sans-serif; }
+      .invoice-section-container { page-break-before: always; }
+      @media print {
+        body {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+      }
+    `,
+  });
 
   // ---- Load detail by ID and convert backend -> Preview format
   useEffect(() => {
@@ -353,13 +371,20 @@ const EditMenuById = () => {
             <h2 className="text-lg font-semibold">Invoice Preview</h2>
             <div className="space-x-2">
               <button 
-              onClick={() => window.print()} className="px-3 py-1 bg-indigo-600 text-white rounded">Print</button>
+              onClick={handlePrint} className="px-3 py-1 bg-indigo-600 text-white rounded">Print
+              </button>
+
+              {/*<button 
+              onClick={() => window.print()} className="px-3 py-1 bg-indigo-600 text-white rounded">Print
+              </button>*/}
+
               <button onClick={() => navigate(-1)} className="px-3 py-1 border rounded">Back</button>
             </div>
           </div>
 
           <Preview
-            ref={previewRef}
+            ref={componentRef}
+            // ref={previewRef}
             menuContexts={menuContexts}
             onRemoveItem={handleRemoveItem}
             onRemoveContext={handleRemoveContext}
