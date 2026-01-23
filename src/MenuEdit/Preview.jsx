@@ -184,6 +184,7 @@ const Preview = forwardRef(
     useEffect(() => {
       if (typeof onInvoiceDataChange === "function") {
         onInvoiceDataChange({
+          rows: invoiceRows,
           subtotal,
           gst,
           grand_total: totalAmount,

@@ -24,7 +24,7 @@ function  Items({ selectedItems, onAddItem }) {
 
   // Fetch products
   useEffect(() => {
-    fetch('http://localhost:4000/api/products')
+ +    fetch('http://localhost:4000/api/products')
       .then(res => res.json())
       .then(data => setItems(data));
   }, []);
