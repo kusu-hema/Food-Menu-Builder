@@ -143,25 +143,30 @@ const Preview = forwardRef(
 
 
     useEffect(() => {
-    const updated = menuContexts.map((ctx, i) => {
-      const meal = ctx.meal?.toUpperCase();
-      const members = parseInt(ctx.members) || 0;
-      
-      // FIX: Use ctx.price if it exists, otherwise fallback to map
-      const price = ctx.price !== undefined ? ctx.price : (pricingMap[meal] || 0);
-      const total = ctx.total !== undefined ? ctx.total : (members * price);
+      const updated = menuContexts.map((ctx, i) => {
+        const meal = ctx.meal?.toUpperCase();
+        const members = parseInt(ctx.members) || 0;
+        
+        // NEW: Use existing price from database if available, else fallback to 0
+        const price = (ctx.price !== undefined && ctx.price !== null) 
+                      ? ctx.price 
+                      : (pricingMap[meal] || 0);
 
-      return {
-        sno: i + 1,
-        event: `${formatDate(ctx.date)} ${meal}`,
-        members,
-        price,
-        total,
-      };
-    });
+        const total = (ctx.total !== undefined && ctx.total !== null) 
+                      ? ctx.total 
+                      : (members * price);
 
-    setInvoiceRows(updated);
-  }, [menuContexts]);
+        return {
+          sno: i + 1,
+          event: `${formatDate(ctx.date)} ${meal}`,
+          members,
+          price,
+          total,
+        };
+      });
+
+      setInvoiceRows(updated);
+    }, [menuContexts]);
 
     // Recalculate totals on changes
     useEffect(() => {
@@ -179,30 +184,16 @@ const Preview = forwardRef(
 
     // Save to localStorage
     useEffect(() => {
-      localStorage.setItem("invoiceRows", JSON.stringify(invoiceRows));
-      localStorage.setItem("subtotal", JSON.stringify(subtotal));
-      localStorage.setItem("gst", JSON.stringify(gst));
-      localStorage.setItem("totalAmount", JSON.stringify(totalAmount));
-      localStorage.setItem("advance", JSON.stringify(advance));
-      localStorage.setItem("balance", JSON.stringify(balance));
-      localStorage.setItem("leadCounters", JSON.stringify(leadCounters));
-      localStorage.setItem("waterBottles", JSON.stringify(waterBottles));
-      localStorage.setItem("CookingCharges", JSON.stringify(CookingCharges));
-      localStorage.setItem("labourCharges", JSON.stringify(labourCharges));
-      localStorage.setItem("transportCharges", JSON.stringify(transportCharges));
-    }, [
-      invoiceRows,
-      subtotal,
-      gst,
-      totalAmount,
-      advance,
-      balance,
-      leadCounters,
-      waterBottles,
-      CookingCharges,
-      labourCharges,
-      transportCharges,
-    ]);
+      if (formData) {
+        if (formData.gst !== undefined) setGst(Number(formData.gst));
+        if (formData.advance !== undefined) setAdvance(Number(formData.advance));
+        if (formData.lead_counters !== undefined) setLeadCounters(Number(formData.lead_counters));
+        if (formData.water_bottles !== undefined) setWaterBottles(Number(formData.water_bottles));
+        if (formData.cooking_charges !== undefined) setCookingCharges(Number(formData.cooking_charges));
+        if (formData.labour_charges !== undefined) setLabourCharges(Number(formData.labour_charges));
+        if (formData.transport_charges !== undefined) setTransportCharges(Number(formData.transport_charges));
+      }
+    }, [formData]);  
 
     // Send data to parent
     useEffect(() => {

@@ -193,7 +193,7 @@ const EditMenuById = () => {
 
   // convert Preview shape back into backend shape (categories array)
   const convertToBackend = () => {
-    const backendContexts = menuContexts.map((ctx) => {
+    const backendContexts = menuContexts.map((ctx, index) => {
       const categoriesArr = Object.entries(ctx.items || {}).map(([category_name, items]) => ({
         category_name,
         items: Array.isArray(items) ? items : [],
