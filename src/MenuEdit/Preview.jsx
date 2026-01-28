@@ -120,24 +120,48 @@ const Preview = forwardRef(
     };
 
     // Update rows when menu changes
+    // useEffect(() => {
+    //   const updated = menuContexts.map((ctx, i) => {
+    //     const meal = ctx.meal?.toUpperCase();
+    //     const members = parseInt(ctx.members) || 0;
+    //     const price = pricingMap[meal] || 0;
+    //     const total = members * price;
+
+    //     return {
+    //       sno: i + 1,
+    //       event: `${formatDate(ctx.date)} ${meal}`,
+    //       members,
+    //       price,
+    //       total,
+    //     };
+    //   });
+
+    //   setInvoiceRows(updated);
+    // }, [menuContexts]);
+
+
+
+
     useEffect(() => {
-      const updated = menuContexts.map((ctx, i) => {
-        const meal = ctx.meal?.toUpperCase();
-        const members = parseInt(ctx.members) || 0;
-        const price = pricingMap[meal] || 0;
-        const total = members * price;
+    const updated = menuContexts.map((ctx, i) => {
+      const meal = ctx.meal?.toUpperCase();
+      const members = parseInt(ctx.members) || 0;
+      
+      // FIX: Use ctx.price if it exists, otherwise fallback to map
+      const price = ctx.price !== undefined ? ctx.price : (pricingMap[meal] || 0);
+      const total = ctx.total !== undefined ? ctx.total : (members * price);
 
-        return {
-          sno: i + 1,
-          event: `${formatDate(ctx.date)} ${meal}`,
-          members,
-          price,
-          total,
-        };
-      });
+      return {
+        sno: i + 1,
+        event: `${formatDate(ctx.date)} ${meal}`,
+        members,
+        price,
+        total,
+      };
+    });
 
-      setInvoiceRows(updated);
-    }, [menuContexts]);
+    setInvoiceRows(updated);
+  }, [menuContexts]);
 
     // Recalculate totals on changes
     useEffect(() => {
@@ -209,6 +233,15 @@ const Preview = forwardRef(
       labourCharges,
       transportCharges,
     ]);
+
+    // Add this near your other useEffects
+    useEffect(() => {
+      // Check if we have valid formData/menuContexts that imply an "Edit" mode
+      if (menuContexts.length > 0) {
+        // These should come from the parent state if provided
+        // You might need to pass the full 'data' object or specific fields to Preview
+      }
+    }, [menuContexts]);
 
     // Update row price
     const handlePriceChange = (i, e) => {
