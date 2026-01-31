@@ -73,19 +73,24 @@ const Preview = forwardRef(
     const [subtotal, setSubtotal] = useState(() =>
       getFromLocalStorage("subtotal", 0)
     );
+
     const [gst, setGst] = useState(() => {
     if (formData?.gst !== undefined) return Number(formData.gst);
     return getFromLocalStorage("gst", 0);
-  });
+    });
+
     const [totalAmount, setTotalAmount] = useState(() =>
       getFromLocalStorage("totalAmount", 0)
     );
+    
     const [advance, setAdvance] = useState(() => 
     formData?.advance !== undefined ? Number(formData.advance) : getFromLocalStorage("advance", 0)
-  );
+    );
+
     const [balance, setBalance] = useState(() =>
       getFromLocalStorage("balance", 0)
     );
+
     const [leadCounters, setLeadCounters] = useState(() => 
     formData?.lead_counters !== undefined ? Number(formData.lead_counters) : getFromLocalStorage("leadCounters", 0)
     );
@@ -145,8 +150,6 @@ const Preview = forwardRef(
 
     //   setInvoiceRows(updated);
     // }, [menuContexts]);
-
-
 
 
     useEffect(() => {
@@ -513,6 +516,8 @@ const Preview = forwardRef(
                   <td className="border border-black p-2">{row.sno}</td>
                   <td className="border border-black p-2">{row.event}</td>
                   <td className="border border-black p-2">{row.members}</td>
+
+                  {/* Price */}
                   <td className="border border-black p-2">
                     <input
                       type="number"
@@ -522,6 +527,8 @@ const Preview = forwardRef(
                       className="w-full text-center bg-transparent border-none focus:outline-none"
                     />
                   </td>
+
+                  {/*  Total */}
                   <td className="border border-black p-2">
                     <input
                       type="number"
@@ -531,6 +538,7 @@ const Preview = forwardRef(
                       className="w-full text-center bg-transparent border-none focus:outline-none"
                     />
                   </td>
+
                 </tr>
               ))}
 
