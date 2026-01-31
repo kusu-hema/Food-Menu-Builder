@@ -73,30 +73,37 @@ const Preview = forwardRef(
     const [subtotal, setSubtotal] = useState(() =>
       getFromLocalStorage("subtotal", 0)
     );
-    const [gst, setGst] = useState(() => getFromLocalStorage("gst", 0));
+    const [gst, setGst] = useState(() => {
+    if (formData?.gst !== undefined) return Number(formData.gst);
+    return getFromLocalStorage("gst", 0);
+  });
     const [totalAmount, setTotalAmount] = useState(() =>
       getFromLocalStorage("totalAmount", 0)
     );
-    const [advance, setAdvance] = useState(() =>
-      getFromLocalStorage("advance", 0)
-    );
+    const [advance, setAdvance] = useState(() => 
+    formData?.advance !== undefined ? Number(formData.advance) : getFromLocalStorage("advance", 0)
+  );
     const [balance, setBalance] = useState(() =>
       getFromLocalStorage("balance", 0)
     );
-    const [leadCounters, setLeadCounters] = useState(() =>
-      getFromLocalStorage("leadCounters", 0)
+    const [leadCounters, setLeadCounters] = useState(() => 
+    formData?.lead_counters !== undefined ? Number(formData.lead_counters) : getFromLocalStorage("leadCounters", 0)
     );
-    const [waterBottles, setWaterBottles] = useState(() =>
-      getFromLocalStorage("waterBottles", 0)
+
+    const [waterBottles, setWaterBottles] = useState(() => 
+    formData?.water_bottles !== undefined ? Number(formData.water_bottles) : getFromLocalStorage("waterBottles", 0)
     );
-    const [CookingCharges, setCookingCharges] = useState(() =>
-      getFromLocalStorage("CookingCharges", 0)
+
+    const [CookingCharges, setCookingCharges] = useState(() => 
+      formData?.cooking_charges !== undefined ? Number(formData.cooking_charges) : getFromLocalStorage("CookingCharges", 0)
     );
-    const [labourCharges, setLabourCharges] = useState(() =>
-      getFromLocalStorage("labourCharges", 0)
+
+    const [labourCharges, setLabourCharges] = useState(() => 
+      formData?.labour_charges !== undefined ? Number(formData.labour_charges) : getFromLocalStorage("labourCharges", 0)
     );
-    const [transportCharges, setTransportCharges] = useState(() =>
-      getFromLocalStorage("transportCharges", 0)
+
+    const [transportCharges, setTransportCharges] = useState(() => 
+      formData?.transport_charges !== undefined ? Number(formData.transport_charges) : getFromLocalStorage("transportCharges", 0)
     );
 
     // Recalculate totals
@@ -185,15 +192,16 @@ const Preview = forwardRef(
     // Save to localStorage
     useEffect(() => {
       if (formData) {
-        if (formData.gst !== undefined) setGst(Number(formData.gst));
-        if (formData.advance !== undefined) setAdvance(Number(formData.advance));
-        if (formData.lead_counters !== undefined) setLeadCounters(Number(formData.lead_counters));
-        if (formData.water_bottles !== undefined) setWaterBottles(Number(formData.water_bottles));
-        if (formData.cooking_charges !== undefined) setCookingCharges(Number(formData.cooking_charges));
-        if (formData.labour_charges !== undefined) setLabourCharges(Number(formData.labour_charges));
-        if (formData.transport_charges !== undefined) setTransportCharges(Number(formData.transport_charges));
+        // Explicitly check for null/undefined and cast to Number
+        setGst(Number(formData.gst) || 0);
+        setAdvance(Number(formData.advance) || 0);
+        setLeadCounters(Number(formData.lead_counters) || 0);
+        setWaterBottles(Number(formData.water_bottles) || 0);
+        setCookingCharges(Number(formData.cooking_charges) || 0);
+        setLabourCharges(Number(formData.labour_charges) || 0);
+        setTransportCharges(Number(formData.transport_charges) || 0);
       }
-    }, [formData]);  
+    }, [formData]); // This triggers when EditMenuById finishes fetching 
 
     // Send data to parent
     useEffect(() => {

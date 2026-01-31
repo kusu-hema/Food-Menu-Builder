@@ -191,6 +191,33 @@ const EditMenuById = () => {
     setFormData((p) => ({ ...p, [name]: value }));
   };
 
+
+  // Inside EditMenuById.js return statement:
+{loading ? (
+  <div className="flex-1 flex items-center justify-center">
+    <p className="text-xl font-bold">Loading Menu Data...</p>
+  </div>
+) : (
+  <Preview
+    ref={componentRef}
+    menuContexts={menuContexts}
+    onRemoveItem={handleRemoveItem}
+    onRemoveContext={handleRemoveContext}
+    // IMPORTANT: Make sure these fields are passed into formData
+    formData={{
+      ...formData,
+      gst: invoiceData?.gst,
+      advance: invoiceData?.advance,
+      lead_counters: invoiceData?.lead_counters,
+      water_bottles: invoiceData?.water_bottles,
+      cooking_charges: invoiceData?.cooking_charges,
+      labour_charges: invoiceData?.labour_charges,
+      transport_charges: invoiceData?.transport_charges,
+    }}
+    onInvoiceDataChange={setInvoiceData}
+  />
+)}
+
   // convert Preview shape back into backend shape (categories array)
   const convertToBackend = () => {
     const backendContexts = menuContexts.map((ctx, index) => {
@@ -394,7 +421,7 @@ const EditMenuById = () => {
             </div>
           </div>
 
-          <Preview
+          {/* <Preview
             ref={componentRef}
             // ref={previewRef}
             menuContexts={menuContexts}
@@ -407,7 +434,32 @@ const EditMenuById = () => {
               place: formData.place,
             }}
             onInvoiceDataChange={setInvoiceData}
+          /> */}
+
+          {loading ? (
+  <p>Loading Data...</p>
+) : (
+
+
+          <Preview
+            ref={componentRef}
+            menuContexts={menuContexts}
+            onRemoveItem={handleRemoveItem}
+            onRemoveContext={handleRemoveContext}
+            // Expand formData to include the invoice fields
+            formData={{
+              ...formData,
+              gst: invoiceData?.gst,
+              advance: invoiceData?.advance,
+              lead_counters: invoiceData?.lead_counters,
+              water_bottles: invoiceData?.water_bottles,
+              cooking_charges: invoiceData?.cooking_charges,
+              labour_charges: invoiceData?.labour_charges,
+              transport_charges: invoiceData?.transport_charges,
+            }}
+            onInvoiceDataChange={setInvoiceData}
           />
+          )}
         </div>
 
       </div>
