@@ -6,7 +6,7 @@ import MenuItems from "../MenuEdit/Items";
 import Preview from "../MenuEdit/Preview";
 
 /** 
- * EditMenuById.js 
+ * EditMenuById.js   
  *
  * - Loads menu by id using GET http://localhost:4000/api/menus/details/${id}
  * - Lets user edit using the same Preview.js UI pattern
@@ -193,30 +193,30 @@ const EditMenuById = () => {
 
 
   // Inside EditMenuById.js return statement:
-{loading ? (
-  <div className="flex-1 flex items-center justify-center">
-    <p className="text-xl font-bold">Loading Menu Data...</p>
-  </div>
-) : (
-  <Preview
-    ref={componentRef}
-    menuContexts={menuContexts}
-    onRemoveItem={handleRemoveItem}
-    onRemoveContext={handleRemoveContext}
-    // IMPORTANT: Make sure these fields are passed into formData
-    formData={{
-      ...formData,
-      gst: invoiceData?.gst,
-      advance: invoiceData?.advance,
-      lead_counters: invoiceData?.lead_counters,
-      water_bottles: invoiceData?.water_bottles,
-      cooking_charges: invoiceData?.cooking_charges,
-      labour_charges: invoiceData?.labour_charges,
-      transport_charges: invoiceData?.transport_charges,
-    }}
-    onInvoiceDataChange={setInvoiceData}
-  />
-)}
+  {loading ? (
+    <div className="flex-1 flex items-center justify-center">
+      <p className="text-xl font-bold">Loading Menu Data...</p>
+    </div>
+  ) : (
+    <Preview
+      ref={componentRef}
+      menuContexts={menuContexts}
+      onRemoveItem={handleRemoveItem}
+      onRemoveContext={handleRemoveContext}
+      // IMPORTANT: Make sure these fields are passed into formData
+      formData={{
+        ...formData,
+        gst: invoiceData?.gst,
+        advance: invoiceData?.advance,
+        lead_counters: invoiceData?.lead_counters,
+        water_bottles: invoiceData?.water_bottles,
+        cooking_charges: invoiceData?.cooking_charges,
+        labour_charges: invoiceData?.labour_charges,
+        transport_charges: invoiceData?.transport_charges,
+      }}
+      onInvoiceDataChange={setInvoiceData}
+    />
+  )}
 
   // convert Preview shape back into backend shape (categories array)
   const convertToBackend = () => {
@@ -437,10 +437,8 @@ const EditMenuById = () => {
           /> */}
 
           {loading ? (
-  <p>Loading Data...</p>
-) : (
-
-
+            <p>Loading Data...</p>
+          ) : (
           <Preview
             ref={componentRef}
             menuContexts={menuContexts}
