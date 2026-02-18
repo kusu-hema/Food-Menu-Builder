@@ -21,7 +21,7 @@ const AppLayout = ({ isLoggedIn, setIsLoggedIn }) => {
       <div style={{ display: 'flex', flex: 1 }}>
         {/* Sidebar */}
         {!isLoginPage && isLoggedIn && (
-          <div style={{ width: isSidebarOpen ? '18%' : '0%', transition: 'width 0.3s ease' }}>
+          <div style={{ width: isSidebarOpen ? '16%' : '0%', transition: 'width 0.3s ease' }}>
             <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
           </div>
         )}
@@ -42,7 +42,7 @@ const AppLayout = ({ isLoggedIn, setIsLoggedIn }) => {
           <div style={{ flexGrow: 1, padding: '20px', overflowX: 'auto' }}>
             <AppRoutes isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
           </div>
-
+   
           {/* Footer */}
           {!isLoginPage && isLoggedIn && (
             <Footer/>
