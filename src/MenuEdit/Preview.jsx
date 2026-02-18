@@ -11,7 +11,7 @@ import React, { useState, forwardRef, useEffect } from "react";
   };
 
 const Preview = forwardRef( 
-  (
+  ( 
     {
       menuContexts,
       onRemoveItem,
@@ -317,8 +317,11 @@ const Preview = forwardRef(
           {/* <h4 className="text-center text-sm text-gray-700 mb-4">
             VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: 1800 890 3081.
           </h4> */}
-          <h4 className="text-center text-sm text-gray-700 mb-4">
+          <h4 className="text-center text-sm text-gray-700 ">
             VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: +91 98661 76781, +040 2765 6781.
+          </h4>
+          <h4 className="text-center text-sm text-gray-700 mb-4">
+              FSSAI NUMBER :- 10018047001017 |  GST NUMBER : 36ABACS0489B1ZK 
           </h4>
           <h3 className="subheading text-center font-black uppercase text-base mb-6 text-[#00B254]">
             WE CATER TO YOUR HEALTH
@@ -466,9 +469,17 @@ const Preview = forwardRef(
           {/* <h4 className="text-center text-sm text-gray-700 mb-4">
             VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: 1800 890 3081.
           </h4> */}
-          <h4 className="text-center text-sm text-gray-700 mb-4">
+          {/* <h4 className="text-center text-sm text-gray-700 mb-4">
             VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: +91 98661 76781, +91 4027 656 781.
+          </h4> */}
+
+           <h4 className="text-center text-sm text-gray-700 ">
+            VIDYA NAGAR, HYDERABAD - 500 044 | CUSTOMER CARE: +91 98661 76781, +040 2765 6781.
           </h4>
+          <h4 className="text-center text-sm text-gray-700 mb-4">
+              FSSAI NUMBER :- 10018047001017 |  GST NUMBER : 36ABACS0489B1ZK 
+          </h4>
+
            {/* +91 98661 76781, +91 4027 656 781. */}
           <h3 className="subheading text-center font-black uppercase text-base mb-6 text-[#00B254]">
             WE CATER TO YOUR HEALTH
