@@ -20,13 +20,26 @@ const AppLayout = ({ isLoggedIn, setIsLoggedIn }) => {
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <div style={{ display: 'flex', flex: 1 }}>
         {/* Sidebar */}
+
         {!isLoginPage && isLoggedIn && (
-          <div style={{ width: isSidebarOpen ? '18%' : '0%', transition: 'width 0.3s ease' }}>
-            <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+          <div 
+          style={{ width: isSidebarOpen ? '16%' : '0%', 
+                   transition: 'width 0.3s ease' }}
+          >
+          <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
           </div>
         )}
 
+
+        {/* {!isLoginPage && isLoggedIn && (
+          <div  className='hello'
+          >
+          <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+          </div>
+        )} */}
+
         {/* Main Content Area with Footer */}
+        
         <div
           style={{
             flex: 1,
@@ -69,11 +82,4 @@ function App() {
   );
 }
 
-export default App; 
-
-
-
-
-
-
-
+export default App;

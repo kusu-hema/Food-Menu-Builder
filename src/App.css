@@ -1,3 +1,11 @@
+/* .hello{
+  width:  'isSidebarOpen ? '16%' : '0%' ';
+  transition: 'width 0.3s ease' ;
+} */
+
+
+
+
 /*  
   .container {
     border: '1px solid #ccc';

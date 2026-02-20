@@ -1,209 +1,255 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
-// Note: You might need to install and import a library like 'react-icons' for true icons
-// For simplicity, I'm using emojis here.
 
 const EditMenu = () => {
-  const [leads, setLeads] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [leadToDelete, setLeadToDelete] = useState(null);
-  const [alertMessage, setAlertMessage] = useState(null);
-  const navigate = useNavigate();
+  const [leads, setLeads] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [leadToDelete, setLeadToDelete] = useState(null);
+  const [alertMessage, setAlertMessage] = useState(null);
+  
+  // --- SEARCH & PAGINATION STATE ---
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5; 
+  
+  const navigate = useNavigate();
 
-  // Fetch all menus/clients
-  const fetchClients = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get('http://localhost:4000/api/menus');
-      const clients = response.data.map(client => ({
-        id: client.id,
-        name: client.customer_name,
-        phone: client.contact,
-        EventDate: new Date(client.date).toLocaleDateString('en-GB', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-        }),
-        place: client.place,
-      }));
-      setLeads(clients);
-    } catch (error) {
-      console.error('Error fetching clients:', error);
-      setAlertMessage('Failed to fetch client data from the server.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  // Fetch all menus
+  const fetchClients = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get('http://localhost:4000/api/menus');
+      const clients = response.data.map(client => ({
+        id: client.id, // Ensure this matches your DB primary key
+        name: client.customer_name,
+        phone: client.contact,
+        EventDate: new Date(client.date).toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+        }),
+        place: client.place,
+      }));
+      setLeads(clients);
+    } catch (error) {
+      console.error('Error fetching clients:', error);
+      setAlertMessage('Failed to fetch client data from the server.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  useEffect(() => {
-    fetchClients();
-  }, [fetchClients]);
+  useEffect(() => {
+    fetchClients();
+  }, [fetchClients]);
 
-  const openDeleteModal = (lead) => {
-    setLeadToDelete(lead);
-    setIsModalOpen(true);
-  };
+  // --- LOGIC: SEARCH FILTERING ---
+  const filteredLeads = useMemo(() => {
+    return leads.filter(lead => 
+      lead.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      lead.place?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      lead.phone?.includes(searchQuery)
+    );
+  }, [leads, searchQuery]);
 
-  const closeDeleteModal = () => {
-    setIsModalOpen(false);
-    setLeadToDelete(null);
-  };
+  // --- LOGIC: PAGINATION CALCULATION ---
+  const totalPages = Math.ceil(filteredLeads.length / itemsPerPage);
+  
+  const currentTableData = useMemo(() => {
+    const firstPageIndex = (currentPage - 1) * itemsPerPage;
+    const lastPageIndex = firstPageIndex + itemsPerPage;
+    return filteredLeads.slice(firstPageIndex, lastPageIndex);
+  }, [currentPage, filteredLeads]);
 
-  const closeAlert = () => {
-    setAlertMessage(null);
-  };
+  const handleSearch = (e) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1); // Reset to first page on new search
+  };
 
-  const handleDelete = async () => {
-    if (!leadToDelete) return;
-    try {
-      const menuId = leadToDelete.id;
-      await axios.delete(`http://localhost:4000/api/menus/${menuId}`);
-      closeDeleteModal();
-      fetchClients();
-    } catch (error) {
-      console.error('Error deleting client:', error);
-      setAlertMessage('Failed to delete the client record or related data.');
-      closeDeleteModal();
-    }
-  };
+  // --- ACTIONS ---
+  const openDeleteModal = (lead) => { 
+    setLeadToDelete(lead); 
+    setIsModalOpen(true); 
+  };
+  
+  const closeDeleteModal = () => { 
+    setIsModalOpen(false); 
+    setLeadToDelete(null); 
+  };
 
-  return (
-    <div className="container mx-auto p-4 sm:p-6 lg:p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-4xl font-extrabold text-gray-800">
-          Client Invoices 🧾
-        </h2>
-        <button
-          onClick={() => navigate('/menu')} // Corrected: Comment removed from inside the attribute
-          className="flex items-center space-x-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-150 ease-in-out transform hover:scale-105"
-        >
-          <span>+ New Menu</span>
-        </button>
-      </div>
+  // FIXED DELETE LOGIC
+  const handleDelete = async () => {
+    if (!leadToDelete) return;
+    try {
+      // 1. Backend Call
+      await axios.delete(`http://localhost:4000/api/menus/${leadToDelete.id}`);
+      
+      // 2. Optimistic State Update (Remove from UI immediately)
+      const updatedLeads = leads.filter(lead => lead.id !== leadToDelete.id);
+      setLeads(updatedLeads);
+      
+      // 3. Pagination Adjustment
+      // If we deleted the last item on the last page, go back one page
+      const newTotalFiltered = filteredLeads.length - 1;
+      const newTotalPages = Math.ceil(newTotalFiltered / itemsPerPage);
+      if (currentPage > newTotalPages && newTotalPages > 0) {
+        setCurrentPage(newTotalPages);
+      }
 
-      <div className="bg-white shadow-2xl overflow-hidden rounded-xl">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-xl">#</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client Name / Place</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Phone</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event Date</th>
-                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-40 rounded-tr-xl">Actions</th>
-              </tr>
-            </thead>
+      closeDeleteModal();
+    } catch (error) {
+      console.error('Delete error:', error);
+      setAlertMessage('Failed to delete the record. Please check if the ID exists.');
+      closeDeleteModal();
+    }
+  };
 
-            <tbody className="bg-white divide-y divide-gray-100">
-              {loading ? (
-                <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
-                    <span className="animate-spin inline-block mr-2">⚙️</span> Loading client data...
-                  </td>
-                </tr>
-              ) : leads.length === 0 ? (
-                <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
-                    No client invoices found. Click '+ New Menu' to add one.
-                  </td>
-                </tr>
-              ) : (
-                leads.map((lead, i) => (
-                  <tr key={lead.id} className="hover:bg-indigo-50 transition duration-100">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{i + 1}.</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="font-semibold text-gray-900">{lead.name}</div>
-                      <div className="text-xs text-gray-500">{lead.place}</div>
-                    </td>
+  return (
+    <div className="container mx-auto p-4 sm:p-6 lg:p-8">
+      
+      {/* HEADER & SEARCH SECTION */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <h2 className="text-4xl font-extrabold text-gray-800">Client Invoices 🧾</h2>
+        
+        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">🔍</span>
+            <input 
+              type="text"
+              placeholder="Search invoices..."
+              value={searchQuery}
+              onChange={handleSearch}
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none w-full sm:w-64 transition"
+            />
+          </div>
 
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 hidden sm:table-cell">{lead.phone}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">{lead.EventDate}</td>
+          <button
+            onClick={() => navigate('/menu')}
+            className="flex items-center justify-center space-x-2 px-6 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition transform hover:scale-105"
+          >
+            <span>+ New Menu</span>
+          </button>
+        </div>
+      </div>
 
-                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                      <div className="flex space-x-2 justify-center">
-                        <button
-                          className="text-sm font-medium flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition"
-                          onClick={() => navigate(`/displaymenu/${lead.id}`)}
-                        >
-                          ✏️ Edit
-                        </button>
-                        <button
-                          className="text-sm font-medium flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition"
-                          onClick={() => navigate(`/displaymenu/${lead.id}`)}
-                        >
-                          👁️ View
-                        </button>
+      {/* TABLE SECTION */}
+      <div className="bg-white shadow-2xl overflow-hidden rounded-xl border border-gray-100">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">#</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Client / Place</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase hidden sm:table-cell">Phone</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Event Date</th>
+                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase w-40">Actions</th>
+              </tr>
+            </thead>
 
-                        <button
-                          className="text-sm font-medium flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition"
-                          onClick={() => openDeleteModal(lead)}
-                        >
-                          🗑️ Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+            <tbody className="bg-white divide-y divide-gray-100">
+              {loading ? (
+                <tr>
+                  <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
+                    <span className="animate-spin inline-block mr-2 text-xl">⚙️</span> Loading...
+                  </td>
+                </tr>
+              ) : currentTableData.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="px-6 py-12 text-center text-gray-500 italic">
+                    {searchQuery ? `No results for "${searchQuery}"` : "No client invoices found."}
+                  </td>
+                </tr>
+              ) : (
+                currentTableData.map((lead, i) => (
+                  <tr key={lead.id} className="hover:bg-indigo-50 transition duration-100">
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      {(currentPage - 1) * itemsPerPage + i + 1}.
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="font-bold text-gray-900">{lead.name}</div>
+                      <div className="text-xs text-gray-500">{lead.place}</div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-600 hidden sm:table-cell">{lead.phone}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600 font-medium">{lead.EventDate}</td>
+                    <td className="px-6 py-4 text-center">
+                      <div className="flex space-x-2 justify-center">
+                        <button onClick={() => navigate(`/displaymenu/${lead.id}`)} className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600">✏️</button>
+                        <button onClick={() => navigate(`/displaymenu/${lead.id}`)} className="p-2 bg-green-500 text-white rounded hover:bg-green-600">👁️</button>
+                        <button onClick={() => openDeleteModal(lead)} className="p-2 bg-red-600 text-white rounded hover:bg-red-700">🗑️</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
 
-      {/* Deletion Confirmation Modal */}
-      {isModalOpen && leadToDelete && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl max-w-lg w-full transform transition-all scale-100 opacity-100">
-            <h3 className="text-2xl font-bold text-red-600 mb-2 flex items-center">
-              ⚠️ Confirm Deletion
-            </h3>
-            <p className="text-gray-700 mb-6">
-              Are you absolutely sure you want to delete the invoice for **{leadToDelete.name}**? This action cannot be undone.
-            </p>
+        {/* PAGINATION FOOTER */}
+        {!loading && totalPages > 1 && (
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+            <div className="text-sm text-gray-700">
+              Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-medium">{Math.min(currentPage * itemsPerPage, filteredLeads.length)}</span> of <span className="font-medium">{filteredLeads.length}</span> results
+            </div>
+            <div className="flex space-x-1">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(prev => prev - 1)}
+                className={`px-3 py-1 border rounded ${currentPage === 1 ? 'bg-gray-100 text-gray-400' : 'bg-white hover:bg-gray-50'}`}
+              >
+                Prev
+              </button>
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index + 1}
+                  onClick={() => setCurrentPage(index + 1)}
+                  className={`px-3 py-1 border rounded hidden sm:block ${currentPage === index + 1 ? 'bg-indigo-600 text-white' : 'bg-white hover:bg-gray-50'}`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(prev => prev + 1)}
+                className={`px-3 py-1 border rounded ${currentPage === totalPages ? 'bg-gray-100 text-gray-400' : 'bg-white hover:bg-gray-50'}`}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
 
-            <div className="flex justify-end space-x-3">
-              <button 
-                onClick={closeDeleteModal} 
-                className="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={handleDelete} 
-                className="px-5 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition"
-              >
-                Yes, Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* DELETE MODAL */}
+      {isModalOpen && leadToDelete && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full">
+            <h3 className="text-2xl font-bold text-red-600 mb-2">⚠️ Confirm Deletion</h3>
+            <p className="text-gray-700 mb-6">
+              Delete invoice for <strong>{leadToDelete.name}</strong>? This cannot be undone.
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button onClick={closeDeleteModal} className="px-5 py-2 border rounded-lg hover:bg-gray-100">Cancel</button>
+              <button onClick={handleDelete} className="px-5 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition">Yes, Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      {/* Error Alert Message */}
-      {alertMessage && (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl max-w-lg w-full border-t-4 border-red-500">
-            <h3 className="text-2xl font-bold text-red-600 mb-2 flex items-center">
-              ❌ Error
-            </h3>
-            <p className="text-gray-700 mb-6">{alertMessage}</p>
-
-            <div className="flex justify-end">
-              <button 
-                onClick={closeAlert} 
-                className="px-5 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-    </div>
-  );
+      {/* ERROR ALERT */}
+      {alertMessage && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white p-8 rounded-2xl max-w-md w-full border-t-4 border-red-500">
+            <h3 className="text-2xl font-bold text-red-600 mb-2">❌ Error</h3>
+            <p className="text-gray-700 mb-6">{alertMessage}</p>
+            <button onClick={() => setAlertMessage(null)} className="w-full py-2 bg-red-600 text-white rounded-lg">Close</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default EditMenu;

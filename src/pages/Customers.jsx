@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-// import './App.css';
+import React, { useState } from 'react';
 import { BsSearch } from 'react-icons/bs';
 
 function  Customers() {
@@ -17,6 +16,7 @@ function  Customers() {
         , "dark pant"
         , "pink shirt"
         , "yellow pant"];
+
     const [products, setProducts] = useState(productList);
 
     const [searchVal, setSearchVal] = useState(" ");
