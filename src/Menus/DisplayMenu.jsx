@@ -94,9 +94,6 @@ const EditMenuById = () => {
             buffet: ctx.buffet === true || ctx.buffet === "true" ? "YES" : String(ctx.buffet || ""),
             items: itemsObj,
             context_id: ctx.context_id || ctx.id || null,
-            // price: ctx.price || 0, 
-            // total: ctx.total || 0,
-            
             price: Number(ctx.price) || 0, 
             total: Number(ctx.total) || 0,
 

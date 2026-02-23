@@ -22,25 +22,21 @@ const AppLayout = ({ isLoggedIn, setIsLoggedIn }) => {
         {/* Sidebar */}
 
         {!isLoginPage && isLoggedIn && (
-          <div 
-          style={{ width: isSidebarOpen ? '16%' : '0%', 
-                   transition: 'width 0.3s ease' }}
-          >
-          <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+          // <div 
+          // style={{ width: isSidebarOpen ? '16%' : '0%', 
+          //          transition: 'width 0.3s ease' }}
+          // >
+          // <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+          // </div>
+
+          <div className={`sidebar-wrapper ${isSidebarOpen ? 'open' : 'closed'}`}>
+            <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
           </div>
+
         )}
 
-
-        {/* {!isLoginPage && isLoggedIn && (
-          <div  className='hello'
-          >
-          <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-          </div>
-        )} */}
-
-        {/* Main Content Area with Footer */}
         
-        <div
+        {/* <div
           style={{
             flex: 1,
             width: isSidebarOpen ? '80%' : '100%',
@@ -50,7 +46,11 @@ const AppLayout = ({ isLoggedIn, setIsLoggedIn }) => {
             flexDirection: 'column',
             justifyContent: 'space-between'
           }}
+        > */}
+        <div
+          className={`main-content ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}
         >
+          
           {/* Main Content */}
           <div style={{ flexGrow: 1, padding: '20px', overflowX: 'auto' }}>
             <AppRoutes isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
