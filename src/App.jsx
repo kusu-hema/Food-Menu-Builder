@@ -47,6 +47,7 @@ const AppLayout = ({ isLoggedIn, setIsLoggedIn }) => {
             justifyContent: 'space-between'
           }}
         > */}
+        
         <div
           className={`main-content ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}
         >

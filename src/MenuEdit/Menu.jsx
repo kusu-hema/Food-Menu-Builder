@@ -18,7 +18,7 @@ function Menu() {
       @media print {
         body {
               -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
+              print-color-adjust: exact;
         }
       }
     `,
@@ -287,6 +287,30 @@ function Menu() {
       }
     };
 
+    const [mobileNumber, setMobileNumber] = useState('');
+    const [message, setMessage] = useState('');
+
+
+    // regex 
+  //   const handleInputChange = (event) => {
+  //       const value = event.target.value;
+  //     if (/^\d*$/.test(value)) {
+  //     setMobileNumber(value);
+
+  //     // Regular expression to match exactly 10 digits
+  //     const regex = /^\d{10}$/;
+  //     if (value.length === 0 || regex.test(value)) {
+  //       setMessage(value.length === 10 ? 'Mobile number is valid.' : '');
+  //     } else {
+  //       setMessage('Mobile number must be exactly 10 digits.');
+  //     }
+  //   } else {
+  //     setMessage('Only digits are allowed.');
+  //   }
+
+  // }
+
+
   // -------------------------------
   // UI
   // -------------------------------
@@ -317,6 +341,7 @@ function Menu() {
                 value={formData.date}
                 onChange={handleFormChange}
                 className="w-full border rounded px-3 py-2 text-sm mb-3"
+                
               />
               <label className="block text-sm font-semibold mb-1">Place</label>
               <input
@@ -342,6 +367,23 @@ function Menu() {
                 onChange={handleFormChange}
                 className="w-full border rounded px-3 py-2 text-sm"
               />
+
+              {/* <input
+                type="text"
+                value={mobileNumber}
+                onChange={handleInputChange}
+                placeholder="Enter your mobile number"
+              />
+
+              {message && (
+                <p style={{ color: message === 'Mobile number is valid.' ? 'green' : 'red' }}>
+                  {message}
+                </p>
+              )} */}
+
+
+
+
             </div>
           )}
 
