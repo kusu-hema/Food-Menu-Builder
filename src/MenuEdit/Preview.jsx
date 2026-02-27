@@ -658,7 +658,6 @@ const Preview = forwardRef(
                 <td className="border border-black p-2">
                   <input
                     type="number"
-                    // value={gst}
                     value={gst === 0 ? "" : gst}
                     onChange={(e) => setGst(parseFloat(e.target.value) || 0)}
                     className="w-full text-center bg-transparent border-none focus:outline-none"
@@ -674,7 +673,6 @@ const Preview = forwardRef(
                 <td className="border border-black p-2" style={{ fontWeight: "600", fontSize: "larger" }}>
                   <input
                     type="number"
-                    // value={totalAmount}
                     value={totalAmount === 0 ? "" : totalAmount}
                     onChange={(e) => setTotalAmount(parseFloat(e.target.value) || 0)}
                     className="w-full text-center bg-transparent border-none focus:outline-none"
@@ -690,7 +688,6 @@ const Preview = forwardRef(
                 <td className="border border-black p-2">
                   <input
                     type="number"
-                    // value={advance}
                     value={advance === 0 ? "" : advance}
                     onChange={(e) => setAdvance(parseFloat(e.target.value) || 0)}
                     className="w-full text-center bg-transparent border-none focus:outline-none"
@@ -704,7 +701,6 @@ const Preview = forwardRef(
                   BALANCE AMOUNT
                 </td>
                 <td className="border border-black p-2" style={{ fontWeight: "600", fontSize: "larger" }}>
-                  {/* {formatNumber(balance)} */}
                 {balance === 0 ? "" : formatNumber(balance)} 
                 </td>
               </tr>

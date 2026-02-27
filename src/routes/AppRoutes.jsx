@@ -28,7 +28,11 @@ import Footer from '../Components/Footer'
 
 // Login page.....                                                                                                                                                                                                                                                                                                                
 import Login from '../pages/Login';
+
+
+// DisplayMenu and View Menu 
 import DisplayMenu from '../Menus/DisplayMenu';
+import ViewMenu from '../Menus/ViewMenu';
 
 
 
@@ -71,8 +75,10 @@ const AppRoutes = ({ isLoggedIn, setIsLoggedIn }) => {
           <Route path="/preview" element={<Preview />} />
           <Route path="/items" element={<Selector />} />
 
-          {/*  Display menu  */} 
+          {/*  Display menu & ViewMenu  */} 
           <Route path="/displaymenu/:id" element={<DisplayMenu />} />
+          <Route path="viewmenu/:id" element={<ViewMenu/> } />
+
 
           {/* Total menu  */}
           <Route path="/totalmenu" element={<TotalMenu />} />

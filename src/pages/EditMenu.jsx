@@ -177,7 +177,8 @@ const EditMenu = () => {
                     <td className="px-6 py-4 text-center">
                       <div className="flex space-x-2 justify-center">
                         <button onClick={() => navigate(`/displaymenu/${lead.id}`)} className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600">✏️</button>
-                        <button onClick={() => navigate(`/displaymenu/${lead.id}`)} className="p-2 bg-green-500 text-white rounded hover:bg-green-600">👁️</button>
+                        {/* <button onClick={() => navigate(`/displaymenu/${lead.id}`)} className="p-2 bg-green-500 text-white rounded hover:bg-green-600">👁️</button> */}
+                        <button onClick={() => navigate(`/viewmenu/${lead.id}`)} className="p-2 bg-green-500 text-white rounded hover:bg-green-600">👁️</button>
                         <button onClick={() => openDeleteModal(lead)} className="p-2 bg-red-600 text-white rounded hover:bg-red-700">🗑️</button>
                       </div>
                     </td>
