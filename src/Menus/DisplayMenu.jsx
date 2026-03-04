@@ -100,7 +100,7 @@ const EditMenuById = () => {
           };
         });
 
-        setMenuContexts(contexts.length ? contexts : [{ date: "", meal: "", members: "", buffet: "", items: {} }]);
+        setMenuContexts(contexts.length ? contexts : [{ date: "", meal: "", members: "", buffet: "", items: {} }]);  
 
         setInvoiceData({
           subtotal: Number(data.subtotal || 0),

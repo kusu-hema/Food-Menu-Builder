@@ -78,7 +78,7 @@ const menuItems = [
     label: 'Orders',
     icon: <FaShoppingCart />,
     children: [
-      { label: 'Create Order', path: '/orders' },
+      // { label: 'Create Order', path: '/orders' },
       // { label: 'Total Orders', path: '/orders/total' },
     ],
   },

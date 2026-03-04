@@ -8,7 +8,7 @@ import Customers from '../pages/Customers';
 import CustomerProfile from '../pages/CustomerProfile';
 import Orders from '../pages/Orders';
 import Categories from '../pages/Categories';
-import Products from '../pages/Products';                                                                                                         
+import Products from '../pages/Products';
 import Invoice from '../pages/Invoice';
 import CorporateEvents from '../pages/CorporateEvents';
 import Packages from '../pages/Packages';
