@@ -35,7 +35,7 @@ const menuItems = [
     label: 'Customers',
     icon: <FaUsers />,
     children: [
-      { label: 'Create Customer', path: '/dashboard' },
+      { label: 'Create Customer', path: '/customers' },
       { label: 'Customer Profile', path: '/customerprofile' },
       // { label: 'Total Customers', path: '/customers/total' },
     ],
